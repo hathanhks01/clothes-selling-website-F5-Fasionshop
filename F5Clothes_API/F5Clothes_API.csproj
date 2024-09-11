@@ -15,8 +15,4 @@
     <ProjectReference Include="..\F5Clothes_Services\F5Clothes_Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>
