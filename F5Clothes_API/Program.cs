@@ -9,12 +9,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using F5cvothes_DAL.Reponsitories;
 
 var builder = WebApplication.CreateBuilder(args);
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 // Cấu hình dịch vụ DbContext với chuỗi kết nối từ appsettings.json
 builder.Services.AddDbContext<DbduAnTnContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.AllowAnyOrigin();
+                      });
+});
 
 // Cấu hình dịch vụ JWTSettings từ appsettings.json
 builder.Services.Configure<JWTSetting>(builder.Configuration.GetSection("Jwt"));
@@ -54,6 +65,29 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthenticationRepo, AuthenticationRepo>();
 builder.Services.AddScoped<IAuthenticationServices, AuthenticationServices>();
+builder.Services.AddScoped<IChatLieuRepo, ChatLieuRepo>();
+builder.Services.AddScoped<IChucVuRepo, ChucVuRepo >();
+builder.Services.AddScoped<IDanhMucRepo, DanhMucRepo>();
+builder.Services.AddScoped<IDiaChiRepo, DiaChiRepo>();
+builder.Services.AddScoped<IGiamGiaRepo, GiamGiaRepo>();
+builder.Services.AddScoped<IGiohangChiTietRepo, GHCTRepo>();
+builder.Services.AddScoped<IGioHangRepo, GiohangRepo>();
+builder.Services.AddScoped<IHDCTRepo,HDCTRepo>();
+builder.Services.AddScoped<IHoaDonRepo, HoaDonRepo >();
+builder.Services.AddScoped<IImageRepo, ImageRepo>();
+builder.Services.AddScoped<IKhachhangRepo, KhachhangRepo>();
+builder.Services.AddScoped<ILSHDRepo, LSHDRepo>();
+builder.Services.AddScoped<IMauSacRepo, MauSacRepo>();
+builder.Services.AddScoped<INhanVienRepo, NhanVienRepo>();
+builder.Services.AddScoped<IRefshTokenRepo, RefeshTokenRepo>();
+builder.Services.AddScoped<ISanPhamRepo, SanPhamRepo>();
+builder.Services.AddScoped<ISizeRepo, SizeRepo>();
+builder.Services.AddScoped<ISPCTRepo, SPCTRepo>();
+builder.Services.AddScoped<IThuongHieuRepo, ThuongHieuRepo>();
+builder.Services.AddScoped<IVoucherRepo, VoucherRepo>();
+builder.Services.AddScoped<IXuatXuRepo, XuatXuRepo>();
+builder.Services.AddScoped<IHinhThucThanhToanRepo, HinhThucThanhToanRepo>();
+
 
 var app = builder.Build();
 
@@ -65,6 +99,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 
 app.MapControllers();
