@@ -6,14 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace F5Clothes_DAL.IReponsitories
+namespace F5Clothes_Services.IServices
 {
-    public interface IVoucherRepo
+    public interface IVoucherService
     {
         Task<List<VouCher>> GetAllVouCher();
         Task<VouCher> GetByVouCher(Guid id);
-        Task AddVc(VouCher Vc);
-        Task UpdateVc(VouCher Vc);
-       
+        Task<VouCher> AddVc(VouCher Vc);
+        Task<VouCher> UpdateVc(VouCher Vc);
+        
     }
 }

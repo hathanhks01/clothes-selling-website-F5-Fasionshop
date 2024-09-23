@@ -87,6 +87,7 @@ builder.Services.AddScoped<IThuongHieuRepo, ThuongHieuRepo>();
 builder.Services.AddScoped<IVoucherRepo, VoucherRepo>();
 builder.Services.AddScoped<IXuatXuRepo, XuatXuRepo>();
 builder.Services.AddScoped<IHinhThucThanhToanRepo, HinhThucThanhToanRepo>();
+builder.Services.AddScoped<IVoucherService, VoucherService>();
 
 
 var app = builder.Build();

@@ -16,6 +16,7 @@ namespace F5Clothes_DAL.Helper
         public MappingProfiles()
         {
             CreateMap<SanPham, SanPhamDtos>();
+            CreateMap<SanPhamDtos, SanPham>();
             CreateMap<ChatLieu, ChatLieuDtos>();
             CreateMap<DanhMuc, DanhMucDtos>();
             CreateMap<DiaChi, DiaChiDtos>();

@@ -12,10 +12,10 @@ namespace F5Clothes_DAL.IReponsitories
     public interface ISanPhamRepo
     {
         Task<List<SanPham>> GetAllSanPham();
-        Task<SanPham> GetBySanPham(string Id);
-        Task AddSanPham (SanPham sanPham);
+        Task<SanPham> GetBySanPham(Guid Id);
+        Task <SanPham>  AddSanPham (SanPham sanPham);
         Task UpdateSanPham(SanPham sanPham);
-        Task DeleteSanPham(string Id);
+        
 
     }
 }

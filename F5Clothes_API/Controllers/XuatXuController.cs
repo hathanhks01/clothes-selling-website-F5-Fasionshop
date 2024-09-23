@@ -50,7 +50,7 @@ namespace F5Clothes_API.Controllers
         }
 
         [HttpPost]
-        public async Task GetAll(XuatXu Xx)
+        public async Task GetAdd(XuatXu Xx)
         {
             await _XuatXuRepo.AddXx(Xx);
         }
