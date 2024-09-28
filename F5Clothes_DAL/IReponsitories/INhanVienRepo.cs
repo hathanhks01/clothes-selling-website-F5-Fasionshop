@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.Models;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.Models;
 
 using System;
 using System.Collections.Generic;

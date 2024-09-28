@@ -2,7 +2,7 @@
 using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
-
+using F5Clothes_Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,12 +13,14 @@ namespace F5Clothes_API.Controllers
     public class NhanVienController : ControllerBase
     {
         private readonly INhanVienRepo _nvRepo;
+        private readonly INhanVienService _nhanvienService;
         private readonly IMapper _mapper;
 
-        public NhanVienController(INhanVienRepo spRepo, IMapper mapper)
+        public NhanVienController(INhanVienRepo spRepo, IMapper mapper, INhanVienService nhanVienService)
         {
             _nvRepo = spRepo;
             _mapper = mapper;
+            _nhanvienService = nhanVienService;
         }
 
         [HttpGet]
@@ -42,8 +44,6 @@ namespace F5Clothes_API.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetBySp(string id)
         {
-
-
             var mappedNhanVien = _mapper.Map<NhanVienDtos>(await _nvRepo.GetByNhanVien(id));  // Mapping single object
             if (!ModelState.IsValid)
             {
@@ -52,5 +52,15 @@ namespace F5Clothes_API.Controllers
             }
             return Ok(mappedNhanVien);
         }
-    }
+        [HttpPost("DangKi/nhanvien")]
+		public async Task<IActionResult> AddNhanVien([FromBody] NhanVienDtos nhanVien)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+			await _nhanvienService.AddNhanVienAsync(nhanVien);
+			return CreatedAtAction(nameof(GetBySp), new { id = nhanVien.MaNv }, nhanVien);
+		}
+	}
 }
