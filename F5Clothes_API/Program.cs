@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using F5cvothes_DAL.Reponsitories;
+using F5Clothes_DAL.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -20,11 +21,10 @@ builder.Services.AddDbContext<DbduAnTnContext>(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.AllowAnyOrigin();
-                      });
+    options.AddPolicy("AllowAllOrigins",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
 });
 
 // Cấu hình dịch vụ JWTSettings từ appsettings.json
@@ -88,6 +88,8 @@ builder.Services.AddScoped<IVoucherRepo, VoucherRepo>();
 builder.Services.AddScoped<IXuatXuRepo, XuatXuRepo>();
 builder.Services.AddScoped<IHinhThucThanhToanRepo, HinhThucThanhToanRepo>();
 builder.Services.AddScoped<IVoucherService, VoucherService>();
+builder.Services.AddScoped<IVNPayService,VNPayService>();
+builder.Services.AddScoped<VNPay>(); // Register the VNPay service
 
 
 var app = builder.Build();
@@ -100,7 +102,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseCors(MyAllowSpecificOrigins);
+app.UseCors("AllowAllOrigins");
 app.UseAuthorization();
 
 app.MapControllers();
