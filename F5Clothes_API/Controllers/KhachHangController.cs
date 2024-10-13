@@ -49,12 +49,6 @@ namespace F5Clothes_API.Controllers
             return Ok(mappeKh);
         }
 
-        [HttpPost]
-        public async Task GetAll(KhachHang Kh)
-        {
-            await _KhachHangRepo.AddKh(Kh);
-        }
-
         [HttpPut]
         public async Task Update(KhachHang Kh)
         {

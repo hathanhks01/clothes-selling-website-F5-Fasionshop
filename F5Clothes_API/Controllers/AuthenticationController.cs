@@ -5,6 +5,7 @@ using F5Clothes_Services.IServices;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Reponsitories;
 using Microsoft.AspNetCore.Identity.Data;
+using F5Clothes_DAL.DTOs;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -40,7 +41,28 @@ namespace F5Clothes_API.Controllers
                 return Conflict(ex.Message);
             }
         }
-        [HttpPost("login")]
+		[HttpPost("register/NhanVien")]
+		public async Task<IActionResult> RegisterNhanVien([FromBody] NhanVienDtos nhanVienDtos)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+			try
+			{
+				var (registeredNhanVien, token) = await _auth.ResisterNhanVien(nhanVienDtos);
+				return Ok(new
+				{
+					User = registeredNhanVien,
+					Token = token
+				});
+			}
+			catch (Exception ex)
+			{
+				return Conflict(ex.Message);
+			}
+		}
+		[HttpPost("login")]
         public async Task<IActionResult> Login( string Username, string Password)
         {
             if (!ModelState.IsValid)
@@ -57,5 +79,22 @@ namespace F5Clothes_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-    }
+		[HttpPost("nhanvien/login")]
+		public async Task<IActionResult> LoginNhanVien(string Username, string Password)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+			try
+			{
+				var result = await _auth.LoginNhanVien(Username, Password);
+				return Ok(result);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+	}
 }
