@@ -1,5 +1,6 @@
 ﻿using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
+using F5Clothes_DAL.Models.system;
 using Microsoft.EntityFrameworkCore;
 
 using System;
@@ -16,11 +17,6 @@ namespace F5Clothes_DAL.Reponsitories
         public KhachhangRepo(DbduAnTnContext context)
         {
             _context = context;
-        }
-        public async Task AddKh(KhachHang Kh)
-        {
-            _context.Add(Kh);
-            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteKh(Guid Id)
@@ -40,7 +36,8 @@ namespace F5Clothes_DAL.Reponsitories
             return await _context.KhachHangs.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task UpdateKh(KhachHang Kh)
+
+		public async Task UpdateKh(KhachHang Kh)
         {
             _context.Entry(Kh).State = EntityState.Modified;
             await _context.SaveChangesAsync();

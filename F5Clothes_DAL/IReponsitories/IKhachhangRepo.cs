@@ -12,7 +12,6 @@ namespace F5Clothes_DAL.IReponsitories
     {
         Task<List<KhachHang>> GetAllKhachHang();
         Task<KhachHang> GetByKhachHang(Guid id);
-        Task AddKh(KhachHang Kh);
         Task UpdateKh(KhachHang Kh);
         Task DeleteKh(Guid Id);
     }

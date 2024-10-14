@@ -79,6 +79,7 @@ builder.Services.AddScoped<IKhachhangRepo, KhachhangRepo>();
 builder.Services.AddScoped<ILSHDRepo, LSHDRepo>();
 builder.Services.AddScoped<IMauSacRepo, MauSacRepo>();
 builder.Services.AddScoped<INhanVienRepo, NhanVienRepo>();
+builder.Services.AddScoped<INhanVienService, NhanVienService>();
 builder.Services.AddScoped<IRefshTokenRepo, RefeshTokenRepo>();
 builder.Services.AddScoped<ISanPhamRepo, SanPhamRepo>();
 builder.Services.AddScoped<ISizeRepo, SizeRepo>();
@@ -99,7 +100,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors(
+	//"AllowAllOrigins");
+	options => options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseCors("AllowAllOrigins");

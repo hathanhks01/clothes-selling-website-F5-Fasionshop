@@ -1,4 +1,6 @@
-﻿using F5Clothes_DAL.IReponsitories;
+﻿using Azure.Core;
+using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
 
 using Microsoft.EntityFrameworkCore;
@@ -19,13 +21,7 @@ namespace F5Clothes_DAL.Reponsitories
             _context = context;
         }
 
-        public async Task AddNhanVien(NhanVien nv)
-        {
-             
-            _context.NhanViens.Add(nv);
-            await _context.SaveChangesAsync();
-        }
-
+        
         public async Task<List<NhanVien>> GetAllNhanVien()
         {
             return await _context.NhanViens.ToListAsync();
@@ -34,8 +30,11 @@ namespace F5Clothes_DAL.Reponsitories
         public async Task DeleteNhanVien(string Id)
         {
             var sp = await GetByNhanVien(Id);
-            _context.NhanViens.Remove(sp);
-            await _context.SaveChangesAsync();
+			if(sp != null)
+			{
+				_context.NhanViens.Remove(sp);
+				await _context.SaveChangesAsync();
+			}
         }
 
         public async Task<NhanVien> GetByNhanVien(string Id)
@@ -43,10 +42,16 @@ namespace F5Clothes_DAL.Reponsitories
             return await _context.NhanViens.FirstOrDefaultAsync(x => x.MaNv == Id);
         }
 
-        public async Task UpdateNhanVien(NhanVien nv)
-        {
-            _context.Entry(nv).State = EntityState.Modified;
+		public async Task AddNhanVien(NhanVien nv)
+		{
+            await _context.NhanViens.AddAsync(nv);
             await _context.SaveChangesAsync();
-        }
-    }
+		}
+
+		public async Task UpdateNhanVien(NhanVien nv)
+		{
+			_context.NhanViens.Update(nv);
+			await _context.SaveChangesAsync();
+		}
+	}
 }
