@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace F5Clothes_DAL.Reponsitories
 {
-    internal class AuthenticationRepositories:IAuthenticationRepo
+    internal class AuthenticationRepo:IAuthenticationRepo
     {
     }
 }
