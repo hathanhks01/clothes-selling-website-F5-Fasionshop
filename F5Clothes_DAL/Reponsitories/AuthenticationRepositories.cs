@@ -15,11 +15,12 @@ using System.Threading.Tasks;
 
 namespace F5Clothes_DAL.Reponsitories
 {
-    public class AuthenticationRepo : IAuthenticationRepo
+    public class AuthenticationRepositories:IAuthenticationRepo
     {
         private readonly DbduAnTnContext _context;
         private readonly JWTSetting _jwtSettings;
-        public AuthenticationRepo(DbduAnTnContext context, JWTSetting jwtSettings)
+
+        public AuthenticationRepositories(DbduAnTnContext context, JWTSetting jwtSettings)
         {
             _context = context;
             _jwtSettings = jwtSettings;

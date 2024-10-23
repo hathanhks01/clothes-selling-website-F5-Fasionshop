@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace F5Clothes_DAL.Models;
 
-public partial class GiamGium
+public partial class GiamGia
 {
     public Guid Id { get; set; }
 

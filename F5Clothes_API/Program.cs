@@ -1,5 +1,6 @@
 ﻿using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models.system;
+using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
 using F5Clothes_DAL.Reponsitories;
 using F5Clothes_Services.IServices;
@@ -10,6 +11,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using F5cvothes_DAL.Reponsitories;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -63,7 +66,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IAuthenticationRepo, AuthenticationRepo>();
+builder.Services.AddScoped<IAuthenticationRepo, AuthenticationRepositories>();
 builder.Services.AddScoped<IAuthenticationServices, AuthenticationServices>();
 builder.Services.AddScoped<IChatLieuRepo, ChatLieuRepo>();
 builder.Services.AddScoped<IChucVuRepo, ChucVuRepo >();
@@ -90,13 +93,16 @@ builder.Services.AddScoped<IXuatXuRepo, XuatXuRepo>();
 builder.Services.AddScoped<IHinhThucThanhToanRepo, HinhThucThanhToanRepo>();
 builder.Services.AddScoped<IVoucherService, VoucherService>();
 
-
+builder.Services.AddScoped<IChatLieuRepositories, ChatLieuRepositories>();
+builder.Services.AddScoped<IChatLieuServices, ChatLieuServices>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+builder.Services.AddScoped<DbduAnTnContext>();
+
 }
 
 app.UseHttpsRedirection();
