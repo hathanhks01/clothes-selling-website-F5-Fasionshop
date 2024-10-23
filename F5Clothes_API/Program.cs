@@ -23,7 +23,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.AllowAnyOrigin();
+                          policy.AllowAnyOrigin()
+                          .AllowAnyMethod()    // Cho phép tất cả các phương thức HTTP (GET, POST, PUT, DELETE,...)
+                                .AllowAnyHeader();   // Cho phép tất cả các tiêu đề, bao gồm Content-Type
                       });
 });
 
@@ -66,6 +68,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthenticationRepo, AuthenticationRepo>();
 builder.Services.AddScoped<IAuthenticationServices, AuthenticationServices>();
 builder.Services.AddScoped<IChatLieuRepo, ChatLieuRepo>();
+builder.Services.AddScoped<IChatLieuServices, ChatLieuServices>();
 builder.Services.AddScoped<IChucVuRepo, ChucVuRepo >();
 builder.Services.AddScoped<IDanhMucRepo, DanhMucRepo>();
 builder.Services.AddScoped<IDiaChiRepo, DiaChiRepo>();
@@ -78,12 +81,16 @@ builder.Services.AddScoped<IImageRepo, ImageRepo>();
 builder.Services.AddScoped<IKhachhangRepo, KhachhangRepo>();
 builder.Services.AddScoped<ILSHDRepo, LSHDRepo>();
 builder.Services.AddScoped<IMauSacRepo, MauSacRepo>();
+builder.Services.AddScoped<IMauSacServices, MauSacServices>();
 builder.Services.AddScoped<INhanVienRepo, NhanVienRepo>();
 builder.Services.AddScoped<INhanVienService, NhanVienService>();
 builder.Services.AddScoped<IRefshTokenRepo, RefeshTokenRepo>();
 builder.Services.AddScoped<ISanPhamRepo, SanPhamRepo>();
+builder.Services.AddScoped<ISanPhamServices, SanPhamServices>();
 builder.Services.AddScoped<ISizeRepo, SizeRepo>();
+builder.Services.AddScoped<ISizeServices, SizeServices>();
 builder.Services.AddScoped<ISPCTRepo, SPCTRepo>();
+builder.Services.AddScoped<ISanPhamChiTietServices, SanPhamChiTietServices>();
 builder.Services.AddScoped<IThuongHieuRepo, ThuongHieuRepo>();
 builder.Services.AddScoped<IVoucherRepo, VoucherRepo>();
 builder.Services.AddScoped<IXuatXuRepo, XuatXuRepo>();

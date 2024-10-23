@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.IReponsitories;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
 
 using Microsoft.EntityFrameworkCore;
@@ -11,23 +12,32 @@ using System.Threading.Tasks;
 
 namespace F5Clothes_DAL.Reponsitories
 {
-    public class MauSacRepo: IMauSacRepo
+    public class MauSacRepo : IMauSacRepo
     {
         private readonly DbduAnTnContext _context;
         public MauSacRepo(DbduAnTnContext context)
         {
             _context = context;
         }
-        public async Task AddMs(MauSac Ms)
+
+        public async Task<MauSac> AddMauSac(MauSacDtos mauSacDto)
         {
-            _context.Add(Ms);
-            await _context.SaveChangesAsync();
+            var mauSac = new MauSac
+            {
+                Id = Guid.NewGuid(),
+                TenMauSac = mauSacDto.TenMauSac,
+                MoTa = mauSacDto.MoTa,
+                TrangThai = mauSacDto.TrangThai
+            };
+            await _context.MauSacs.AddAsync(mauSac);
+            _context.SaveChanges();
+            return mauSac;
         }
 
-        public async Task DeleteMs(Guid Id)
+        public async Task DeleteMauSac(Guid id)
         {
-            var Ms = await GetByMauSac(Id);
-            _context.Remove(Ms);
+            var mauSac = await GetByIdMauSac(id);
+            _context.MauSacs.Remove(mauSac);
             await _context.SaveChangesAsync();
         }
 
@@ -36,15 +46,25 @@ namespace F5Clothes_DAL.Reponsitories
             return await _context.MauSacs.ToListAsync();
         }
 
-        public async Task<MauSac> GetByMauSac(Guid id)
+        public async Task<MauSac> GetByIdMauSac(Guid id)
         {
             return await _context.MauSacs.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task UpdateMs(MauSac Ms)
+        public async Task<MauSac> UpdateMauSac(MauSacDtos mauSacDto)
         {
-            _context.Entry(Ms).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            var existingMauSac = await _context.MauSacs
+                .Where(cl => cl.Id == mauSacDto.Id)
+                .FirstOrDefaultAsync();
+            if (existingMauSac != null)
+            {
+                existingMauSac.TenMauSac = mauSacDto.TenMauSac;
+                existingMauSac.MoTa = mauSacDto.MoTa;
+                existingMauSac.TrangThai = mauSacDto.TrangThai;
+
+                await _context.SaveChangesAsync();
+            }
+            return existingMauSac ?? new MauSac();
         }
     }
 }

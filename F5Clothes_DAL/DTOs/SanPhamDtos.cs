@@ -8,8 +8,7 @@ namespace F5Clothes_DAL.DTOs
 {
     public class SanPhamDtos
     {
-        
-
+        public Guid Id { get; set; }
         public Guid? IdDm { get; set; }
 
         public Guid? IdTh { get; set; }
