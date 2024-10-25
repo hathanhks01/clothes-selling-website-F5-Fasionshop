@@ -61,6 +61,8 @@ namespace F5Clothes_DAL.Reponsitories
 				Id = Guid.NewGuid(),
 				MaKh = await GetNewCustomerCode(),
 				HoVaTenKh = customer.HoVaTenKh,
+				NgaySinh = customer.NgaySinh,
+				GioiTinh = customer.GioiTinh,
 				Email = customer.Email,
 				TaiKhoan = customer.TaiKhoan,
 				MatKhau = BCrypt.Net.BCrypt.HashPassword(customer.MatKhau), // Mã hóa mật khẩu
