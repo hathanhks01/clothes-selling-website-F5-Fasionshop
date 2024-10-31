@@ -53,7 +53,7 @@ namespace F5Clothes_DAL.Reponsitories
         public async Task<Size> UpdateSize(SizeDtos sizeDto)
         {
             var existingSize = await _context.Sizes
-                .Where(cl => cl.Id == sizeDto.Id)
+                .Where(size => size.Id == sizeDto.Id)
                 .FirstOrDefaultAsync();
             if (existingSize != null)
             {
