@@ -23,12 +23,7 @@ namespace F5Clothes_DAL.Reponsitories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteDm(Guid Id)
-        {
-            var dm = await GetByDanhMuc(Id);
-            _context.Remove(dm);
-            await _context.SaveChangesAsync();
-        }
+        
 
         public async Task<List<DanhMuc>> GetAllDanhMuc()
         {
@@ -37,8 +32,13 @@ namespace F5Clothes_DAL.Reponsitories
 
         public async Task<DanhMuc> GetByDanhMuc(Guid id)
         {
-            return await _context.DanhMucs.FirstOrDefaultAsync(x => x.Id == id);
+            // Use FirstOrDefaultAsync to get a single DanhMuc by ID asynchronously
+            return await _context.DanhMucs
+                                 .Where(x => x.Id == id)
+                                 .OrderBy(x => x.TenDanhMuc)
+                                 .FirstOrDefaultAsync();
         }
+
 
         public async Task UpdateDm(DanhMuc dm)
         {

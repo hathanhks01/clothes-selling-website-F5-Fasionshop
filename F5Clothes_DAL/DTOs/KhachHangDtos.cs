@@ -11,6 +11,7 @@ namespace F5Clothes_DAL.DTOs
         public Guid Id { get; set; }
 
         public string? MaKh { get; set; }
+       
 
         public string? HoVaTenKh { get; set; }
 
@@ -31,5 +32,10 @@ namespace F5Clothes_DAL.DTOs
         public string? MoTa { get; set; }
 
         public int? TrangThai { get; set; }
+    }
+    public class ChangePasswordDto
+    {
+        public string OldPassword { get; set; }
+        public string NewPassword { get; set; }
     }
 }

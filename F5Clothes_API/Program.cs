@@ -10,7 +10,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using F5cvothes_DAL.Reponsitories;
-using F5Clothes_DAL.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -22,9 +21,12 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
-        builder => builder.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
+            builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            });
 });
 
 // Cấu hình dịch vụ JWTSettings từ appsettings.json
@@ -66,14 +68,14 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthenticationRepo, AuthenticationRepo>();
 builder.Services.AddScoped<IAuthenticationServices, AuthenticationServices>();
 builder.Services.AddScoped<IChatLieuRepo, ChatLieuRepo>();
-builder.Services.AddScoped<IChucVuRepo, ChucVuRepo >();
+builder.Services.AddScoped<IChucVuRepo, ChucVuRepo>();
 builder.Services.AddScoped<IDanhMucRepo, DanhMucRepo>();
 builder.Services.AddScoped<IDiaChiRepo, DiaChiRepo>();
 builder.Services.AddScoped<IGiamGiaRepo, GiamGiaRepo>();
 builder.Services.AddScoped<IGiohangChiTietRepo, GHCTRepo>();
 builder.Services.AddScoped<IGioHangRepo, GiohangRepo>();
-builder.Services.AddScoped<IHDCTRepo,HDCTRepo>();
-builder.Services.AddScoped<IHoaDonRepo, HoaDonRepo >();
+builder.Services.AddScoped<IHDCTRepo, HDCTRepo>();
+builder.Services.AddScoped<IHoaDonRepo, HoaDonRepo>();
 builder.Services.AddScoped<IImageRepo, ImageRepo>();
 builder.Services.AddScoped<IKhachhangRepo, KhachhangRepo>();
 builder.Services.AddScoped<ILSHDRepo, LSHDRepo>();
@@ -89,8 +91,10 @@ builder.Services.AddScoped<IVoucherRepo, VoucherRepo>();
 builder.Services.AddScoped<IXuatXuRepo, XuatXuRepo>();
 builder.Services.AddScoped<IHinhThucThanhToanRepo, HinhThucThanhToanRepo>();
 builder.Services.AddScoped<IVoucherService, VoucherService>();
-builder.Services.AddScoped<IVNPayService,VNPayService>();
-builder.Services.AddScoped<VNPay>(); // Register the VNPay service
+builder.Services.AddScoped<IKhachHangService, KhachHangService>();
+builder.Services.AddScoped<IDMService, DMService>();
+
+
 
 
 var app = builder.Build();
@@ -100,12 +104,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors(
-	//"AllowAllOrigins");
-	options => options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
+app.UseCors("AllowAllOrigins");
+    
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseCors("AllowAllOrigins");
+app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 
 app.MapControllers();

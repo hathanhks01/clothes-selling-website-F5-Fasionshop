@@ -39,10 +39,17 @@ namespace F5Clothes_DAL.Reponsitories
 
         public async Task<List<SanPham>> GetAllSanPham()
         {
-            return await _context.SanPhams.OrderBy(p=>p.MaSp).ToListAsync();
+            return await _context.SanPhams
+                .Include(sp => sp.IdDmNavigation) // Include DanhMuc
+                .Include(sp => sp.IdGgNavigation) // Include GiamGium (if needed)
+                .Include(sp => sp.IdThNavigation) // Include ThuongHieu
+                .Include(sp => sp.IdXxNavigation) // Include XuatXu
+                .Include(sp => sp.IdClNavigation)
+                .ToListAsync();
         }
 
-      
+
+
 
         public async Task<SanPham> GetBySanPham(Guid Id)
         {

@@ -2,7 +2,7 @@
 using F5Clothes_DAL.Models;
 using F5Clothes_DAL.Models.system;
 using Microsoft.EntityFrameworkCore;
-
+using BCrypt.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +19,7 @@ namespace F5Clothes_DAL.Reponsitories
             _context = context;
         }
 
-        public async Task DeleteKh(Guid Id)
-        {
-            var Kh = await GetByKhachHang(Id);
-            _context.Remove(Kh);
-            await _context.SaveChangesAsync();
-        }
+       
 
         public async Task<List<KhachHang>> GetAllKhachHang()
         {
@@ -36,11 +31,37 @@ namespace F5Clothes_DAL.Reponsitories
             return await _context.KhachHangs.FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        
 
-		public async Task UpdateKh(KhachHang Kh)
+        public async Task UpdateKh(KhachHang Kh)
         {
             _context.Entry(Kh).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
+        public async Task<bool> ChangePassword(Guid id, string oldPassword, string newPassword)
+        {
+            var khachHang = await _context.KhachHangs.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (khachHang == null)
+            {
+                return false; // Không tìm thấy khách hàng
+            }
+
+            // Kiểm tra mật khẩu cũ
+            if (!BCrypt.Net.BCrypt.Verify(oldPassword, khachHang.MatKhau)) // So sánh mật khẩu đã mã hóa
+            {
+                return false; // Mật khẩu cũ không đúng
+            }
+
+            // Mã hóa mật khẩu mới
+            khachHang.MatKhau = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            // Đặt trạng thái cho đối tượng và lưu thay đổi
+            _context.Entry(khachHang).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return true; // Đổi mật khẩu thành công
+        }
+
     }
 }

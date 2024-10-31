@@ -41,5 +41,11 @@ namespace F5Clothes_DAL.DTOs
         public string? MoTa { get; set; }
 
         public int? TrangThai { get; set; }
+        public string? TenDanhMuc { get; set; }
+        public string? TenGiamGium { get; set; }
+        public string? TenThuongHieu { get; set; }
+        public string? TenXuatXu { get; set; }
+        public string? TenChatLieu { get; set; }
+
     }
 }
