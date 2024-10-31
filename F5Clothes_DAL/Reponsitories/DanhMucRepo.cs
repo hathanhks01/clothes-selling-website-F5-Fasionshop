@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.IReponsitories;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,23 +11,32 @@ using System.Threading.Tasks;
 
 namespace F5Clothes_DAL.Reponsitories
 {
-    public class DanhMucRepo:IDanhMucRepo
+    public class DanhMucRepo : IDanhMucRepo
     {
         private readonly DbduAnTnContext _context;
         public DanhMucRepo(DbduAnTnContext context)
         {
             _context = context;
         }
-        public async Task AddDm(DanhMuc dm)
+
+        public async Task<DanhMuc> AddDanhMuc(DanhMucDtos danhMucDto)
         {
-            _context.Add(dm);
-            await _context.SaveChangesAsync();
+            var danhMuc = new DanhMuc
+            {
+                Id = Guid.NewGuid(),
+                TenDanhMuc = danhMucDto.TenDanhMuc,
+                MoTa = danhMucDto.MoTa,
+                TrangThai = danhMucDto.TrangThai
+            };
+            await _context.DanhMucs.AddAsync(danhMuc);
+            _context.SaveChanges();
+            return danhMuc;
         }
 
-        public async Task DeleteDm(Guid Id)
+        public async Task DeleteDanhMuc(Guid id)
         {
-            var dm = await GetByDanhMuc(Id);
-            _context.Remove(dm);
+            var danhMuc = await GetByIdDanhMuc(id);
+            _context.DanhMucs.Remove(danhMuc);
             await _context.SaveChangesAsync();
         }
 
@@ -35,15 +45,25 @@ namespace F5Clothes_DAL.Reponsitories
             return await _context.DanhMucs.ToListAsync();
         }
 
-        public async Task<DanhMuc> GetByDanhMuc(Guid id)
+        public async Task<DanhMuc> GetByIdDanhMuc(Guid id)
         {
             return await _context.DanhMucs.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task UpdateDm(DanhMuc dm)
+        public async Task<DanhMuc> UpdateDanhMuc(DanhMucDtos danhMucDto)
         {
-            _context.Entry(dm).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            var existingDanhMuc = await _context.DanhMucs
+                .Where(danhMuc => danhMuc.Id == danhMucDto.Id)
+                .FirstOrDefaultAsync();
+            if (existingDanhMuc != null)
+            {
+                existingDanhMuc.TenDanhMuc = danhMucDto.TenDanhMuc;
+                existingDanhMuc.MoTa = danhMucDto.MoTa;
+                existingDanhMuc.TrangThai = danhMucDto.TrangThai;
+
+                await _context.SaveChangesAsync();
+            }
+            return existingDanhMuc ?? new DanhMuc();
         }
     }
 }
