@@ -55,6 +55,18 @@ namespace F5Clothes_API.Controllers
             await _KhachHangRepo.UpdateKh(Kh);
         }
 
-        
+        [HttpGet("list")]
+        public async Task<IActionResult> GetList([FromQuery] ListKhachHangModel model)
+        {
+            try
+            {
+                var list = await _KhachHangRepo.GetKhachHang(model);
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

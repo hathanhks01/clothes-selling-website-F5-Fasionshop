@@ -38,11 +38,23 @@ namespace F5Clothes_API.Controllers
 
             return Ok(mappedNhanViens);
         }
-
+        [HttpGet("list")]
+        public async Task<IActionResult> GetList([FromQuery] ListNhanVienModel model)
+        {
+            try
+            {
+                var list = await _nvRepo.GetNhanVien(model);
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(NhanVien))]  // Fixed the type to a single NhanVien
         [ProducesResponseType(400)]
-        public async Task<IActionResult> GetBySp(string id)
+        public async Task<IActionResult> GetBySp(Guid id)
         {
             var mappedNhanVien = _mapper.Map<NhanVienDtos>(await _nvRepo.GetByNhanVien(id));  // Mapping single object
             if (!ModelState.IsValid)
