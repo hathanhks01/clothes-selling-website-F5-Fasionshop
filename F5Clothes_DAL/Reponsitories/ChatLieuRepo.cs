@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.IReponsitories;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
 
 using Microsoft.EntityFrameworkCore;
@@ -18,16 +19,26 @@ namespace F5Clothes_DAL.Reponsitories
         {
             _context = context;
         }
-        public async Task AddCl(ChatLieu cl)
+
+        public async Task<ChatLieu> AddChatLieu(ChatLieuDtos chatLieuDtos)
         {
-           _context.Add(cl);
-            await _context.SaveChangesAsync();
+            var chatLieu = new ChatLieu
+            {
+                Id = Guid.NewGuid(),
+                TenChatLieu = chatLieuDtos.TenChatLieu,
+                MoTa = chatLieuDtos.MoTa,
+                TrangThai = chatLieuDtos.TrangThai
+            };
+            await _context.ChatLieus.AddAsync(chatLieu);
+            _context.SaveChanges();
+            return chatLieu;
+
         }
 
-        public async Task DeleteCl(Guid Id)
+        public async Task DeleteChatLieu(Guid id)
         {
-            var cl = await GetByChatLieu(Id);
-            _context.Remove(cl);
+            var chatLieu = await GetByIdChatLieu(id);
+            _context.ChatLieus.Remove(chatLieu);
             await _context.SaveChangesAsync();
         }
 
@@ -36,15 +47,26 @@ namespace F5Clothes_DAL.Reponsitories
             return await _context.ChatLieus.ToListAsync();
         }
 
-        public async Task<ChatLieu> GetByChatLieu(Guid id)
+        public async Task<ChatLieu> GetByIdChatLieu(Guid id)
         {
-            return await _context.ChatLieus.FirstOrDefaultAsync(x=>x.Id==id);
+            return await _context.ChatLieus.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task UpdateCl(ChatLieu cl)
+        public async Task<ChatLieu> UpdateChatLieu(ChatLieuDtos chatLieuDtos)
         {
-           _context.Entry(cl).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            var existingChatLieu = await _context.ChatLieus
+                .Where(cl => cl.Id == chatLieuDtos.Id)
+                .FirstOrDefaultAsync();
+            if(existingChatLieu != null)
+            {
+                existingChatLieu.TenChatLieu = chatLieuDtos.TenChatLieu;
+                existingChatLieu.MoTa = chatLieuDtos.MoTa;
+                existingChatLieu.TrangThai = chatLieuDtos.TrangThai;
+
+                await _context.SaveChangesAsync();
+            }
+            return existingChatLieu ?? new ChatLieu();
         }
+
     }
 }

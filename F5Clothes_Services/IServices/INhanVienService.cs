@@ -12,12 +12,12 @@ namespace F5Clothes_Services.IServices
 	{
 		Task<IEnumerable<NhanVien>> GetAllNhanVienAsync();
 
-		Task<NhanVien?> GetNhanVienByIdAsync(string id);
+		Task<NhanVien?> GetNhanVienByIdAsync(Guid id);
 
 		Task AddNhanVienAsync(NhanVienDtos nvRequest);
 
 		Task UpdateNhanVienAsync(NhanVienDtos nhanVien);
 
-		Task DeleteNhanVienAsync(string id);
+		Task DeleteNhanVienAsync(Guid id);
 	}
 }

@@ -2,7 +2,7 @@
 using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
-
+using F5Clothes_Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,53 +12,55 @@ namespace F5Clothes_API.Controllers
     [ApiController]
     public class SizeController : ControllerBase
     {
-        private readonly ISizeRepo _SizeRepo;
-        private readonly IMapper _mapper;
+        private readonly ISizeServices _sizeSer;
 
-        public SizeController(ISizeRepo SizeRepo, IMapper mapper)
+        public SizeController(ISizeServices sizeSer)
         {
-            _SizeRepo = SizeRepo;
-            _mapper = mapper;
+            _sizeSer = sizeSer;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Size>>> GetAllSize()
+        public async Task<List<Size>> GetAll()
         {
-            var SizeList = await _SizeRepo.GetAllSize();
-            var mappeSize = _mapper.Map<List<SizeDtos>>(SizeList);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(mappeSize);
+            return await _sizeSer.GetAllSize();
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetBySize(Guid id)
+        public async Task<Size> GetById(Guid id)
         {
-
-
-            var mappeSize = _mapper.Map<SizeDtos>(await _SizeRepo.GetBySize(id));
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-
-            }
-            return Ok(mappeSize);
+            return await _sizeSer.GetByIdSize(id);
         }
 
         [HttpPost]
-        public async Task GetAll(Size Size)
+        public async Task<ActionResult> Add(SizeDtos sizeDto)
         {
-            await _SizeRepo.AddSz(Size);
+            await _sizeSer.AddSize(sizeDto);
+            return CreatedAtAction(nameof(GetById), new { id = sizeDto.Id }, sizeDto);
         }
 
-        [HttpPut]
-        public async Task Update(Size Size)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, SizeDtos sizeDto)
         {
-            await _SizeRepo.UpdateSz(Size);
+            if (id != sizeDto.Id)
+            {
+                return BadRequest("ID không khớp");
+            }
+
+            try
+            {
+                await _sizeSer.UpdateSize(sizeDto);
+                return Ok(sizeDto); // Trả về dữ liệu đã cập nhật
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task Delete(Guid id)
+        {
+            await _sizeSer.DeleteSize(id);
         }
     }
 }

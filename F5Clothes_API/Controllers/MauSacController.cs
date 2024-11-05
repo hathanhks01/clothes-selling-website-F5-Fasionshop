@@ -2,7 +2,8 @@
 using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
-
+using F5Clothes_DAL.Reponsitories;
+using F5Clothes_Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,53 +13,53 @@ namespace F5Clothes_API.Controllers
     [ApiController]
     public class MauSacController : ControllerBase
     {
-        private readonly IMauSacRepo _MauSacRepo;
-        private readonly IMapper _mapper;
-
-        public MauSacController(IMauSacRepo MsRepo, IMapper mapper)
+        private readonly IMauSacServices _mauSacSer;
+        public MauSacController(IMauSacServices mauSacSer)
         {
-            _MauSacRepo = MsRepo;
-            _mapper = mapper;
+            _mauSacSer = mauSacSer;
         }
-
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MauSac>>> GetAllMs()
+        public async Task<List<MauSac>> GetAll()
         {
-            var MauSacList = await _MauSacRepo.GetAllMauSac();
-            var mappeMs = _mapper.Map<List<MauSacDtos>>(MauSacList);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(mappeMs);
+            return await _mauSacSer.GetAllMauSac();
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetByMauSac(Guid id)
+        public async Task<MauSac> GetById(Guid id)
         {
-
-
-            var mappeMs = _mapper.Map<MauSacDtos>(await _MauSacRepo.GetByMauSac(id));
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-
-            }
-            return Ok(mappeMs);
+            return await _mauSacSer.GetByIdMauSac(id);
         }
 
         [HttpPost]
-        public async Task GetAll(MauSac Ms)
+        public async Task<ActionResult> Add(MauSacDtos mauSacDto)
         {
-            await _MauSacRepo.AddMs(Ms);
+            await _mauSacSer.AddMauSac(mauSacDto);
+            return CreatedAtAction(nameof(GetById), new { id = mauSacDto.Id }, mauSacDto);
         }
 
-        [HttpPut]
-        public async Task Update(MauSac Ms)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, MauSacDtos mauSacDto)
         {
-            await _MauSacRepo.UpdateMs(Ms);
+            if (id != mauSacDto.Id)
+            {
+                return BadRequest("ID không khớp");
+            }
+
+            try
+            {
+                await _mauSacSer.UpdateMauSac(mauSacDto);
+                return Ok(mauSacDto); // Trả về dữ liệu đã cập nhật
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task Delete(Guid id)
+        {
+            await _mauSacSer.DeleteMauSac(id);
         }
     }
 }

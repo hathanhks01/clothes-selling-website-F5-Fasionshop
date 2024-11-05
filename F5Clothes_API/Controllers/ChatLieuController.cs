@@ -3,7 +3,8 @@
 using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
-
+using F5Clothes_DAL.Reponsitories;
+using F5Clothes_Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,59 +15,54 @@ namespace F5Clothes_API.Controllers
     [ApiController]
     public class ChatLieuController : ControllerBase
     {
-        private readonly IChatLieuRepo _chatLieuRepo;
-        private readonly IMapper _mapper;
-
-        public ChatLieuController(IChatLieuRepo clRepo, IMapper mapper)
+        private readonly IChatLieuServices _chatLieuSer;
+        public ChatLieuController(IChatLieuServices chatLieuSer, IChatLieuRepo chatLieuRepo)
         {
-            _chatLieuRepo = clRepo;
-            _mapper = mapper;
+            _chatLieuSer = chatLieuSer;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ChatLieu>>> GetAll()
+        public async Task<List<ChatLieu>> GetAll()
         {
-            var chatLieuList = await _chatLieuRepo.GetAllChatLieu();
-            var mappedCL = _mapper.Map<List<ChatLieuDtos>>(chatLieuList);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(mappedCL);
+            return await _chatLieuSer.GetAllChatLieu();
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetBySp(Guid id)
+        public async Task<ChatLieu> GetById(Guid id)
         {
-
-
-            var mappedNhanVien = _mapper.Map<ChatLieuDtos>(await _chatLieuRepo.GetByChatLieu(id));  // Mapping single object
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-
-            }
-            return Ok(mappedNhanVien);
+            return await _chatLieuSer.GetByIdChatLieu(id);
         }
 
         [HttpPost]
-        public async Task GetAll(ChatLieu sv)
+        public async Task<ActionResult> Add(ChatLieuDtos chatLieuDto)
         {
-            await _chatLieuRepo.AddCl(sv);
+            await _chatLieuSer.AddChatLieu(chatLieuDto);
+            return CreatedAtAction(nameof(GetById), new { id = chatLieuDto.Id }, chatLieuDto);
         }
 
-        [HttpPut]
-        public async Task Update(ChatLieu sv)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, ChatLieuDtos chatLieuDto)
         {
-            await _chatLieuRepo.UpdateCl(sv);
+            if (id != chatLieuDto.Id)
+            {
+                return BadRequest("ID không khớp");
+            }
+
+            try
+            {
+                await _chatLieuSer.UpdateChatLieu(chatLieuDto);
+                return Ok(chatLieuDto); // Trả về dữ liệu đã cập nhật
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task Delete(Guid id)
         {
-            await _chatLieuRepo.DeleteCl(id);
+            await _chatLieuSer.DeleteChatLieu(id);
         }
     }
 }
