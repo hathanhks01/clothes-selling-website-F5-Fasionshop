@@ -47,7 +47,7 @@ namespace F5Clothes_Services.Services
 			}
 		}
 
-		public async Task DeleteNhanVienAsync(string id)
+		public async Task DeleteNhanVienAsync(Guid id)
 		{
 			await _nhanvienRepo.DeleteNhanVien(id);
 		}
@@ -57,7 +57,7 @@ namespace F5Clothes_Services.Services
 			return await _nhanvienRepo.GetAllNhanVien();
 		}
 
-		public async Task<NhanVien?> GetNhanVienByIdAsync(string id)
+		public async Task<NhanVien?> GetNhanVienByIdAsync(Guid id)
 		{
 			return await _nhanvienRepo.GetByNhanVien(id);
 		}
