@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.Models;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.Models;
 
 using System;
 using System.Collections.Generic;
@@ -11,9 +12,9 @@ namespace F5Clothes_DAL.IReponsitories
     public interface ISPCTRepo
     {
         Task<List<SanPhamChiTiet>> GetAllSanPhamChiTiet();
-        Task<SanPhamChiTiet> GetBySanPhamChiTiet(Guid id);
-        Task AddSPCT(SanPhamChiTiet SPCT);
-        Task UpdateSPCT(SanPhamChiTiet SPCT);
-        Task DeleteSPCT(Guid Id);
+        Task<SanPhamChiTiet> GetByIdSanPhamChiTiet(Guid id);
+        Task<SanPhamChiTiet> AddSanPhamChiTiet(SanPhamChiTietDtos sanPhamChiTietDto);
+        Task<SanPhamChiTiet> UpdateSanPhamChiTiet(SanPhamChiTietDtos sanPhamChiTietDto);
+        Task DeleteSanPhamChiTiet(Guid id);
     }
 }

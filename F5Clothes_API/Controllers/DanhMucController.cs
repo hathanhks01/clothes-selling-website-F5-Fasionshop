@@ -2,7 +2,7 @@
 using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
-
+using F5Clothes_Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,59 +12,54 @@ namespace F5Clothes_API.Controllers
     [ApiController]
     public class DanhMucController : ControllerBase
     {
-        private readonly IDanhMucRepo _DanhMucRepo;
-        private readonly IMapper _mapper;
-
-        public DanhMucController(IDanhMucRepo dmRepo, IMapper mapper)
+        private readonly IDanhMucService _danhMucSer;
+        public DanhMucController(IDanhMucService danhMucSer)
         {
-            _DanhMucRepo = dmRepo;
-            _mapper = mapper;
+            _danhMucSer = danhMucSer;
         }
-
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DanhMuc>>> GetAll()
+        public async Task<List<DanhMuc>> GetAll()
         {
-            var DanhMucList = await _DanhMucRepo.GetAllDanhMuc();
-            var mappeddm = _mapper.Map<List<DanhMucDtos>>(DanhMucList);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(mappeddm);
+            return await _danhMucSer.GetAllDanhMuc();
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetBySp(Guid id)
+        public async Task<DanhMuc> GetById(Guid id)
         {
-
-
-            var mappedDm = _mapper.Map<DanhMucDtos>(await _DanhMucRepo.GetByDanhMuc(id));  // Mapping single object
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-
-            }
-            return Ok(mappedDm);
+            return await _danhMucSer.GetByIdDanhMuc(id);
         }
 
         [HttpPost]
-        public async Task GetAll(DanhMuc dm)
+        public async Task<ActionResult> Add(DanhMucDtos danhMucDto)
         {
-            await _DanhMucRepo.AddDm(dm);
+            await _danhMucSer.AddDanhMuc(danhMucDto);
+            return CreatedAtAction(nameof(GetById), new { id = danhMucDto.Id }, danhMucDto);
         }
 
-        [HttpPut]
-        public async Task Update(DanhMuc dm)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, DanhMucDtos danhMucDto)
         {
-            await _DanhMucRepo.UpdateDm(dm);
+            if (id != danhMucDto.Id)
+            {
+                return BadRequest("ID không khớp");
+            }
+
+            try
+            {
+                await _danhMucSer.UpdateDanhMuc(danhMucDto);
+                return Ok(danhMucDto); // Trả về dữ liệu đã cập nhật
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task Delete(Guid id)
         {
-            await _DanhMucRepo.DeleteDm(id);
+            await _danhMucSer.DeleteDanhMuc(id);
         }
+
     }
 }

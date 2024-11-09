@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.Models;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.Models;
 
 using System;
 using System.Collections.Generic;
@@ -11,9 +12,9 @@ namespace F5Clothes_DAL.IReponsitories
     public interface IThuongHieuRepo
     {
         Task<List<ThuongHieu>> GetAllThuongHieu();
-        Task<ThuongHieu> GetByThuongHieu(Guid id);
-        Task AddTh(ThuongHieu th);
-        Task UpdateTh(ThuongHieu th);
-        Task DeleteTh(Guid Id);
+        Task<ThuongHieu> GetByIdThuongHieu(Guid id);
+        Task<ThuongHieu> AddThuongHieu(ThuongHieuDtos thuongHieuDto);
+        Task<ThuongHieu> UpdateThuongHieu(ThuongHieuDtos thuongHieuDto);
+        Task DeleteThuongHieu(Guid id);
     }
 }

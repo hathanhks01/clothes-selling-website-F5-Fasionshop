@@ -2,7 +2,7 @@
 using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
-
+using F5Clothes_Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,53 +12,54 @@ namespace F5Clothes_API.Controllers
     [ApiController]
     public class SPCTController : ControllerBase
     {
-        private readonly ISPCTRepo _SanPhamChiTietRepo;
-        private readonly IMapper _mapper;
-
-        public SPCTController(ISPCTRepo SPCTRepo, IMapper mapper)
+        private readonly ISanPhamChiTietServices _sanPhamChiTietSer;   
+        public SPCTController(ISanPhamChiTietServices sanPhamChiTietSer)
         {
-            _SanPhamChiTietRepo = SPCTRepo;
-            _mapper = mapper;
+            _sanPhamChiTietSer = sanPhamChiTietSer;
         }
-
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SanPhamChiTiet>>> GetAllSPCT()
+        public async Task<List<SanPhamChiTiet>> GetAll()
         {
-            var SanPhamChiTietList = await _SanPhamChiTietRepo.GetAllSanPhamChiTiet();
-            var mappeSPCT = _mapper.Map<List<SanPhamChiTietDtos>>(SanPhamChiTietList);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(mappeSPCT);
+            return await _sanPhamChiTietSer.GetAllSanPhamChiTiet();
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetBySanPhamChiTiet(Guid id)
+        public async Task<SanPhamChiTiet> GetById(Guid id)
         {
-
-
-            var mappeSPCT = _mapper.Map<SanPhamChiTietDtos>(await _SanPhamChiTietRepo.GetBySanPhamChiTiet(id));
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-
-            }
-            return Ok(mappeSPCT);
+            return await _sanPhamChiTietSer.GetByIdSanPhamChiTiet(id);
         }
 
         [HttpPost]
-        public async Task GetAll(SanPhamChiTiet SPCT)
+        public async Task<ActionResult> Add(SanPhamChiTietDtos sanPhamChiTietDto)
         {
-            await _SanPhamChiTietRepo.AddSPCT(SPCT);
+            await _sanPhamChiTietSer.AddSanPhamChiTiet(sanPhamChiTietDto);
+            return CreatedAtAction(nameof(GetById), new { id = sanPhamChiTietDto.Id }, sanPhamChiTietDto);
         }
 
-        [HttpPut]
-        public async Task Update(SanPhamChiTiet SPCT)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, SanPhamChiTietDtos sanPhamChiTietDto)
         {
-            await _SanPhamChiTietRepo.UpdateSPCT(SPCT);
+            if (id != sanPhamChiTietDto.Id)
+            {
+                return BadRequest("ID không khớp");
+            }
+
+            try
+            {
+                await _sanPhamChiTietSer.UpdateSanPhamChiTiet(sanPhamChiTietDto);
+                return Ok(sanPhamChiTietDto); // Trả về dữ liệu đã cập nhật
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
+
+        [HttpDelete("{id}")]
+        public async Task Delete(Guid id)
+        {
+            await _sanPhamChiTietSer.DeleteSanPhamChiTiet(id);
+        }
+
     }
 }

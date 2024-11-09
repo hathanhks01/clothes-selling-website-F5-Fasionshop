@@ -43,7 +43,7 @@ public partial class SanPham
 
     public virtual DanhMuc? IdDmNavigation { get; set; }
 
-    public virtual GiamGia? IdGgNavigation { get; set; }
+    public virtual GiamGium? IdGgNavigation { get; set; }
 
     public virtual ThuongHieu? IdThNavigation { get; set; }
 

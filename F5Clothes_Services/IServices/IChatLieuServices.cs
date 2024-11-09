@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.Models;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace F5Clothes_Services.IServices
 {
     public interface IChatLieuServices
     {
-        Task<List<ChatLieu>> GetAll();
-        Task<ChatLieu> GetById(Guid id);
-        Task Create(ChatLieu chatLieu);
-        Task Update(ChatLieu chatLieu);
-        Task Delete(Guid id);
+        Task<List<ChatLieu>> GetAllChatLieu();
+        Task<ChatLieu?> GetByIdChatLieu(Guid id);
+        Task<ChatLieu> AddChatLieu(ChatLieuDtos chatLieuDto);
+        Task<ChatLieu> UpdateChatLieu(ChatLieuDtos chatLieuDto);
+        Task DeleteChatLieu(Guid id);
     }
 }

@@ -2,7 +2,7 @@
 using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
-
+using F5Clothes_Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,53 +12,54 @@ namespace F5Clothes_API.Controllers
     [ApiController]
     public class ThuongHieuController : ControllerBase
     {
-        private readonly IThuongHieuRepo _ThuongHieuRepo;
-        private readonly IMapper _mapper;
+        private readonly IThuongHieuService _thuongHieuSer;
 
-        public ThuongHieuController(IThuongHieuRepo ThRepo, IMapper mapper)
+        public ThuongHieuController(IThuongHieuService thuongHieuSer)
         {
-            _ThuongHieuRepo = ThRepo;
-            _mapper = mapper;
+            _thuongHieuSer = thuongHieuSer;
         }
-
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ThuongHieu>>> GetAllTh()
+        public async Task<List<ThuongHieu>> GetAll()
         {
-            var ThuongHieuList = await _ThuongHieuRepo.GetAllThuongHieu();
-            var mappeTh = _mapper.Map<List<ThuongHieuDtos>>(ThuongHieuList);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(mappeTh);
+            return await _thuongHieuSer.GetAllThuongHieu();
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetByThuongHieu(Guid id)
+        public async Task<ThuongHieu> GetById(Guid id)
         {
-
-
-            var mappeTh = _mapper.Map<ThuongHieuDtos>(await _ThuongHieuRepo.GetByThuongHieu(id));
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-
-            }
-            return Ok(mappeTh);
+            return await _thuongHieuSer.GetByIdThuongHieu(id);
         }
 
         [HttpPost]
-        public async Task GetAll(ThuongHieu Th)
+        public async Task<ActionResult> Add(ThuongHieuDtos thuongHieuDto)
         {
-            await _ThuongHieuRepo.AddTh(Th);
+            await _thuongHieuSer.AddThuongHieu(thuongHieuDto);
+            return CreatedAtAction(nameof(GetById), new { id = thuongHieuDto.Id }, thuongHieuDto);
         }
 
-        [HttpPut]
-        public async Task Update(ThuongHieu Th)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, ThuongHieuDtos thuongHieuDto)
         {
-            await _ThuongHieuRepo.UpdateTh(Th);
+            if (id != thuongHieuDto.Id)
+            {
+                return BadRequest("ID không khớp");
+            }
+
+            try
+            {
+                await _thuongHieuSer.UpdateThuongHieu(thuongHieuDto);
+                return Ok(thuongHieuDto); // Trả về dữ liệu đã cập nhật
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task Delete(Guid id)
+        {
+            await _thuongHieuSer.DeleteThuongHieu(id);
         }
     }
 }

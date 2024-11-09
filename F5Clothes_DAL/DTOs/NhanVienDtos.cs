@@ -8,6 +8,7 @@ namespace F5Clothes_DAL.DTOs
 {
     public class NhanVienDtos
     {
+		public Guid Id { get; set; }
 		public int? IdCv { get; set; }
 		public string? MaNv { get; set; }
 		public string? HoVaTenNv { get; set; }
@@ -22,4 +23,10 @@ namespace F5Clothes_DAL.DTOs
 		public string? MoTa { get; set; }
 		public int? TrangThai { get; set; }
 	}
+	public class ListNhanVienModel
+	{ 
+		public string? Keyword {  get; set; }
+		public int? IsPublic { get; set; }
+	}
+
 }

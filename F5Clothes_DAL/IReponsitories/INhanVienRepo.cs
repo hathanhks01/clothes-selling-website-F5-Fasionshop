@@ -12,9 +12,10 @@ namespace F5Clothes_DAL.IReponsitories
     public interface INhanVienRepo
     {
         Task<List<NhanVien>> GetAllNhanVien();
-        Task<NhanVien> GetByNhanVien(string Id);
+        Task<List<NhanVienDtos>> GetNhanVien(ListNhanVienModel nhanvien);
+        Task<NhanVien> GetByNhanVien(Guid Id);
         Task AddNhanVien(NhanVien nv);
         Task UpdateNhanVien(NhanVien nv);
-        Task DeleteNhanVien(string Id);
+        Task DeleteNhanVien(Guid Id);
     }
 }

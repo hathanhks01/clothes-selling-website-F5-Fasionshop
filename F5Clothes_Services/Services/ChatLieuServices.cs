@@ -1,5 +1,8 @@
-﻿using F5Clothes_DAL.IReponsitories;
+﻿using AutoMapper;
+using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
+using F5Clothes_DAL.Reponsitories;
 using F5Clothes_Services.IServices;
 using System;
 using System.Collections.Generic;
@@ -11,34 +14,34 @@ namespace F5Clothes_Services.Services
 {
     public class ChatLieuServices : IChatLieuServices
     {
-        private readonly IChatLieuRepositories _response;
-        public ChatLieuServices(IChatLieuRepositories response)
+        private readonly IChatLieuRepo _chatLieuRepo;       
+        public ChatLieuServices(IChatLieuRepo chatLieuRepo, IMapper mapper)
         {
-            _response = response;
+            _chatLieuRepo = chatLieuRepo;         
         }
-        public async Task Create(ChatLieu chatLieu)
+        public async Task<ChatLieu> AddChatLieu(ChatLieuDtos chatLieuDto)
         {
-            await _response.Create(chatLieu);
-        }
-
-        public async Task Delete(Guid id)
-        {
-            await _response.Delete(id);
+           return await _chatLieuRepo.AddChatLieu(chatLieuDto);
         }
 
-        public async Task<List<ChatLieu>> GetAll()
+        public async Task DeleteChatLieu(Guid id)
         {
-           return await _response.GetAll();    
+            await _chatLieuRepo.DeleteChatLieu(id);
         }
 
-        public async Task<ChatLieu> GetById(Guid id)
+        public async Task<List<ChatLieu>> GetAllChatLieu()
         {
-            return await _response.GetById(id);
+            return await _chatLieuRepo.GetAllChatLieu();
         }
 
-        public async Task Update(ChatLieu chatLieu)
+        public async Task<ChatLieu?> GetByIdChatLieu(Guid id)
         {
-            await _response.Update(chatLieu);
+            return await _chatLieuRepo.GetByIdChatLieu(id);
+        }
+
+        public async Task<ChatLieu> UpdateChatLieu(ChatLieuDtos chatLieuDto)
+        {
+            return await _chatLieuRepo.UpdateChatLieu(chatLieuDto);
         }
     }
 }

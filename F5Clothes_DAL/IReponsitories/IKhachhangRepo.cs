@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.Models;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.Models;
 
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,8 @@ namespace F5Clothes_DAL.IReponsitories
     public interface IKhachhangRepo
     {
         Task<List<KhachHang>> GetAllKhachHang();
+        Task<List<KhachHangDtos>> GetKhachHang(ListKhachHangModel valid);
         Task<KhachHang> GetByKhachHang(Guid id);
-        Task AddKh(KhachHang Kh);
         Task UpdateKh(KhachHang Kh);
         Task DeleteKh(Guid Id);
     }

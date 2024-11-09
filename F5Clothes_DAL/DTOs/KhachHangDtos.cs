@@ -32,4 +32,9 @@ namespace F5Clothes_DAL.DTOs
 
         public int? TrangThai { get; set; }
     }
+    public class ListKhachHangModel
+    {
+        public string? Keyword { get; set; }
+        public int? IsPublic { get; set; }
+    }
 }

@@ -1,4 +1,6 @@
-﻿using F5Clothes_DAL.Models;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.IReponsitories;
+using F5Clothes_DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +9,12 @@ using System.Threading.Tasks;
 
 namespace F5Clothes_Services.IServices
 {
-    public interface
-        ISanPhamChiTietServices
+    public interface ISanPhamChiTietServices
     {
-        Task<List<SanPhamChiTiet>> GetAll();
-        Task<SanPhamChiTiet> GetById(Guid id);
-        Task Create(SanPhamChiTiet chatLieu);
-        Task Update(SanPhamChiTiet chatLieu);
-        Task Delete(Guid id);
+        Task<List<SanPhamChiTiet>> GetAllSanPhamChiTiet();
+        Task<SanPhamChiTiet> GetByIdSanPhamChiTiet(Guid id);
+        Task<SanPhamChiTiet> AddSanPhamChiTiet(SanPhamChiTietDtos sanPhamChiTietDto);
+        Task<SanPhamChiTiet> UpdateSanPhamChiTiet(SanPhamChiTietDtos sanPhamChiTietDto);
+        Task DeleteSanPhamChiTiet(Guid id);
     }
 }

@@ -2,7 +2,7 @@
 using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
-
+using F5Clothes_Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,59 +12,55 @@ namespace F5Clothes_API.Controllers
     [ApiController]
     public class GiamGiaController : ControllerBase
     {
-        private readonly IGiamGiaRepo _GiamGiaRepo;
-        private readonly IMapper _mapper;
+        private readonly IGiamGiaService _giamGiaSer;
 
-        public GiamGiaController(IGiamGiaRepo ggRepo, IMapper mapper)
+        public GiamGiaController(IGiamGiaService giamGiaSer)
         {
-            _GiamGiaRepo = ggRepo;
-            _mapper = mapper;
+            _giamGiaSer = giamGiaSer;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GiamGium>>> GetAll()
+        public async Task<List<GiamGium>> GetAll()
         {
-            var GiamGiaList = await _GiamGiaRepo.GetAllGg();
-            var mappedgg = _mapper.Map<List<GiamGiaDtos>>(GiamGiaList);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(mappedgg);
+            return await _giamGiaSer.GetAllGiamGia();
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetBySp(Guid id)
+        public async Task<GiamGium> GetById(Guid id)
         {
-
-
-            var mappedgg = _mapper.Map<GiamGiaDtos>(await _GiamGiaRepo.GetByGg(id));  // Mapping single object
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-
-            }
-            return Ok(mappedgg);
+            return await _giamGiaSer.GetByIdGiamGia(id);
         }
 
         [HttpPost]
-        public async Task GetAll(GiamGium gg)
+        public async Task<ActionResult> Add(GiamGiaDtos giamGiaDto)
         {
-            await _GiamGiaRepo.AddGg(gg);
+            await _giamGiaSer.AddGiamGia(giamGiaDto);
+            return CreatedAtAction(nameof(GetById), new { id = giamGiaDto.Id }, giamGiaDto);
         }
 
-        [HttpPut]
-        public async Task Update(GiamGium gg)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, GiamGiaDtos giamGiaDto)
         {
-            await _GiamGiaRepo.UpdateGg(gg);
+            if (id != giamGiaDto.Id)
+            {
+                return BadRequest("ID không khớp");
+            }
+
+            try
+            {
+                await _giamGiaSer.UpdateGiamGia(giamGiaDto);
+                return Ok(giamGiaDto); // Trả về dữ liệu đã cập nhật
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task Delete(Guid id)
         {
-            await _GiamGiaRepo.DeleteGg(id);
+            await _giamGiaSer.DeleteGiamGia(id);
         }
     }
 }

@@ -1,6 +1,9 @@
 ﻿using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models.system;
+<<<<<<< HEAD
+=======
 using F5Clothes_DAL.IReponsitories;
+>>>>>>> HaThanhThanh
 using F5Clothes_DAL.Models;
 using F5Clothes_DAL.Reponsitories;
 using F5Clothes_Services.IServices;
@@ -11,8 +14,11 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using F5cvothes_DAL.Reponsitories;
+<<<<<<< HEAD
+=======
 
 
+>>>>>>> HaThanhThanh
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -26,7 +32,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.AllowAnyOrigin();
+                          policy.AllowAnyOrigin()
+                          .AllowAnyMethod()    // Cho phép tất cả các phương thức HTTP (GET, POST, PUT, DELETE,...)
+                                .AllowAnyHeader();   // Cho phép tất cả các tiêu đề, bao gồm Content-Type
                       });
 });
 
@@ -66,13 +74,20 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+<<<<<<< HEAD
+builder.Services.AddScoped<IAuthenticationRepo, AuthenticationRepo>();
+=======
 builder.Services.AddScoped<IAuthenticationRepo, AuthenticationRepositories>();
+>>>>>>> HaThanhThanh
 builder.Services.AddScoped<IAuthenticationServices, AuthenticationServices>();
 builder.Services.AddScoped<IChatLieuRepo, ChatLieuRepo>();
+builder.Services.AddScoped<IChatLieuServices, ChatLieuServices>();
 builder.Services.AddScoped<IChucVuRepo, ChucVuRepo >();
 builder.Services.AddScoped<IDanhMucRepo, DanhMucRepo>();
+builder.Services.AddScoped<IDanhMucService, DanhMucService>();
 builder.Services.AddScoped<IDiaChiRepo, DiaChiRepo>();
 builder.Services.AddScoped<IGiamGiaRepo, GiamGiaRepo>();
+builder.Services.AddScoped<IGiamGiaService, GiamGiaService>();
 builder.Services.AddScoped<IGiohangChiTietRepo, GHCTRepo>();
 builder.Services.AddScoped<IGioHangRepo, GiohangRepo>();
 builder.Services.AddScoped<IHDCTRepo,HDCTRepo>();
@@ -81,20 +96,30 @@ builder.Services.AddScoped<IImageRepo, ImageRepo>();
 builder.Services.AddScoped<IKhachhangRepo, KhachhangRepo>();
 builder.Services.AddScoped<ILSHDRepo, LSHDRepo>();
 builder.Services.AddScoped<IMauSacRepo, MauSacRepo>();
+builder.Services.AddScoped<IMauSacServices, MauSacServices>();
 builder.Services.AddScoped<INhanVienRepo, NhanVienRepo>();
 builder.Services.AddScoped<INhanVienService, NhanVienService>();
 builder.Services.AddScoped<IRefshTokenRepo, RefeshTokenRepo>();
 builder.Services.AddScoped<ISanPhamRepo, SanPhamRepo>();
+builder.Services.AddScoped<ISanPhamServices, SanPhamServices>();
 builder.Services.AddScoped<ISizeRepo, SizeRepo>();
+builder.Services.AddScoped<ISizeServices, SizeServices>();
 builder.Services.AddScoped<ISPCTRepo, SPCTRepo>();
+builder.Services.AddScoped<ISanPhamChiTietServices, SanPhamChiTietServices>();
 builder.Services.AddScoped<IThuongHieuRepo, ThuongHieuRepo>();
+builder.Services.AddScoped<IThuongHieuService, ThuongHieuService>();
 builder.Services.AddScoped<IVoucherRepo, VoucherRepo>();
 builder.Services.AddScoped<IXuatXuRepo, XuatXuRepo>();
+builder.Services.AddScoped<IXuatXuService, XuatXuService>();
 builder.Services.AddScoped<IHinhThucThanhToanRepo, HinhThucThanhToanRepo>();
 builder.Services.AddScoped<IVoucherService, VoucherService>();
 
+<<<<<<< HEAD
+
+=======
 builder.Services.AddScoped<IChatLieuRepositories, ChatLieuRepositories>();
 builder.Services.AddScoped<IChatLieuServices, ChatLieuServices>();
+>>>>>>> HaThanhThanh
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -104,7 +129,9 @@ if (app.Environment.IsDevelopment())
 builder.Services.AddScoped<DbduAnTnContext>();
 
 }
-
+app.UseCors(
+	//"AllowAllOrigins");
+	options => options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseCors(MyAllowSpecificOrigins);

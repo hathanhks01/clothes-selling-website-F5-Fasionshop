@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.Models;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.Models;
 
 using System;
 using System.Collections;
@@ -12,10 +13,11 @@ namespace F5Clothes_DAL.IReponsitories
     public interface ISanPhamRepo
     {
         Task<List<SanPham>> GetAllSanPham();
-        Task<SanPham> GetBySanPham(Guid Id);
-        Task <SanPham>  AddSanPham (SanPham sanPham);
-        Task UpdateSanPham(SanPham sanPham);
-        
+        Task<SanPham> GetByIdSanPham(Guid id);
+        Task<SanPham> AddSanPham(SanPhamDtos sanPhamDto);
+        Task<SanPham> UpdateSanPham(SanPhamDtos sanPhamDto);
+        Task DeleteSanPham(Guid id);
+
 
     }
 }

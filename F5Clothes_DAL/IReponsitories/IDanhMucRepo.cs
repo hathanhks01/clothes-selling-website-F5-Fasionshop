@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.Models;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.Models;
 
 using System;
 using System.Collections.Generic;
@@ -11,9 +12,9 @@ namespace F5Clothes_DAL.IReponsitories
     public interface IDanhMucRepo
     {
         Task<List<DanhMuc>> GetAllDanhMuc();
-        Task<DanhMuc> GetByDanhMuc(Guid id);
-        Task AddDm(DanhMuc dm);
-        Task UpdateDm(DanhMuc dm);
-        Task DeleteDm(Guid Id);
+        Task<DanhMuc> GetByIdDanhMuc(Guid id);
+        Task<DanhMuc> AddDanhMuc(DanhMucDtos danhMucDto);
+        Task<DanhMuc> UpdateDanhMuc(DanhMucDtos danhMucDto);
+        Task DeleteDanhMuc(Guid id);
     }
 }
