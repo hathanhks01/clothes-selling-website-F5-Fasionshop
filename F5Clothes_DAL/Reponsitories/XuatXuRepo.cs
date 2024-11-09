@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.IReponsitories;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,23 +11,32 @@ using System.Threading.Tasks;
 
 namespace F5Clothes_DAL.Reponsitories
 {
-    public class XuatXuRepo: IXuatXuRepo
+    public class XuatXuRepo : IXuatXuRepo
     {
         private readonly DbduAnTnContext _context;
         public XuatXuRepo(DbduAnTnContext context)
         {
             _context = context;
         }
-        public async Task AddXx(XuatXu xx)
+
+        public async Task<XuatXu> AddXuatXu(XuatXuDtos xuatXuDto)
         {
-            _context.Add(xx);
-            await _context.SaveChangesAsync();
+            var xuatXu = new XuatXu
+            {
+                Id = Guid.NewGuid(),
+                TenXuatXu = xuatXuDto.TenXuatXu,
+                MoTa = xuatXuDto.MoTa,
+                TrangThai = xuatXuDto.TrangThai
+            };
+            await _context.XuatXus.AddAsync(xuatXu);
+            _context.SaveChanges();
+            return xuatXu;
         }
 
-        public async Task DeleteXx(Guid Id)
+        public async Task DeleteXuatXu(Guid id)
         {
-            var xx = await GetByXuatXu(Id);
-            _context.Remove(xx);
+            var xuatXu = await GetByIdXuatXu(id);
+            _context.XuatXus.Remove(xuatXu);
             await _context.SaveChangesAsync();
         }
 
@@ -35,15 +45,25 @@ namespace F5Clothes_DAL.Reponsitories
             return await _context.XuatXus.ToListAsync();
         }
 
-        public async Task<XuatXu> GetByXuatXu(Guid id)
+        public async Task<XuatXu> GetByIdXuatXu(Guid id)
         {
             return await _context.XuatXus.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task UpdateXx(XuatXu xx)
+        public async Task<XuatXu> UpdateXuatXu(XuatXuDtos xuatXuDto)
         {
-            _context.Entry(xx).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            var existiingXuatXu = await _context.XuatXus
+                .Where(xuatXu => xuatXu.Id == xuatXuDto.Id)
+                .FirstOrDefaultAsync();
+            if (existiingXuatXu != null)
+            {
+                existiingXuatXu.TenXuatXu = xuatXuDto.TenXuatXu;
+                existiingXuatXu.MoTa = xuatXuDto.MoTa;
+                existiingXuatXu.TrangThai = xuatXuDto.TrangThai;
+
+                await _context.SaveChangesAsync();
+            }
+            return existiingXuatXu ?? new XuatXu();
         }
     }
 }

@@ -2,7 +2,7 @@
 using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
-
+using F5Clothes_Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,53 +12,55 @@ namespace F5Clothes_API.Controllers
     [ApiController]
     public class XuatXuController : ControllerBase
     {
-        private readonly IXuatXuRepo _XuatXuRepo;
-        private readonly IMapper _mapper;
+        private readonly IXuatXuService _xuatXuSer;
 
-        public XuatXuController(IXuatXuRepo XxRepo, IMapper mapper)
+        public XuatXuController(IXuatXuService xuatXuSer)
         {
-            _XuatXuRepo = XxRepo;
-            _mapper = mapper;
+            _xuatXuSer = xuatXuSer;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<XuatXu>>> GetAllXx()
+        public async Task<List<XuatXu>> GetAll()
         {
-            var XuatXuList = await _XuatXuRepo.GetAllXuatXu();
-            var mappeXx = _mapper.Map<List<XuatXuDtos>>(XuatXuList);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(mappeXx);
+            return await _xuatXuSer.GetAllXuatXu();
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetByXuatXu(Guid id)
+        public async Task<XuatXu> GetById(Guid id)
         {
-
-
-            var mappeXx = _mapper.Map<XuatXuDtos>(await _XuatXuRepo.GetByXuatXu(id));
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-
-            }
-            return Ok(mappeXx);
+            return await _xuatXuSer.GetByIdXuatXu(id);
         }
 
         [HttpPost]
-        public async Task GetAdd(XuatXu Xx)
+        public async Task<ActionResult> Add(XuatXuDtos xuatXuDto)
         {
-            await _XuatXuRepo.AddXx(Xx);
+            await _xuatXuSer.AddXuatXu(xuatXuDto);
+            return CreatedAtAction(nameof(GetById), new { id = xuatXuDto.Id }, xuatXuDto);
         }
 
-        [HttpPut]
-        public async Task Update(XuatXu Xx)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, XuatXuDtos xuatXuDto)
         {
-            await _XuatXuRepo.UpdateXx(Xx);
+            if (id != xuatXuDto.Id)
+            {
+                return BadRequest("ID không khớp");
+            }
+
+            try
+            {
+                await _xuatXuSer.UpdateXuatXu(xuatXuDto);
+                return Ok(xuatXuDto); // Trả về dữ liệu đã cập nhật
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task Delete(Guid id)
+        {
+            await _xuatXuSer.DeleteXuatXu(id);
         }
     }
 }
