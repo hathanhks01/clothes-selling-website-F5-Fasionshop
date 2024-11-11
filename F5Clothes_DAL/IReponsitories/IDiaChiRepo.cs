@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.Models;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.Models;
 
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace F5Clothes_DAL.IReponsitories
     {
         Task<List<DiaChi>> GetAllDiaChi();
         Task<DiaChi> GetByDiaChi(Guid id);
-        Task Adddc(DiaChi dc);
+        Task<DiaChi> Adddc(DiaChiDtos dc);
         Task Updatedc(DiaChi dc);
         Task Deletedc(Guid Id);
     }
