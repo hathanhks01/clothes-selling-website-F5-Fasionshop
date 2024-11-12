@@ -1,9 +1,5 @@
 ﻿using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models.system;
-<<<<<<< HEAD
-=======
-using F5Clothes_DAL.IReponsitories;
->>>>>>> HaThanhThanh
 using F5Clothes_DAL.Models;
 using F5Clothes_DAL.Reponsitories;
 using F5Clothes_Services.IServices;
@@ -14,18 +10,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using F5cvothes_DAL.Reponsitories;
-<<<<<<< HEAD
-=======
-
-
->>>>>>> HaThanhThanh
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-// Cấu hình dịch vụ DbContext với chuỗi kết nối từ appsettings.json
+// Configure DbContext with connection string from appsettings.json
 builder.Services.AddDbContext<DbduAnTnContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddCors(options =>
 {
@@ -33,19 +25,19 @@ builder.Services.AddCors(options =>
                       policy =>
                       {
                           policy.AllowAnyOrigin()
-                          .AllowAnyMethod()    // Cho phép tất cả các phương thức HTTP (GET, POST, PUT, DELETE,...)
-                                .AllowAnyHeader();   // Cho phép tất cả các tiêu đề, bao gồm Content-Type
+                                .AllowAnyMethod()
+                                .AllowAnyHeader();
                       });
 });
 
-// Cấu hình dịch vụ JWTSettings từ appsettings.json
+// Configure JWT settings from appsettings.json
 builder.Services.Configure<JWTSetting>(builder.Configuration.GetSection("Jwt"));
 
-// Đảm bảo bạn đang sử dụng cùng tên cấu hình
+// Ensure consistent JWT configuration
 builder.Services.AddSingleton(resolver =>
     resolver.GetRequiredService<IOptions<JWTSetting>>().Value);
 
-// Cấu hình dịch vụ Authentication với JWT Bearer
+// Configure Authentication with JWT Bearer
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -74,15 +66,15 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-<<<<<<< HEAD
+
+// Add Scoped services for Repositories and Services
 builder.Services.AddScoped<IAuthenticationRepo, AuthenticationRepo>();
-=======
-builder.Services.AddScoped<IAuthenticationRepo, AuthenticationRepositories>();
->>>>>>> HaThanhThanh
+builder.Services.AddScoped<IAuthenticationServices, AuthenticationServices>();
+builder.Services.AddScoped<IAuthenticationRepo, AuthenticationRepo>();
 builder.Services.AddScoped<IAuthenticationServices, AuthenticationServices>();
 builder.Services.AddScoped<IChatLieuRepo, ChatLieuRepo>();
 builder.Services.AddScoped<IChatLieuServices, ChatLieuServices>();
-builder.Services.AddScoped<IChucVuRepo, ChucVuRepo >();
+builder.Services.AddScoped<IChucVuRepo, ChucVuRepo>();
 builder.Services.AddScoped<IDanhMucRepo, DanhMucRepo>();
 builder.Services.AddScoped<IDanhMucService, DanhMucService>();
 builder.Services.AddScoped<IDiaChiRepo, DiaChiRepo>();
@@ -90,8 +82,10 @@ builder.Services.AddScoped<IGiamGiaRepo, GiamGiaRepo>();
 builder.Services.AddScoped<IGiamGiaService, GiamGiaService>();
 builder.Services.AddScoped<IGiohangChiTietRepo, GHCTRepo>();
 builder.Services.AddScoped<IGioHangRepo, GiohangRepo>();
-builder.Services.AddScoped<IHDCTRepo,HDCTRepo>();
-builder.Services.AddScoped<IHoaDonRepo, HoaDonRepo >();
+builder.Services.AddScoped<IHoaDonChiTietRepositories, HoaDonChiTietRepositories>();
+builder.Services.AddScoped<IHoaDonServices, HoaDonChiTietRepositories>();
+builder.Services.AddScoped<IHoaDonRepo, HoaDonRepo>();
+builder.Services.AddScoped<IHoaDonServices, HoaDonServices>();
 builder.Services.AddScoped<IImageRepo, ImageRepo>();
 builder.Services.AddScoped<IKhachhangRepo, KhachhangRepo>();
 builder.Services.AddScoped<ILSHDRepo, LSHDRepo>();
@@ -114,29 +108,22 @@ builder.Services.AddScoped<IXuatXuService, XuatXuService>();
 builder.Services.AddScoped<IHinhThucThanhToanRepo, HinhThucThanhToanRepo>();
 builder.Services.AddScoped<IVoucherService, VoucherService>();
 
-<<<<<<< HEAD
-
-=======
-builder.Services.AddScoped<IChatLieuRepositories, ChatLieuRepositories>();
+builder.Services.AddScoped<IChatLieuRepo, ChatLieuRepo>();
 builder.Services.AddScoped<IChatLieuServices, ChatLieuServices>();
->>>>>>> HaThanhThanh
+builder.Services.AddScoped<DbduAnTnContext>(); // Place this before building the app
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-builder.Services.AddScoped<DbduAnTnContext>();
-
 }
-app.UseCors(
-	//"AllowAllOrigins");
-	options => options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
+
+app.UseCors(MyAllowSpecificOrigins);
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
