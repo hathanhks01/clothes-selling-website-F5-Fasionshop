@@ -1,0 +1,62 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Admin\\source\\repos\\clothes-selling-website-F5-Fasionshop1\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{C0CD1BCD-26D5-4847-8107-4612A620363E}|Solution Items{C0CD1BCD-26D5-4847-8107-4612A620363E}|C:\\Users\\Admin\\Source\\Repos\\clothes-selling-website-F5-Fasionshop1\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{C0CD1BCD-26D5-4847-8107-4612A620363E}|Solution Items{C0CD1BCD-26D5-4847-8107-4612A620363E}|solutionrelative:.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{74FCD807-2118-47A8-B671-38DA0981C40B}|F5Clothes_API\\F5Clothes_API.csproj|c:\\users\\admin\\source\\repos\\clothes-selling-website-f5-fasionshop1\\f5clothes_api\\vnpayrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{74FCD807-2118-47A8-B671-38DA0981C40B}|F5Clothes_API\\F5Clothes_API.csproj|solutionrelative:f5clothes_api\\vnpayrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "VNPayRepo.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\clothes-selling-website-F5-Fasionshop1\\F5Clothes_API\\VNPayRepo.cs",
+              "RelativeDocumentMoniker": "F5Clothes_API\\VNPayRepo.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\clothes-selling-website-F5-Fasionshop1\\F5Clothes_API\\VNPayRepo.cs",
+              "RelativeToolTip": "F5Clothes_API\\VNPayRepo.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T13:30:20.516Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": ".gitignore",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\clothes-selling-website-F5-Fasionshop1\\.gitignore",
+              "RelativeDocumentMoniker": ".gitignore",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\clothes-selling-website-F5-Fasionshop1\\.gitignore",
+              "RelativeToolTip": ".gitignore",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2024-11-09T14:24:45.621Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

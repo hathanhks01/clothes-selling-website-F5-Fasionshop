@@ -3,13 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F5Clothes_API", "F5Clothes_API\F5Clothes_API.csproj", "{74FCD807-2118-47A8-B671-38DA0981C40B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "F5Clothes_API", "F5Clothes_API\F5Clothes_API.csproj", "{74FCD807-2118-47A8-B671-38DA0981C40B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F5Clothes_DAL", "F5Clothes_DAL\F5Clothes_DAL.csproj", "{99708393-A63E-425A-A024-A1A7C4DE3E37}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "F5Clothes_DAL", "F5Clothes_DAL\F5Clothes_DAL.csproj", "{99708393-A63E-425A-A024-A1A7C4DE3E37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F5Clothes_Services", "F5Clothes_Services\F5Clothes_Services.csproj", "{A349B022-707D-4354-B870-D4AFCA4B9801}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "F5Clothes_Services", "F5Clothes_Services\F5Clothes_Services.csproj", "{A349B022-707D-4354-B870-D4AFCA4B9801}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F5Clothes", "F5Clothes\F5Clothes.csproj", "{6619E14A-EDBD-41AA-8AB2-B8848C765519}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C0CD1BCD-26D5-4847-8107-4612A620363E}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
