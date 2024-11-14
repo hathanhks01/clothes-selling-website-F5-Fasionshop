@@ -21,8 +21,11 @@ namespace F5Clothes_DAL.Helper
             CreateMap<DanhMuc, DanhMucDtos>();
             CreateMap<DiaChi, DiaChiDtos>();
             CreateMap<GiamGium, GiamGiaDtos>();
-            CreateMap<GioHang, GiohangDtos>();
-            CreateMap<GioHangChiTiet, GioHangChiTietDtos>();
+            CreateMap<GioHangChiTiet, GiohangDtos>()
+                .ForMember(dest => dest.TenSp, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.TenSp))
+                .ForMember(dest => dest.HinhAnh, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.ImageDefaul ))
+                .ForMember(dest => dest.DonGia, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.GiaBan))
+                .ForMember(dest => dest.TongTien, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.GiaBan * c.SoLuong));
             CreateMap<HoaDon, HoaDonDtos>();
             CreateMap<HoaDonChiTiet,HoaDonChiTietDtos>();
             CreateMap<KhachHang, KhachHangDtos>();

@@ -3,6 +3,8 @@ using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
 
+using F5Clothes_Services.IServices;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,59 +14,120 @@ namespace F5Clothes_API.Controllers
     [ApiController]
     public class GioHangController : ControllerBase
     {
-        private readonly IGioHangRepo _GioHangRepo;
+        private readonly IGioHangServices _GioHangSer;
         private readonly IMapper _mapper;
 
-        public GioHangController(IGioHangRepo ghRepo, IMapper mapper)
+        public GioHangController(IGioHangServices ghSev, IMapper mapper)
         {
-            _GioHangRepo = ghRepo;
+            _GioHangSer = ghSev;
             _mapper = mapper;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GioHang>>> GetAll()
+
+
+        [HttpGet("{IdKh:Guid}")]
+        public async Task<ActionResult<GiohangDtos>> GetAllGh(Guid idKh)
         {
-            var GioHangList = await _GioHangRepo.GetAllGioHang();
-            var mappeddm = _mapper.Map<List<GiohangDtos>>(GioHangList);
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                // Get all the items from the service
+                var ghct = await _GioHangSer.GetAll(idKh);
 
-            return Ok(mappeddm);
+                // If no items are found, return NoContent status
+                if (ghct == null || !ghct.Any())
+                {
+                    return NoContent();
+                }
+
+                // Map the data to DTOs
+                var dtos = _mapper.Map<IEnumerable<GiohangDtos>>(ghct);
+
+                // Return the mapped DTOs with an OK status
+                return Ok(dtos);
+            }
+            catch (Exception ex)
+            {
+                // Return 500 error if something goes wrong
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetBySp(Guid id)
+
+        [HttpGet("{IDGH:guid}")]
+        public async Task<ActionResult<GiohangDtos>> GetItem(Guid cartItemId)
         {
-
-
-            var mappedDm = _mapper.Map<GiohangDtos>(await _GioHangRepo.GetByGioHang(id));  
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var cartItem = await _GioHangSer.GetItem(cartItemId);
+
+                if (cartItem == null)
+                {
+                    return NotFound();
+                }
+                var dto = _mapper.Map<GiohangDtos>(cartItem);
+                return Ok(dto);
 
             }
-            return Ok(mappedDm);
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
-
         [HttpPost]
-        public async Task GetAll(GioHang dm)
+        public async Task<ActionResult<GiohangDtos>> AddItem([FromBody] GioHangChiTietDtos cartItemToAdd)
         {
-            await _GioHangRepo.AddGh(dm);
-        }
+            try
+            {
+                var cartItem = await _GioHangSer.AddItem(cartItemToAdd);
 
-        [HttpPut]
-        public async Task Update(GioHang dm)
-        {
-            await _GioHangRepo.UpdateGh(dm);
-        }
+                if (cartItem == null)
+                {
+                    return NoContent();
+                }
 
-        [HttpDelete("{id}")]
-        public async Task Delete(Guid id)
+                var dto = _mapper.Map<GiohangDtos>(cartItem);
+                return CreatedAtAction(nameof(GetItem), new { id = cartItem.Id }, cartItem);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        [HttpDelete("{IDGH:guid}")]
+        public async Task<ActionResult<GiohangDtos>> RemoveItem(Guid cartItemId)
         {
-            await _GioHangRepo.DeleteGh(id);
+            try
+            {
+                var cartItem = await _GioHangSer.RemoveItem(cartItemId);
+                if (cartItem == null)
+                {
+                    return NotFound();
+                }
+                var dto = _mapper.Map<GiohangDtos>(cartItem);
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        [HttpPatch("{IDGH:guid}")]
+        public async Task<ActionResult<GiohangDtos>> UpdateItem(Guid cartItemId, GioHangUpdate cartItemToUpdate)
+        {
+            try
+            {
+                var cartItem = await _GioHangSer.UpdateItem(cartItemId, cartItemToUpdate);
+                if (cartItem is null)
+                {
+                    return NotFound();
+                }
+                var dto = _mapper.Map<GiohangDtos>(cartItem);
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }
