@@ -26,6 +26,7 @@ namespace F5Clothes_DAL.Helper
             CreateMap<HoaDon, HoaDonDtos>();
             CreateMap<HoaDonChiTiet,HoaDonChiTietDtos>();
             CreateMap<KhachHang, KhachHangDtos>();
+            CreateMap<KhachHangDtos, KhachHang>();
             CreateMap<Image, ImageDtos>();
             CreateMap<LichSuHoaDon, LichSuHoaDonDtos>();
             CreateMap<MauSac, MauSacDtos>();

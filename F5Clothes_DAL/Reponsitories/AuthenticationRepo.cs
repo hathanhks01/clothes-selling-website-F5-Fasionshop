@@ -159,6 +159,7 @@ namespace F5Clothes_DAL.Reponsitories
                     new Claim("MaNv", nhanVien.MaNv),
                     new Claim("HoVaTenNv", nhanVien.HoVaTenNv),
                     new Claim("TaiKhoan", nhanVien.TaiKhoan),
+               
                 });
             }
             // Kiểm tra nếu user là KhachHang
@@ -172,6 +173,8 @@ namespace F5Clothes_DAL.Reponsitories
                     new Claim("MaKh", khachHang.MaKh),
                     new Claim("HoVaTenKh", khachHang.HoVaTenKh),
                     new Claim("TaiKhoan", khachHang.TaiKhoan),
+                    new Claim("IdKhachhang", khachHang.Id.ToString()),
+
                 });
             }
 

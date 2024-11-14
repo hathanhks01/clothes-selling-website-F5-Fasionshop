@@ -35,6 +35,32 @@ namespace F5Clothes_API.Controllers
             return Ok(mappeKh);
         }
 
+        [HttpGet("profile-by-username/{username}")]
+
+
+        public async Task<IActionResult> GetByTK(string username)
+        {
+            // Fetch the customer data by username
+            var khachHang = await _KhachHangRepo.GetByTK(username);
+
+            // Check if the customer data is null
+            if (khachHang == null)
+            {
+                return NotFound(new { message = "Customer not found" });
+            }
+
+            // Map the customer data to KhachHangDtos
+            var mappedKh = _mapper.Map<KhachHangDtos>(khachHang);
+
+            // Validate the model state
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(mappedKh);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByKhachhang(Guid id)
         {
@@ -48,6 +74,8 @@ namespace F5Clothes_API.Controllers
             }
             return Ok(mappeKh);
         }
+        
+
 
         [HttpPut]
         public async Task Update(KhachHang Kh)
@@ -67,6 +95,36 @@ namespace F5Clothes_API.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        [HttpPatch("profile/{id:guid}")]
+        public async Task<IActionResult> UpdateProfile(Guid id, [FromBody] KhachHangProfileUpdateDto profileUpdateDto)
+        {
+            if (profileUpdateDto == null)
+            {
+                return BadRequest("Profile data is required.");
+            }
+
+            var success = await _KhachHangRepo.UpdateProfile(id, profileUpdateDto);
+
+            if (!success)
+            {
+                return NotFound("Customer not found.");
+            }
+
+            return Ok("Profile updated successfully.");
+        }
+
+        [HttpPatch("change-password/{id:guid}")]
+        public async Task<IActionResult> ChangePassword(Guid id, [FromQuery] string oldPassword, [FromQuery] string newPassword)
+        {
+            var success = await _KhachHangRepo.ChangePassword(id, oldPassword, newPassword);
+
+            if (!success)
+            {
+                return BadRequest("Password change failed. Ensure that the old password is correct.");
+            }
+
+            return Ok("Password changed successfully.");
         }
     }
 }

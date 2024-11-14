@@ -12,7 +12,8 @@ namespace F5Clothes_Services.IServices
     {
         Task<List<KhachHang>> GetAllKhachHang();
         Task<KhachHang?> GetByIdKhachHang(Guid id);
-        Task<KhachHang> UpdateKhachHang(KhachHangDtos chatLieuDto);
+        Task<KhachHang> UpdateKhachHang(KhachHangDtos Kh);
         Task DeleteChatLieu(Guid id);
+        Task<bool> ChangePassword(Guid id, string oldPassword, string newPassword);
     }
 }

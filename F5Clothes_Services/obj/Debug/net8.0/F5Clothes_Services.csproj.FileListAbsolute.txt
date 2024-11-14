@@ -1,0 +1,16 @@
+D:\DATN\F5Clothes_Services\bin\Debug\net8.0\F5Clothes_Services.deps.json
+D:\DATN\F5Clothes_Services\bin\Debug\net8.0\F5Clothes_Services.dll
+D:\DATN\F5Clothes_Services\bin\Debug\net8.0\F5Clothes_Services.pdb
+D:\DATN\F5Clothes_Services\bin\Debug\net8.0\F5Clothes_DAL.dll
+D:\DATN\F5Clothes_Services\bin\Debug\net8.0\F5Clothes_DAL.pdb
+D:\DATN\F5Clothes_Services\obj\Debug\net8.0\F5Clothes_Services.csproj.AssemblyReference.cache
+D:\DATN\F5Clothes_Services\obj\Debug\net8.0\F5Clothes_Services.GeneratedMSBuildEditorConfig.editorconfig
+D:\DATN\F5Clothes_Services\obj\Debug\net8.0\F5Clothes_Services.AssemblyInfoInputs.cache
+D:\DATN\F5Clothes_Services\obj\Debug\net8.0\F5Clothes_Services.AssemblyInfo.cs
+D:\DATN\F5Clothes_Services\obj\Debug\net8.0\F5Clothes_Services.csproj.CoreCompileInputs.cache
+D:\DATN\F5Clothes_Services\obj\Debug\net8.0\F5Clothes_Services.sourcelink.json
+D:\DATN\F5Clothes_Services\obj\Debug\net8.0\F5Clothe.48900FB8.Up2Date
+D:\DATN\F5Clothes_Services\obj\Debug\net8.0\F5Clothes_Services.dll
+D:\DATN\F5Clothes_Services\obj\Debug\net8.0\refint\F5Clothes_Services.dll
+D:\DATN\F5Clothes_Services\obj\Debug\net8.0\F5Clothes_Services.pdb
+D:\DATN\F5Clothes_Services\obj\Debug\net8.0\ref\F5Clothes_Services.dll
