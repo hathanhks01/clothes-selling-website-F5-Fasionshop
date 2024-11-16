@@ -75,7 +75,7 @@ builder.Services.AddScoped<IDanhMucService, DanhMucService>();
 builder.Services.AddScoped<IDiaChiRepo, DiaChiRepo>();
 builder.Services.AddScoped<IGiamGiaRepo, GiamGiaRepo>();
 builder.Services.AddScoped<IGiamGiaService, GiamGiaService>();
-builder.Services.AddScoped<IGiohangChiTietRepo, GHCTRepo>();
+builder.Services.AddScoped<IGioHangChiTietRepo, GHCTRepo>();
 builder.Services.AddScoped<IGioHangRepo, GiohangRepo>();
 builder.Services.AddScoped<IHDCTRepo,HDCTRepo>();
 builder.Services.AddScoped<IHoaDonRepo, HoaDonRepo >();

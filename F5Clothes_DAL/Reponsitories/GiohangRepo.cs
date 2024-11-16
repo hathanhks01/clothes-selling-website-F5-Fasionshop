@@ -2,48 +2,64 @@
 using F5Clothes_DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace F5Clothes_DAL.Reponsitories
 {
-    public class GiohangRepo: IGioHangRepo
+    public class GiohangRepo : IGioHangRepo
     {
         private readonly DbduAnTnContext _context;
+
         public GiohangRepo(DbduAnTnContext context)
         {
             _context = context;
         }
-        public async Task AddGh(GioHang gh)
+
+        public async Task AddAsync(GioHang gioHang)
         {
-            _context.Add(gh);
+            await _context.GioHangs.AddAsync(gioHang);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteGh(Guid Id)
+        public async Task DeleteAsync(Guid id)
         {
-            var Gh = await GetByGioHang(Id);
-            _context.Remove(Gh);
+            var gioHang = await GetByIdAsync(id);
+            if (gioHang == null) throw new ArgumentException("Không tìm thấy Giỏ hàng.");
+            _context.GioHangs.Remove(gioHang);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<GioHang>> GetAllGioHang()
+        public async Task<List<GioHang>> GetAllAsync()
         {
             return await _context.GioHangs.ToListAsync();
         }
 
-        public async Task<GioHang> GetByGioHang(Guid id)
+        public async Task<GioHang?> GetByIdAsync(Guid id)
         {
             return await _context.GioHangs.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task UpdateGh(GioHang gh)
+        public async Task UpdateAsync(GioHang gioHang)
         {
-            _context.Entry(gh).State = EntityState.Modified;
+            _context.GioHangs.Update(gioHang);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<GioHang?> GetWithDetailsAsync(Guid id)
+        {
+            return await _context.GioHangs
+                .Include(g => g.GioHangChiTiets)
+                    .ThenInclude(ct => ct.IdSpctNavigation)
+                        .ThenInclude(spct => spct.IdSpNavigation) // Bao gồm thông tin từ Sản phẩm
+                .FirstOrDefaultAsync(g => g.Id == id);
+        }
+
+        public async Task<List<GioHang>> GetByCustomerIdAsync(Guid customerId)
+        {
+            return await _context.GioHangs
+                .Where(gh => gh.IdKh == customerId)  // Lọc theo IdKh (ID khách hàng)
+                .Include(gh => gh.GioHangChiTiets)  // Bao gồm GioHangChiTiet của giỏ hàng
+                    .ThenInclude(ct => ct.IdSpctNavigation)  // Bao gồm SanPhamChiTiet
+                        .ThenInclude(spct => spct.IdSpNavigation)  // Bao gồm thông tin sản phẩm từ SanPhamChiTiet
+                .ToListAsync();
         }
     }
 }
