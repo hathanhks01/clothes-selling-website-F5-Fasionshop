@@ -3,6 +3,7 @@ using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
 using F5Clothes_Services.IServices;
+using F5Clothes_Services.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,18 +37,25 @@ namespace F5Clothes_API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetBySp(Guid id)
+        public async Task<ActionResult<HoaDon>> GetHoaDonById(Guid id)
         {
-
-
-            var mappeHdd = _mapper.Map<HoaDonDtos>(await _HoaDonSV.GetById(id));
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-
+                var hoaDon = await _HoaDonSV.GetById(id);  
+                if (hoaDon == null)
+                {
+                    return NotFound();
+                }
+                return Ok(hoaDon);
             }
-            return Ok(mappeHdd);
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
         }
+
+
+
 
         [HttpPost]
         public async Task GetAll(HoaDon Hd)

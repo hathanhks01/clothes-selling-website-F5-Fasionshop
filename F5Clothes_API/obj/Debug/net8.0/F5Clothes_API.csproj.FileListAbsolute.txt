@@ -77,3 +77,7 @@ C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_
 C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_API\obj\Debug\net8.0\F5Clothes_API.pdb
 C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_API\obj\Debug\net8.0\F5Clothes_API.genruntimeconfig.cache
 C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_API\obj\Debug\net8.0\ref\F5Clothes_API.dll
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_API\bin\Debug\net8.0\F5Clothes_API.staticwebassets.endpoints.json
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_API\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_API\obj\Debug\net8.0\staticwebassets\msbuild.F5Clothes_API.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

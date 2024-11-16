@@ -83,7 +83,7 @@ builder.Services.AddScoped<IGiamGiaService, GiamGiaService>();
 builder.Services.AddScoped<IGiohangChiTietRepo, GHCTRepo>();
 builder.Services.AddScoped<IGioHangRepo, GiohangRepo>();
 builder.Services.AddScoped<IHoaDonChiTietRepositories, HoaDonChiTietRepositories>();
-builder.Services.AddScoped<IHoaDonServices, HoaDonChiTietRepositories>();
+builder.Services.AddScoped<IHoaDonChiTietServices, HoaDonChiTietServices>();
 builder.Services.AddScoped<IHoaDonRepo, HoaDonRepo>();
 builder.Services.AddScoped<IHoaDonServices, HoaDonServices>();
 builder.Services.AddScoped<IImageRepo, ImageRepo>();

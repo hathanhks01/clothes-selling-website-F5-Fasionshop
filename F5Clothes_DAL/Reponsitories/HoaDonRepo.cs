@@ -26,19 +26,43 @@ namespace F5Clothes_DAL.Reponsitories
 
         public async Task DeleteHd(Guid Id)
         {
-            var Hd = await GetByHoaDon(Id);
-            _context.Remove(Hd);
+            var Hd = await _context.HoaDons
+                .Include(h => h.HoaDonChiTiets)  // Đảm bảo các bản ghi HoaDonChiTiets được tải
+                .Include(h => h.HinhThucThanhToans)  // Đảm bảo các bản ghi HinhThucThanhToans được tải
+                .Include(h => h.LichSuHoaDons)
+                .FirstOrDefaultAsync(h => h.Id == Id);
+
+            if (Hd == null)
+            {
+                throw new Exception("HoaDon not found");
+            }
+            _context.LichSuHoaDons.RemoveRange(Hd.LichSuHoaDons);
+            // Xóa các bản ghi phụ thuộc trước
+            _context.HoaDonChiTiets.RemoveRange(Hd.HoaDonChiTiets);  // Xóa bản ghi HoaDonChiTiet
+            _context.HinhThucThanhToans.RemoveRange(Hd.HinhThucThanhToans);  // Xóa bản ghi HinhThucThanhToan
+
+            // Xóa bản ghi HoaDon
+            _context.HoaDons.Remove(Hd);
+
+            // Lưu các thay đổi
             await _context.SaveChangesAsync();
         }
 
+
+
+
+
         public async Task<List<HoaDon>> GetAllHoaDon()
         {
-            return await _context.HoaDons.ToListAsync();
+            return await _context.HoaDons
+                         .Include(hd => hd.IdNvNavigation)  
+                         .Include(hd => hd.IdKhNavigation)  
+                         .ToListAsync();
         }
 
         public async Task<HoaDon> GetByHoaDon(Guid id)
         {
-            return await _context.HoaDons.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.HoaDons.FindAsync(id);
         }
 
         public async Task UpdateHd(HoaDon Hd)
