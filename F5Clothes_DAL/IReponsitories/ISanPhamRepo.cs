@@ -17,7 +17,8 @@ namespace F5Clothes_DAL.IReponsitories
         Task<SanPham> AddSanPham(SanPhamDtos sanPhamDto);
         Task<SanPham> UpdateSanPham(SanPhamDtos sanPhamDto);
         Task DeleteSanPham(Guid id);
-
+        Task<IEnumerable<object>> GetAllSanPhamsWithDetailsAsync(); 
+        Task<object> GetSanPhamWithDetailsAsync(Guid sanPhamId);
 
     }
 }
