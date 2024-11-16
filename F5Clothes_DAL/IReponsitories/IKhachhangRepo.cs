@@ -13,6 +13,7 @@ namespace F5Clothes_DAL.IReponsitories
     {
         Task<List<KhachHang>> GetAllKhachHang();
         Task<List<KhachHangDtos>> GetKhachHang(ListKhachHangModel valid);
+        Task<KhachHang> GetByMaKhachHang(string maKH);
         Task<KhachHang> GetByKhachHang(Guid id);
         Task UpdateKh(KhachHang Kh);
         Task DeleteKh(Guid Id);

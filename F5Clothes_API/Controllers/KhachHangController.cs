@@ -48,13 +48,28 @@ namespace F5Clothes_API.Controllers
             }
             return Ok(mappeKh);
         }
-
         [HttpPut]
         public async Task Update(KhachHang Kh)
         {
             await _KhachHangRepo.UpdateKh(Kh);
         }
+        [HttpGet("ma-khach-hang/{maKH}")]
+        public async Task<IActionResult> GetByMaKhachHang(string maKH)
+        {
+            var khachHang = await _KhachHangRepo.GetByMaKhachHang(maKH);
+            if (khachHang == null)
+            {
+                return NotFound($"Khách hàng với mã {maKH} không tồn tại.");
+            }
 
+            var mappeKh = _mapper.Map<KhachHangDtos>(khachHang);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(mappeKh);
+        }
         [HttpGet("list")]
         public async Task<IActionResult> GetList([FromQuery] ListKhachHangModel model)
         {
