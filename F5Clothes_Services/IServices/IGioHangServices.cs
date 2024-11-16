@@ -19,8 +19,8 @@ namespace F5Clothes_Services.IServices
         
         Task<GioHangChiTiet> GetItem(Guid id);
 
-        
-        Task<GioHangChiTiet> RemoveItem(Guid id);
+
+        Task<bool> RemoveItem(Guid id);
 
         
         Task<GioHangChiTiet> UpdateItem(Guid cartItemId, GioHangUpdate itemToUpdate);

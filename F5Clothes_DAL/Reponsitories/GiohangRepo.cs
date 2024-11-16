@@ -27,58 +27,91 @@ namespace F5Clothes_DAL.Reponsitories
                 .AnyAsync(x => x.IdSpct == IdSp && x.IdGh == Id);
         }
 
-        public async Task<GioHangChiTiet> AddItem(GioHangChiTietDtos itemToAdd)
+        public async Task<GioHangChiTiet?> AddItem(GioHangChiTietDtos itemToAdd)
         {
-            if (await CartItemExists(itemToAdd.IdGh, itemToAdd.IdSpct) == false)
+            // Kiểm tra xem mục đã tồn tại trong giỏ hàng chưa
+            if (!await CartItemExists(itemToAdd.IdGh, itemToAdd.IdSpct))
             {
-                var item = await
-                    (from SanPhamChiTiet  in _context.SanPhamChiTiets
-                     where SanPhamChiTiet.Id == itemToAdd.IdSpct
-                     select new GioHangChiTiet
-                     {
-                         Id= new Guid(),
-                         IdGh = itemToAdd.IdGh,
-                         IdSpct = SanPhamChiTiet.Id,
-                         SoLuong = itemToAdd.SoLuong,
-                         NgayTao = DateTime.Now,
-                         
-                     })
-                     .FirstOrDefaultAsync();
+                // Lấy thông tin sản phẩm chi tiết từ CSDL
+                var sanPhamChiTiet = await _context.SanPhamChiTiets
+                    .FirstOrDefaultAsync(x => x.Id == itemToAdd.IdSpct);
 
-
-                if (item != null)
+                if (sanPhamChiTiet == null)
                 {
+                    // Không tìm thấy sản phẩm chi tiết
+                    throw new KeyNotFoundException($"Không tìm thấy sản phẩm chi tiết với Id: {itemToAdd.IdSpct}");
+                }
+
+                // Tạo đối tượng giỏ hàng chi tiết
+                var item = new GioHangChiTiet
+                {
+                    IdGh = itemToAdd.IdGh,
+                    IdSpct = sanPhamChiTiet.Id,
+                    SoLuong = itemToAdd.SoLuong,
+                    NgayTao = DateTime.UtcNow
+                };
+
+                try
+                {
+                    // Thêm mục vào cơ sở dữ liệu
                     var result = await _context.AddAsync(item);
                     await _context.SaveChangesAsync();
+
+                    // Trả về mục vừa thêm
                     return result.Entity;
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Lỗi khi thêm mục vào giỏ hàng: {ex.Message}");
+                    throw new Exception("Đã xảy ra lỗi khi thêm mục vào giỏ hàng.", ex);
+                }
             }
+
+            // Mục đã tồn tại trong giỏ hàng
             return null;
         }
 
+
+
+
+
         public async Task<IEnumerable<GioHangChiTiet>> GetAll(Guid userId)
         {
-            return await _context.GioHangChiTiets
+            var result = await _context.GioHangChiTiets
                 .AsNoTracking()
                 .Include(c => c.IdGhNavigation)
                 .Include(c => c.IdSpctNavigation)
-                .Where(c => c.IdGhNavigation.IdKh == userId)
+                .Where(c => c.IdGhNavigation != null && c.IdGhNavigation.IdKh == userId)
                 .ToListAsync();
 
+            if (result.Any(c => c.IdGhNavigation == null || c.IdSpctNavigation == null))
+            {
+                Console.WriteLine($"Cảnh báo: Có thuộc tính điều hướng null cho UserId: {userId}");
+            }
+
+            return result;
         }
 
-        public async Task<GioHangChiTiet> GetItem(Guid id)
+
+        public async Task<GioHangChiTiet?> GetItem(Guid id)
         {
-            return await _context.GioHangChiTiets
-                .AsNoTracking()
-                .AsSplitQuery()
-                .Include(x => x.IdGhNavigation)
-                .Include(x => x.IdSpctNavigation)
-                .Where(x => x.Id == id)
-                .SingleOrDefaultAsync();
+            var item = await _context.GioHangChiTiets
+                .Include(c => c.IdSpctNavigation)
+                .ThenInclude(spct => spct.IdSpNavigation)
+                .FirstOrDefaultAsync(x => x.IdGh == id);
+
+            // Kiểm tra nếu item hoặc các liên kết quan trọng là null
+            if (item == null || item.IdSpctNavigation?.IdSpNavigation == null)
+            {
+                return null; // Hoặc ném ra một exception tùy thuộc vào cách xử lý lỗi của bạn
+            }
+
+            return item;
         }
 
-        public async Task<GioHangChiTiet> RemoveItem(Guid id)
+
+
+        public async Task<bool> RemoveItem(Guid id)
         {
             var cartItem = await _context.GioHangChiTiets
                 .Include(x => x.IdSpctNavigation)
@@ -88,10 +121,11 @@ namespace F5Clothes_DAL.Reponsitories
             {
                 _context.GioHangChiTiets.Remove(cartItem);
                 await _context.SaveChangesAsync();
+                return true; // Indicating success
             }
-            return cartItem;
-
+            return false; // Indicating failure
         }
+
 
         public async Task<GioHangChiTiet> UpdateItem(Guid cartItemId, GioHangUpdate itemToUpdate)
         {

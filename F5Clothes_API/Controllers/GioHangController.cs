@@ -25,54 +25,90 @@ namespace F5Clothes_API.Controllers
 
 
 
-        [HttpGet("{IdKh:Guid}")]
-        public async Task<ActionResult<GiohangDtos>> GetAllGh(Guid idKh)
+        [HttpGet("all/{idKh}")]
+        public async Task<ActionResult<IEnumerable<GiohangDtos>>> GetAllGh(Guid idKh)
         {
             try
             {
-                // Get all the items from the service
+                // Fetch the cart items
                 var ghct = await _GioHangSer.GetAll(idKh);
 
-                // If no items are found, return NoContent status
                 if (ghct == null || !ghct.Any())
                 {
-                    return NoContent();
+                    return NotFound("Không có sản phẩm nào.");
                 }
 
-                // Map the data to DTOs
+                // Debugging: Log or inspect the content of ghct
+                Console.WriteLine($"Found {ghct.Count()} items for User {idKh}");
+
+                // Check each item for null navigation properties
+                foreach (var item in ghct)
+                {
+                    if (item.IdSpctNavigation == null)
+                    {
+                        // Log the item or user information where the null navigation was found
+                        Console.WriteLine($"Item with ID {item.IdGh} has null IdSpctNavigation.");
+                        return BadRequest("Dữ liệu liên kết bị thiếu.");
+                    }
+
+                    // You can add more checks if needed, for example:
+                    if (item.IdSpctNavigation.IdSpNavigation == null)
+                    {
+                        Console.WriteLine($"Item with ID {item.IdGh} has null IdSpNavigation.");
+                        return BadRequest("Dữ liệu sản phẩm bị thiếu.");
+                    }
+                }
+
+                // Map to DTOs
                 var dtos = _mapper.Map<IEnumerable<GiohangDtos>>(ghct);
 
-                // Return the mapped DTOs with an OK status
                 return Ok(dtos);
             }
             catch (Exception ex)
             {
-                // Return 500 error if something goes wrong
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                // Log the exception message for debugging purposes
+                Console.WriteLine($"Exception occurred: {ex.Message}");
+
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Lỗi xảy ra: {ex.Message}");
             }
         }
 
 
-        [HttpGet("{IDGH:guid}")]
+        [HttpGet("single/{cartItemId}")]
         public async Task<ActionResult<GiohangDtos>> GetItem(Guid cartItemId)
         {
             try
             {
+                // Gọi service để lấy mục trong giỏ hàng
                 var cartItem = await _GioHangSer.GetItem(cartItemId);
 
+                // Kiểm tra nếu không tìm thấy dữ liệu
                 if (cartItem == null)
                 {
-                    return NotFound();
+                    return NotFound("Không tìm thấy mục giỏ hàng.");
                 }
-                var dto = _mapper.Map<GiohangDtos>(cartItem);
-                return Ok(dto);
 
+                // Kiểm tra nếu _mapper chưa được khởi tạo
+                if (_mapper == null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Cấu hình AutoMapper không hợp lệ.");
+                }
+
+                // Ánh xạ sang DTO
+                var dto = _mapper.Map<GiohangDtos>(cartItem);
+
+                // Trả về dữ liệu
+                return Ok(dto);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                // Trả về lỗi nội bộ với thông tin chi tiết
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Lỗi xảy ra: {ex.Message}");
             }
         }
+
+
+
         [HttpPost]
         public async Task<ActionResult<GiohangDtos>> AddItem([FromBody] GioHangChiTietDtos cartItemToAdd)
         {
@@ -93,7 +129,7 @@ namespace F5Clothes_API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        [HttpDelete("{IDGH:guid}")]
+        [HttpDelete("{IDGH}")]
         public async Task<ActionResult<GiohangDtos>> RemoveItem(Guid cartItemId)
         {
             try
@@ -111,7 +147,7 @@ namespace F5Clothes_API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        [HttpPatch("{IDGH:guid}")]
+        [HttpPatch("{IDGH}")]
         public async Task<ActionResult<GiohangDtos>> UpdateItem(Guid cartItemId, GioHangUpdate cartItemToUpdate)
         {
             try

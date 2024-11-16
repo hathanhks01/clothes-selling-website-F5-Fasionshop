@@ -18,7 +18,7 @@ namespace F5Clothes_DAL.IReponsitories
         Task<GioHangChiTiet> GetItem(Guid id);
 
         // Removes an item from the cart by its ID
-        Task<GioHangChiTiet> RemoveItem(Guid id);
+        Task<bool> RemoveItem(Guid id);
 
         // Updates the quantity of a cart item
         Task<GioHangChiTiet> UpdateItem(Guid cartItemId, GioHangUpdate itemToUpdate);

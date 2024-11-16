@@ -35,7 +35,7 @@ namespace F5Clothes_Services.Services
             return _gioHangRepo.GetItem(id);
         }
 
-        public Task<GioHangChiTiet> RemoveItem(Guid id)
+        public Task<bool> RemoveItem(Guid id)
         {
             return _gioHangRepo.RemoveItem(id);
         }
