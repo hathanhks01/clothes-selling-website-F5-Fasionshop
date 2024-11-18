@@ -8,19 +8,12 @@ namespace F5Clothes_DAL.IReponsitories
 {
     public interface IGioHangRepo
     {
-        // Adds a new item to the cart
-        Task<GioHangChiTiet> AddItem(GioHangChiTietDtos itemToAdd);
-
-        // Retrieves all cart items for a given user
-        Task<IEnumerable<GioHangChiTiet>> GetAll(Guid userId);
-
-        // Retrieves a specific cart item by its ID
-        Task<GioHangChiTiet> GetItem(Guid id);
-
-        // Removes an item from the cart by its ID
-        Task<bool> RemoveItem(Guid id);
-
-        // Updates the quantity of a cart item
-        Task<GioHangChiTiet> UpdateItem(Guid cartItemId, GioHangUpdate itemToUpdate);
+        Task<List<GiohangDtos>> GetAllGioHangAsync(Guid idKh);
+        Task<GiohangDtos> GetGioHangByIdAsync(Guid id);
+        Task<decimal> GetProductPriceAsync(Guid idSpct);
+        Task<GioHangChiTiet> GetCartItemByIdsAsync(Guid idGh, Guid idSpct);
+        Task AddGioHangAsync(GioHangChiTiet newCartItem);
+        Task UpdateGioHangAsync(GioHangChiTiet updatedCartItem);
+        Task DeleteGioHangAsync(Guid id);
     }
 }

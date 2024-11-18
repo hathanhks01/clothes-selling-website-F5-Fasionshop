@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace F5Clothes_DAL.DTOs
 {
-    public class GioHangChiTietDtos
+    public class AddGioHangDtos
     {
 
-
+        public Guid Id { get; set; }= Guid.NewGuid();
         public Guid IdGh { get; set; }
 
         public Guid IdSpct { get; set; }
@@ -21,5 +21,6 @@ namespace F5Clothes_DAL.DTOs
     {
         public Guid id { get; set; }
         public int SoLuong { get; set; }
+
     }
 }

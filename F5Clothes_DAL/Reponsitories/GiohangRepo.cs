@@ -20,125 +20,112 @@ namespace F5Clothes_DAL.Reponsitories
             _context = context;
         }
 
-        private async Task<bool> CartItemExists(Guid Id, Guid IdSp)
+        // Get all cart items for a specific customer
+        public async Task<List<GiohangDtos>> GetAllGioHangAsync(Guid idKh)
         {
-            return await _context.GioHangChiTiets
-                .AsNoTracking()
-                .AnyAsync(x => x.IdSpct == IdSp && x.IdGh == Id);
-        }
+            var existingCart = await _context.GioHangs
+         .FirstOrDefaultAsync(gh => gh.IdKh == idKh);
 
-        public async Task<GioHangChiTiet?> AddItem(GioHangChiTietDtos itemToAdd)
-        {
-            // Kiểm tra xem mục đã tồn tại trong giỏ hàng chưa
-            if (!await CartItemExists(itemToAdd.IdGh, itemToAdd.IdSpct))
+            // If no cart exists, create one
+            if (existingCart == null)
             {
-                // Lấy thông tin sản phẩm chi tiết từ CSDL
-                var sanPhamChiTiet = await _context.SanPhamChiTiets
-                    .FirstOrDefaultAsync(x => x.Id == itemToAdd.IdSpct);
-
-                if (sanPhamChiTiet == null)
+                var newCart = new GioHang
                 {
-                    // Không tìm thấy sản phẩm chi tiết
-                    throw new KeyNotFoundException($"Không tìm thấy sản phẩm chi tiết với Id: {itemToAdd.IdSpct}");
-                }
-
-                // Tạo đối tượng giỏ hàng chi tiết
-                var item = new GioHangChiTiet
-                {
-                    IdGh = itemToAdd.IdGh,
-                    IdSpct = sanPhamChiTiet.Id,
-                    SoLuong = itemToAdd.SoLuong,
-                    NgayTao = DateTime.UtcNow
+                    Id = Guid.NewGuid(), // Generate a new unique ID for the cart
+                    IdKh = idKh,
+                    NgayTao = DateTime.UtcNow, // Add the current timestamp
+                                               // Add other default values as needed
                 };
+                _context.GioHangs.Add(newCart);
+                await _context.SaveChangesAsync();
 
-                try
-                {
-                    // Thêm mục vào cơ sở dữ liệu
-                    var result = await _context.AddAsync(item);
-                    await _context.SaveChangesAsync();
-
-                    // Trả về mục vừa thêm
-                    return result.Entity;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Lỗi khi thêm mục vào giỏ hàng: {ex.Message}");
-                    throw new Exception("Đã xảy ra lỗi khi thêm mục vào giỏ hàng.", ex);
-                }
+                // Set the new cart for the customer
+                existingCart = newCart;
             }
 
-            // Mục đã tồn tại trong giỏ hàng
-            return null;
-        }
-
-
-
-
-
-        public async Task<IEnumerable<GioHangChiTiet>> GetAll(Guid userId)
-        {
-            var result = await _context.GioHangChiTiets
-                .AsNoTracking()
-                .Include(c => c.IdGhNavigation)
-                .Include(c => c.IdSpctNavigation)
-                .Where(c => c.IdGhNavigation != null && c.IdGhNavigation.IdKh == userId)
+            // Fetch cart details
+            var gioHangDtos = await _context.GioHangChiTiets
+                .Where(ghct => ghct.IdGh == existingCart.Id)
+                .Include(ghct => ghct.IdSpctNavigation)
+                    .ThenInclude(spct => spct.IdSpNavigation)
+                .Select(ghct => new GiohangDtos
+                {
+                    IdGh = ghct.IdGh,
+                    IdSpct = ghct.IdSpct,
+                    TenSp = ghct.IdSpctNavigation.IdSpNavigation.TenSp,
+                    HinhAnh = ghct.IdSpctNavigation.IdSpNavigation.ImageDefaul,
+                    TenMauSac = ghct.IdSpctNavigation.IdMsNavigation.TenMauSac,
+                    TenSize = ghct.IdSpctNavigation.IdSizeNavigation.TenSize,
+                    SoLuong = ghct.SoLuong,
+                    DonGia = ghct.DonGia,
+                    TongTien = ghct.SoLuong * ghct.DonGia
+                })
                 .ToListAsync();
 
-            if (result.Any(c => c.IdGhNavigation == null || c.IdSpctNavigation == null))
-            {
-                Console.WriteLine($"Cảnh báo: Có thuộc tính điều hướng null cho UserId: {userId}");
-            }
+            return gioHangDtos;
+        }
 
-            return result;
+        // Get a specific cart item by its ID
+        public async Task<GiohangDtos> GetGioHangByIdAsync(Guid id)
+        {
+            var gioHangDto = await _context.GioHangChiTiets
+                .Where(ghct => ghct.Id == id)
+                .Include(ghct => ghct.IdSpctNavigation)
+                    .ThenInclude(spct => spct.IdSpNavigation)
+                .Select(ghct => new GiohangDtos
+                {
+                    IdGh = ghct.IdGh,
+                    IdSpct = ghct.IdSpct,
+                    TenSp = ghct.IdSpctNavigation.IdSpNavigation.TenSp,
+                    HinhAnh = ghct.IdSpctNavigation.IdSpNavigation.ImageDefaul,
+                    TenMauSac = ghct.IdSpctNavigation.IdMsNavigation.TenMauSac,
+                    TenSize = ghct.IdSpctNavigation.IdSizeNavigation.TenSize,
+                    SoLuong = ghct.SoLuong,
+                    DonGia = ghct.DonGia,
+                    TongTien = ghct.SoLuong * ghct.DonGia
+                })
+                .FirstOrDefaultAsync();
+
+            return gioHangDto;
+        }
+
+        // Get the price of a product variant
+        public async Task<decimal> GetProductPriceAsync(Guid idSpct)
+        {
+            return (decimal)await _context.SanPhamChiTiets
+                    .Where(spct => spct.Id == idSpct)
+                    .Select(spct => spct.IdSpNavigation.GiaBan)
+                    .FirstOrDefaultAsync();
+        }
+        public async Task<GioHangChiTiet> GetCartItemByIdsAsync(Guid idGh, Guid idSpct)
+        {
+            return await _context.GioHangChiTiets
+                .FirstOrDefaultAsync(g => g.IdGh == idGh && g.IdSpct == idSpct);
+        }
+        // Add a new item to the cart
+        public async Task AddGioHangAsync(GioHangChiTiet newCartItem)
+        {
+            _context.GioHangChiTiets.Add(newCartItem);
+            await _context.SaveChangesAsync();
+        }
+
+        // Update a cart item
+        public async Task UpdateGioHangAsync(GioHangChiTiet updatedCartItem)
+        {
+            _context.GioHangChiTiets.Update(updatedCartItem);  // Cập nhật bản ghi trong cơ sở dữ liệu
+            await _context.SaveChangesAsync();  // Lưu thay đổi vào database
         }
 
 
-        public async Task<GioHangChiTiet?> GetItem(Guid id)
+        // Delete a cart item
+        public async Task DeleteGioHangAsync(Guid id)
         {
-            var item = await _context.GioHangChiTiets
-                .Include(c => c.IdSpctNavigation)
-                .ThenInclude(spct => spct.IdSpNavigation)
-                .FirstOrDefaultAsync(x => x.IdGh == id);
-
-            // Kiểm tra nếu item hoặc các liên kết quan trọng là null
-            if (item == null || item.IdSpctNavigation?.IdSpNavigation == null)
+            var gioHangChiTiet = await _context.GioHangChiTiets.FindAsync(id);
+            if (gioHangChiTiet != null)
             {
-                return null; // Hoặc ném ra một exception tùy thuộc vào cách xử lý lỗi của bạn
-            }
-
-            return item;
-        }
-
-
-
-        public async Task<bool> RemoveItem(Guid id)
-        {
-            var cartItem = await _context.GioHangChiTiets
-                .Include(x => x.IdSpctNavigation)
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (cartItem != null)
-            {
-                _context.GioHangChiTiets.Remove(cartItem);
+                _context.GioHangChiTiets.Remove(gioHangChiTiet);
                 await _context.SaveChangesAsync();
-                return true; // Indicating success
             }
-            return false; // Indicating failure
-        }
-
-
-        public async Task<GioHangChiTiet> UpdateItem(Guid cartItemId, GioHangUpdate itemToUpdate)
-        {
-            var cartItem = await _context.GioHangChiTiets
-                .Include(x => x.IdSpctNavigation)
-                .SingleOrDefaultAsync(x => x.Id == cartItemId);
-
-            if (cartItem is not null)
-            {
-                cartItem.SoLuong = itemToUpdate.SoLuong;
-                await _context.SaveChangesAsync();
-            }
-            return cartItem;
         }
     }
 }

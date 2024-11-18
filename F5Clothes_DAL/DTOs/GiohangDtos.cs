@@ -11,7 +11,8 @@ namespace F5Clothes_DAL.DTOs
        
         public Guid IdGh { get; set; }
         public string TenSp { get; set; }
-       
+        public string TenMauSac { get; set; }
+        public string TenSize { get; set; }
         public string HinhAnh { get; set; }
         public Guid IdSpct { get; set; }
 

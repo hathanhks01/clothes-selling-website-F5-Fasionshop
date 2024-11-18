@@ -11,18 +11,10 @@ namespace F5Clothes_Services.IServices
 {
     public interface IGioHangServices
     {
-        Task<GioHangChiTiet> AddItem(GioHangChiTietDtos itemToAdd);
-
-        
-        Task<IEnumerable<GioHangChiTiet>> GetAll(Guid userId);
-
-        
-        Task<GioHangChiTiet> GetItem(Guid id);
-
-
-        Task<bool> RemoveItem(Guid id);
-
-        
-        Task<GioHangChiTiet> UpdateItem(Guid cartItemId, GioHangUpdate itemToUpdate);
+        Task<List<GiohangDtos>> GetAllGioHangAsync(Guid idKh);
+        Task<GiohangDtos> GetGioHangByIdAsync(Guid id);
+        Task AddGioHangAsync(AddGioHangDtos addDto);
+        Task UpdateGioHangAsync(GioHangUpdate updateDto);
+        Task DeleteGioHangAsync(Guid id);
     }
 }
