@@ -8,7 +8,7 @@ namespace F5Clothes_DAL.DTOs
 {
     public class GiohangDtos
     {
-       
+        public Guid Id { get; set; }
         public Guid IdGh { get; set; }
         public string TenSp { get; set; }
         public string TenMauSac { get; set; }

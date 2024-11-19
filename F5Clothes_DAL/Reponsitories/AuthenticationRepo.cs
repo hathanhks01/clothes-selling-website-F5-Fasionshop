@@ -50,7 +50,7 @@ namespace F5Clothes_DAL.Reponsitories
         public async Task<(KhachHang, string)> Register(Customer customer)
         {
 
-            var KhachHangExist = _context.KhachHangs.FirstOrDefault(x => x.Id == customer.Id);
+            var KhachHangExist = _context.KhachHangs.FirstOrDefault(x => x.MaKh == customer.MaKh);
             KhachHang user;
             if (KhachHangExist == null)
             {

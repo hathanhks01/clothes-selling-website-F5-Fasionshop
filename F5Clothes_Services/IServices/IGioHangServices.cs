@@ -16,5 +16,7 @@ namespace F5Clothes_Services.IServices
         Task AddGioHangAsync(AddGioHangDtos addDto);
         Task UpdateGioHangAsync(GioHangUpdate updateDto);
         Task DeleteGioHangAsync(Guid id);
+        Task PlaceOrderAsync(Guid customerId, OrderInfoDto orderInfo);
+        
     }
 }

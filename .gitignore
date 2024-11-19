@@ -1,3 +1,42 @@
+# Chặn tất cả các file có đuôi .bin
+*.bin
 /.vs
 /bin
 /obj
+
+# Chặn các file nhị phân khác như .exe, .dll, .dat
+*.exe
+*.dll
+*.dat
+*.obj
+*.so
+*.dylib
+
+# Chặn thư mục chứa các file binary
+bin/
+# Chặn các file model (ví dụ .h5, .pkl, .pt)
+*.h5
+*.pkl
+*.pt
+
+# Chặn thư mục build, dist hoặc các thư mục sinh ra khi build
+build/
+dist/
+
+# Chặn các file tạm thời, log, hoặc file sinh ra khi debug
+*.log
+*.out
+*.tmp
+*.swp
+*.bak
+
+.vs/
+
+
+# Chặn các file hệ thống (ví dụ .DS_Store trên macOS)
+.DS_Store
+Thumbs.db
+
+# Chặn các file cấu hình tạm thời của IDE (Visual Studio Code, IntelliJ, v.v.)
+.vscode/
+.idea/

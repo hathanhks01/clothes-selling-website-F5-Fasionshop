@@ -50,6 +50,7 @@ namespace F5Clothes_DAL.Reponsitories
                     .ThenInclude(spct => spct.IdSpNavigation)
                 .Select(ghct => new GiohangDtos
                 {
+                    Id = ghct.Id,
                     IdGh = ghct.IdGh,
                     IdSpct = ghct.IdSpct,
                     TenSp = ghct.IdSpctNavigation.IdSpNavigation.TenSp,
@@ -109,6 +110,7 @@ namespace F5Clothes_DAL.Reponsitories
             await _context.SaveChangesAsync();
         }
 
+
         // Update a cart item
         public async Task UpdateGioHangAsync(GioHangChiTiet updatedCartItem)
         {
@@ -126,6 +128,7 @@ namespace F5Clothes_DAL.Reponsitories
                 _context.GioHangChiTiets.Remove(gioHangChiTiet);
                 await _context.SaveChangesAsync();
             }
+            if (gioHangChiTiet == null) throw new Exception("Cart item not found.");
         }
     }
 }

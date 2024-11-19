@@ -100,9 +100,7 @@ builder.Services.AddScoped<IXuatXuRepo, XuatXuRepo>();
 builder.Services.AddScoped<IXuatXuService, XuatXuService>();
 builder.Services.AddScoped<IHinhThucThanhToanRepo, HinhThucThanhToanRepo>();
 builder.Services.AddScoped<IVoucherService, VoucherService>();
-builder.Services.AddScoped<IKhachHangService, KhachHangService>();
-builder.Services.AddScoped<IGioHangServices,GioHangServices>();
-
+builder.Services.AddScoped<IGioHangServices, GioHangServices>();
 
 
 var app = builder.Build();

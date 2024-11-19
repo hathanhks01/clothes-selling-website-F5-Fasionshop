@@ -7,18 +7,32 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using F5Clothes_DAL.Reponsitories;
 
 namespace F5Clothes_Services.Services
 {
     public class GioHangServices : IGioHangServices
     {
         private readonly IGioHangRepo _gioHangRepo;
+        
         private readonly IMapper _mapper;
+        private readonly ISPCTRepo _sPCTRepo;
+        private readonly IHoaDonRepo _hoaDonRepo;
+        private readonly IHDCTRepo _hDCTRepo;
+        private readonly IVoucherRepo _voucherRepo;
+        private readonly IDiaChiRepo _diaChiRepo;
 
-        public GioHangServices(IGioHangRepo gioHangRepo, IMapper mapper)
+        public GioHangServices(IGioHangRepo gioHangRepo, 
+            IMapper mapper, ISPCTRepo sPCTRepo,IHoaDonRepo hoaDonRepo,
+            IHDCTRepo hDCTRepo,IVoucherRepo voucherRepo, IDiaChiRepo diaChiRepo)
         {
             _gioHangRepo = gioHangRepo;
             _mapper = mapper;
+            _sPCTRepo = sPCTRepo;
+            _hoaDonRepo = hoaDonRepo;
+            _hDCTRepo = hDCTRepo;
+            _voucherRepo = voucherRepo;
+           _diaChiRepo = diaChiRepo;
         }
 
         // Retrieve all cart items for a customer by ID
@@ -36,8 +50,126 @@ namespace F5Clothes_Services.Services
             if (gioHangChiTiet == null) throw new Exception("Cart item not found.");
             return _mapper.Map<GiohangDtos>(gioHangChiTiet);
         }
+        public async Task<decimal?> ApplyVoucherAsync(OrderInfoDto orderInfo, decimal tongTien)
+        {
+            if (!orderInfo.VoucherId.HasValue)
+                return 0;
 
-        // Add a new cart item
+            var voucher = await _voucherRepo.GetByVouCher(orderInfo.VoucherId.Value);
+            if (voucher == null || voucher.TrangThai ==2)
+                throw new Exception("Voucher không hợp lệ hoặc đã hết hiệu lực.");
+
+            var now = DateTime.UtcNow; // Or DateTime.Now based on your time zone choice
+            if (DateTime.Compare(voucher.NgayBatDau.Value, now) > 0 || DateTime.Compare(voucher.NgayKetThuc.Value, now) < 0)
+            {
+                throw new Exception("Voucher không còn hiệu lực.");
+            }
+
+
+
+
+            if (tongTien < (voucher.DieuKienToiThieuHoaDon ?? 0))
+                throw new Exception($"Hóa đơn không đạt điều kiện tối thiểu để sử dụng mã giảm giá. Yêu cầu tối thiểu: {voucher.DieuKienToiThieuHoaDon}.");
+
+            decimal? giaTriGiam = 0;
+            if (voucher.HinhThucGiam == 1) // Giảm theo phần trăm
+            {
+                var discountPercent = (voucher.GiaTriGiam ?? 0) / 100m;
+                giaTriGiam = tongTien * discountPercent;
+
+                if (giaTriGiam > tongTien)
+                    giaTriGiam = tongTien;
+            }
+            else if (voucher.HinhThucGiam == 2) // Giảm số tiền cố định
+            {
+                giaTriGiam = voucher.GiaTriGiam;
+
+                if (giaTriGiam > tongTien)
+                    giaTriGiam = tongTien;
+            }
+
+            return giaTriGiam;
+        }
+
+        public async Task PlaceOrderAsync(Guid customerId, OrderInfoDto orderInfo)
+        {
+            var cartItems = await _gioHangRepo.GetAllGioHangAsync(customerId);
+
+            if (cartItems == null || !cartItems.Any())
+                throw new Exception("Giỏ hàng trống, không thể đặt hàng.");
+
+            decimal tongTien = cartItems.Sum(item => item.SoLuong * item.DonGia);
+
+            // Áp dụng mã giảm giá
+            decimal? giaTriGiam = await ApplyVoucherAsync(orderInfo, tongTien);
+            tongTien -= giaTriGiam ?? 0;
+
+            // Generate MaHoaDon
+            var maHoaDon = await GenerateMaHoaDonAsync();
+
+            var hoaDon = new HoaDon
+            {
+                MaHoaDon = maHoaDon,
+                IdKh = customerId,
+                NgayTao = DateTime.Now,
+                TrangThai = 0,
+                LoaiHoaDon = 1,
+                DiaChiNhanHang = orderInfo.DiaChiNhanHang,
+                TenNguoiNhan = orderInfo.TenNguoiNhan,
+                SdtnguoiNhan = orderInfo.SdtNguoiNhan,
+                IdVouCher = orderInfo.VoucherId,
+                ThanhTien = tongTien,
+                GiaTriGiam = giaTriGiam,
+                GhiChu = orderInfo.GhiChu
+            };
+
+            await _hoaDonRepo.AddHd(hoaDon);
+
+            foreach (var item in cartItems)
+            {
+                var product = await _sPCTRepo.GetByIdSanPhamChiTiet(item.IdSpct);
+                if (product.SoLuongTon < item.SoLuong)
+                    throw new Exception($"Không đủ số lượng sản phẩm {product.IdSpNavigation.TenSp} trong kho.");
+
+                product.SoLuongTon -= item.SoLuong;
+                await _sPCTRepo.UpdateSanPhamChiTiet(_mapper.Map<SanPhamChiTietDtos>(product));
+
+                var hoaDonChiTiet = new HoaDonChiTiet
+                {
+                    IdHd = hoaDon.Id,
+                    IdSpct = item.IdSpct,
+                    SoLuong = item.SoLuong,
+                    DonGia = item.DonGia,
+                    NgayTao = DateTime.Now
+                };
+                await _hDCTRepo.AddHDCT(hoaDonChiTiet);
+
+                await _gioHangRepo.DeleteGioHangAsync(item.Id);
+            }
+        }
+
+        private async Task<string> GenerateMaHoaDonAsync()
+        {
+            var latestHoaDon = await _hoaDonRepo.GetLatestOrderAsync();
+
+            if (latestHoaDon == null)
+            {
+                return "DH00001"; // No orders exist, start with DH00001
+            }
+
+            var lastOrderNumber = latestHoaDon.MaHoaDon;
+            var numericPart = lastOrderNumber.Substring(2); // Extracts part after "DH"
+            if (int.TryParse(numericPart, out int lastNumber))
+            {
+                return $"DH{(lastNumber + 1):D5}"; // Format as DHxxxxx
+            }
+            else
+            {
+                throw new Exception("Lỗi khi tạo mã hóa đơn.");
+            }
+        }
+
+
 
         public async Task AddGioHangAsync(AddGioHangDtos addDto)
         {
@@ -94,5 +226,7 @@ namespace F5Clothes_Services.Services
             // Delete the cart item from the repository
             await _gioHangRepo.DeleteGioHangAsync(id);
         }
+
+       
     }
 }

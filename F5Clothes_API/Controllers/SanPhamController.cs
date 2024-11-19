@@ -15,11 +15,13 @@ namespace F5Clothes_API.Controllers
     public class SanPhamController : ControllerBase
     {
         private readonly ISanPhamServices _sanPhamSer;
-        public SanPhamController(ISanPhamServices sanPhamSer)
+        private readonly ISanPhamRepo _sanPhamRepo;
+        public SanPhamController(ISanPhamServices sanPhamSer, ISanPhamRepo sanPhamRepo)
         {
             _sanPhamSer = sanPhamSer;
+            _sanPhamRepo = sanPhamRepo;
         }
-        [HttpGet]
+        [HttpGet("GetAll")]
         public async Task<List<SanPham>> GetAll()
         {
             return await _sanPhamSer.GetAllSanPham();
@@ -30,7 +32,17 @@ namespace F5Clothes_API.Controllers
         {
             return await _sanPhamSer.GetByIdSanPham(id);
         }
+        [HttpGet("store")]
+        public async Task<IEnumerable<object>> GetAllSanPhamsAsync()
+        {
+            return await _sanPhamRepo.GetAllSanPhamsWithDetailsAsync();
+        }
 
+        [HttpGet("{id}/details")]
+        public async Task<object> GetSanPhamDetailsByIdAsync(Guid id)
+        {
+            return await _sanPhamRepo.GetSanPhamWithDetailsAsync(id);
+        }
         [HttpPost]
         public async Task<ActionResult> Add(SanPhamDtos sanPhamDto)
         {

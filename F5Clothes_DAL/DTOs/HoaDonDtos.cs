@@ -65,4 +65,16 @@ namespace F5Clothes_DAL.DTOs
         public int? TrangThai { get; set; }
 
     }
+    public class OrderInfoDto
+    {
+        
+           
+            public Guid? VoucherId { get; set; } // Mã voucher (nếu có)
+            public string? DiaChiNhanHang { get; set; } // Địa chỉ nhận hàng
+            public string? TenNguoiNhan { get; set; } // Tên người nhận hàng
+            public string? SdtNguoiNhan { get; set; } // Số điện thoại người nhận
+            public string? GhiChu { get; set; } // Ghi chú đơn hàng
+           
+        
+    }
 }
