@@ -1,5 +1,4 @@
 ﻿using F5Clothes_DAL.Models;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +14,6 @@ namespace F5Clothes_DAL.IReponsitories
         Task AddHd(HoaDon Hd);
         Task UpdateHd(HoaDon Hd);
         Task DeleteHd(Guid Id);
+        Task<int> CountHdByMaHoaDonPrefix(string prefix);
     }
 }

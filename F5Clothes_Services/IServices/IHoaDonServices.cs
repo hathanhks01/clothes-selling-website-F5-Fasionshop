@@ -14,5 +14,6 @@ namespace F5Clothes_Services.IServices
         Task Create(HoaDon hoaDon);
         Task Update(HoaDon hoaDon);
         Task Delete(Guid id);
+        Task<string> GenerateSerialForDate(string prefix, string datePart);
     }
 }

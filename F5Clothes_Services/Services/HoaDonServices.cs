@@ -22,9 +22,12 @@ namespace F5Clothes_Services.Services
                 {
                     throw new ArgumentNullException(nameof(hoaDon), "Hóa đơn không được để null.");
                 }
-
-                // Gán ngày tạo là ngày hiện tại
-                hoaDon.NgayTao = DateTime.Now; // Lưu ngày giờ thực tế
+            string datePart = DateTime.Now.ToString("yyyyMMdd"); // Phần ngày theo định dạng YYYYMMDD
+            string prefix = "HD"; // Tiền tố mã hóa đơn
+            string serial = await GenerateSerialForDate(prefix, datePart);
+            hoaDon.MaHoaDon = $"{prefix}{datePart}{serial}";
+           
+            hoaDon.NgayTao = DateTime.Now; // Lưu ngày giờ thực tế
 
                 // Kiểm tra và tính tổng tiền cho hóa đơn từ danh sách chi tiết hóa đơn
                 if (hoaDon.HoaDonChiTiets != null && hoaDon.HoaDonChiTiets.Count > 0)
@@ -56,6 +59,17 @@ namespace F5Clothes_Services.Services
           await _hoaDonRepo.DeleteHd(id);
         }
 
+        public async Task<string> GenerateSerialForDate(string prefix, string datePart)
+        {
+            string fullPrefix = $"{prefix}{datePart}";
+
+            // Gọi repository để đếm số lượng hóa đơn với tiền tố này
+            int count = await _hoaDonRepo.CountHdByMaHoaDonPrefix(fullPrefix);
+
+            // Serial bắt đầu từ 1, cần định dạng thành 2 chữ số (01, 02, ...)
+            return (count + 1).ToString("D2");
+        }
+
         public async Task<List<HoaDon>> GetAll()
         {
             return await _hoaDonRepo.GetAllHoaDon(); 
@@ -70,5 +84,6 @@ namespace F5Clothes_Services.Services
         {
             await _hoaDonRepo.UpdateHd(hoaDon);
         }
+      
     }
 }

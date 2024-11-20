@@ -70,5 +70,12 @@ namespace F5Clothes_DAL.Reponsitories
             _context.Entry(Hd).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
+        public async Task<int> CountHdByMaHoaDonPrefix(string prefix)
+        {
+            return await _context.HoaDons
+                                 .Where(hd => hd.MaHoaDon.StartsWith(prefix)) 
+                                 .CountAsync(); 
+        }
+
     }
 }
