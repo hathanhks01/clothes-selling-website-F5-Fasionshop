@@ -1,6 +1,8 @@
 ﻿using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
+using F5Clothes_DAL.Models.system;
+
 using Microsoft.EntityFrameworkCore;
 
 using System;
@@ -71,10 +73,14 @@ namespace F5Clothes_DAL.Reponsitories
             return await _context.DiaChis.ToListAsync();
         }
 
-        public async Task<DiaChi> GetByDiaChi(Guid idKH)
+        public async Task<List<DiaChi>> GetByDiaChi(Guid idKH)
         {
-            return await _context.DiaChis.FirstOrDefaultAsync(x => x.IdKh == idKH);
+            return await _context.DiaChis
+                                 .Where(x => x.IdKh == idKH)
+                                 .ToListAsync(); 
         }
+
+
 
         public async Task Updatedc(DiaChi dc)
         {

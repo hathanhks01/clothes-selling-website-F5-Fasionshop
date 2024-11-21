@@ -15,7 +15,7 @@ namespace F5Clothes_DAL.DTOs
         public string TenSize { get; set; }
         public string HinhAnh { get; set; }
         public Guid IdSpct { get; set; }
-
+        public decimal? DonGiaKhiGiam { get; set; }
         public int SoLuong { get; set; }
 
         public decimal DonGia { get; set; }

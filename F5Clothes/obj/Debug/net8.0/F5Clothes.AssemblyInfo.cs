@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("F5Clothes")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3c761afd01d507bc40aea46de295c683109f9020")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1c02d59974746d071b67853f1f75bbc49b08e93e")]
 [assembly: System.Reflection.AssemblyProductAttribute("F5Clothes")]
 [assembly: System.Reflection.AssemblyTitleAttribute("F5Clothes")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

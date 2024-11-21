@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("F5Clothes_API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b8a22a78e72702484d3426a86ad994401b51fce1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1c02d59974746d071b67853f1f75bbc49b08e93e")]
 [assembly: System.Reflection.AssemblyProductAttribute("F5Clothes_API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("F5Clothes_API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
