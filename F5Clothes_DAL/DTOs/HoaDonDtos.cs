@@ -63,6 +63,7 @@ namespace F5Clothes_DAL.DTOs
         public int? LoaiHoaDon { get; set; }
 
         public int? TrangThai { get; set; }
+        public List<HoaDonChiTietDtos> ChiTietHoaDon { get; set; }
 
     }
 }

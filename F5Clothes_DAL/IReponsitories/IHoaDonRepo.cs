@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.Models;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace F5Clothes_DAL.IReponsitories
     {
         Task<List<HoaDon>> GetAllHoaDon();
         Task<HoaDon> GetByHoaDon(Guid id);
-        Task AddHd(HoaDon Hd);
+        Task<HoaDon> AddHd(HoaDon Hd);
         Task UpdateHd(HoaDon Hd);
         Task DeleteHd(Guid Id);
         Task<int> CountHdByMaHoaDonPrefix(string prefix);

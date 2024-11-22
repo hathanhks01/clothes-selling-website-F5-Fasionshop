@@ -1,4 +1,5 @@
-﻿using F5Clothes_DAL.Models;
+﻿using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace F5Clothes_Services.IServices
     {
         Task<List<HoaDon>> GetAll();
         Task<HoaDon> GetById(Guid id);
-        Task Create(HoaDon hoaDon);
+        Task<HoaDon> Create(HoaDon hoaDon);
         Task Update(HoaDon hoaDon);
         Task Delete(Guid id);
         Task<string> GenerateSerialForDate(string prefix, string datePart);
