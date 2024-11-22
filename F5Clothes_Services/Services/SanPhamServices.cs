@@ -27,7 +27,7 @@ namespace F5Clothes_Services.Services
             await _sanPhamRepo.DeleteSanPham(id);
         }
 
-        public async Task<List<SanPham>> GetAllSanPham()
+        public async Task<IEnumerable<object>> GetAllSanPham()
         {
             return await _sanPhamRepo.GetAllSanPham();
         }

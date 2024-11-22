@@ -55,9 +55,61 @@ namespace F5Clothes_DAL.Reponsitories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<SanPham>> GetAllSanPham()
+        public async Task<IEnumerable<object>> GetAllSanPham()
         {
-            return await _context.SanPhams.ToListAsync();
+            var result = await _context.SanPhams
+                .Include(sp => sp.IdClNavigation) // Bao gồm chất liệu
+                .Include(sp => sp.IdThNavigation) // Bao gồm thương hiệu
+                .Include(sp => sp.IdDmNavigation) // Bao gồm danh mục
+                .Include(sp => sp.SanPhamChiTiets)
+                    .ThenInclude(ct => ct.IdMsNavigation) // Bao gồm màu sắc
+                .Include(sp => sp.SanPhamChiTiets)
+                    .ThenInclude(ct => ct.IdSizeNavigation) // Bao gồm kích thước
+                .Select(sp => new
+                {
+                    sp.Id,
+                    sp.TenSp,
+                    sp.MaSp,
+                    sp.GiaBan,
+                    sp.GiaNhap,
+                    sp.MoTa,
+                    sp.ImageDefaul,
+                    sp.NgayThem,
+                    sp.TrangThai,
+                    DanhMuc = sp.IdDmNavigation == null ? null : new
+                    {
+                        sp.IdDmNavigation.Id,
+                        sp.IdDmNavigation.TenDanhMuc
+                    },
+                    ThuongHieu = sp.IdThNavigation == null ? null : new
+                    {
+                        sp.IdThNavigation.Id,
+                        sp.IdThNavigation.TenThuongHieu
+                    },
+                    ChatLieu = sp.IdClNavigation == null ? null : new
+                    {
+                        sp.IdClNavigation.Id,
+                        sp.IdClNavigation.TenChatLieu
+                    },
+                    SanPhamChiTiets = sp.SanPhamChiTiets.Select(ct => new
+                    {
+                        ct.Id,
+                        ct.SoLuongTon,
+                        MauSac = ct.IdMsNavigation == null ? null : new
+                        {
+                            ct.IdMsNavigation.Id,
+                            ct.IdMsNavigation.TenMauSac
+                        },
+                        KichThuoc = ct.IdSizeNavigation == null ? null : new
+                        {
+                            ct.IdSizeNavigation.Id,
+                            ct.IdSizeNavigation.TenSize
+                        }
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return result;
         }
 
         public async Task<SanPham> GetByIdSanPham(Guid id)
@@ -92,6 +144,85 @@ namespace F5Clothes_DAL.Reponsitories
                 await _context.SaveChangesAsync();
             }
             return existingSanPham ?? new SanPham();
+        }
+
+        public async Task<IEnumerable<object>> GetAllSanPhamsWithDetailsAsync()
+        {
+            var result = await _context.SanPhams
+            .Include(sp => sp.IdClNavigation) // Bao gồm thông tin Chất liệu
+            .Include(sp => sp.IdThNavigation) // Bao gồm thông tin Thương hiệu
+            .Include(sp => sp.IdDmNavigation) // Bao gồm thông tin Danh mục
+            .Include(sp => sp.SanPhamChiTiets)
+            .ThenInclude(ct => ct.IdMsNavigation) // Bao gồm thông tin Màu sắc
+            .Include(sp => sp.SanPhamChiTiets)
+            .ThenInclude(ct => ct.IdSizeNavigation) // Bao gồm thông tin Size
+            .Select(sp => new
+            {
+                sp.Id,
+                sp.TenSp,
+                sp.MaSp,
+                sp.GiaBan,
+                sp.GiaNhap,
+                sp.MoTa,
+                sp.ImageDefaul,
+                sp.NgayThem,
+                sp.TrangThai,
+                ChatLieu = sp.IdClNavigation == null ? null : new { sp.IdClNavigation.Id, sp.IdClNavigation.TenChatLieu },
+                ThuongHieu = sp.IdThNavigation == null ? null : new { sp.IdThNavigation.Id, sp.IdThNavigation.TenThuongHieu },
+                DanhMuc = sp.IdDmNavigation == null ? null : new { sp.IdDmNavigation.Id, sp.IdDmNavigation.TenDanhMuc },
+                SanPhamChiTiets = sp.SanPhamChiTiets.Select(ct => new
+                {
+                    ct.Id,
+                    ct.SoLuongTon,
+                    ct.MoTa,
+                    ct.QrCode,
+                    ct.TrangThai,
+                    MauSac = ct.IdMsNavigation == null ? null : new { ct.IdMsNavigation.Id, ct.IdMsNavigation.TenMauSac },
+                    Size = ct.IdSizeNavigation == null ? null : new { ct.IdSizeNavigation.Id, ct.IdSizeNavigation.TenSize }
+                }).ToList()
+            })
+            .ToListAsync();
+
+            return result;
+        }
+
+
+        public async Task<object> GetSanPhamWithDetailsAsync(Guid sanPhamId)
+        {
+            var result = await _context.SanPhams
+                .Where(sp => sp.Id == sanPhamId)
+                .Select(sp => new
+                {
+                    sp.Id,
+                    sp.MaSp,
+                    sp.TenSp,
+                    sp.GiaBan,
+                    sp.MoTa,
+                    sp.ImageDefaul,
+                    ChatLieu = sp.IdClNavigation == null ? null : new { sp.IdClNavigation.Id, sp.IdClNavigation.TenChatLieu }, // Trả về id và name của chất liệu
+                    MauSac = sp.SanPhamChiTiets
+                        .Where(ct => ct.IdSp == sp.Id)
+                        .Select(ct => ct.IdMsNavigation)
+                        .Where(ms => ms != null)
+                        .Select(ms => new { ms.Id, ms.TenMauSac })
+                        .Distinct()
+                        .ToList(), // Trả về danh sách màu sắc
+                    Size = sp.SanPhamChiTiets
+                        .Where(ct => ct.IdSp == sp.Id)
+                        .Select(ct => ct.IdSizeNavigation)
+                        .Where(size => size != null)
+                        .Select(size => new { size.Id, size.TenSize })
+                        .Distinct()
+                        .ToList(),
+                    Images = sp.Images
+                        .Where(ct => ct.IdSp == sp.Id)
+                        .Select(ct => new { ct.Id, ct.TenImage })
+                        .Distinct()
+                        .ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            return result;
         }
     }
 }

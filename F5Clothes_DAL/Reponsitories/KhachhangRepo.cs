@@ -26,6 +26,10 @@ namespace F5Clothes_DAL.Reponsitories
             _context.Remove(Kh);
             await _context.SaveChangesAsync();
         }
+        public async Task<KhachHang> GetByMaKhachHang(string maKH)
+        {
+            return await _context.KhachHangs.FirstOrDefaultAsync(kh => kh.MaKh == maKH);
+        }
 
         public async Task<List<KhachHang>> GetAllKhachHang()
         {
@@ -36,7 +40,6 @@ namespace F5Clothes_DAL.Reponsitories
         {
             return await _context.KhachHangs.FirstOrDefaultAsync(x => x.Id == id);
         }
-
         public async Task<List<KhachHangDtos>> GetKhachHang(ListKhachHangModel valid)
         {
             var query = _context.KhachHangs.AsQueryable();

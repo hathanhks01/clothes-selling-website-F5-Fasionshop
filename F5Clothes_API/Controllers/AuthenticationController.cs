@@ -41,7 +41,7 @@ namespace F5Clothes_API.Controllers
                 return Conflict(ex.Message);
             }
         }
-		[HttpPost("register/NhanVien")]
+		[HttpPost("register/NhanVien")]     
 		public async Task<IActionResult> RegisterNhanVien([FromBody] NhanVienDtos nhanVienDtos)
 		{
 			if (!ModelState.IsValid)

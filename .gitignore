@@ -1,5 +1,8 @@
 # Chặn tất cả các file có đuôi .bin
 *.bin
+/.vs
+/bin
+/obj
 
 # Chặn các file nhị phân khác như .exe, .dll, .dat
 *.exe
@@ -26,6 +29,9 @@ dist/
 *.tmp
 *.swp
 *.bak
+
+.vs/
+
 
 # Chặn các file hệ thống (ví dụ .DS_Store trên macOS)
 .DS_Store
