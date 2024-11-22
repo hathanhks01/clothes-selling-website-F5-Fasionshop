@@ -12,7 +12,7 @@ namespace F5Clothes_DAL.IReponsitories
 {
     public interface ISanPhamRepo
     {
-        Task<List<SanPham>> GetAllSanPham();
+        Task<IEnumerable<object>> GetAllSanPham();
         Task<SanPham> GetByIdSanPham(Guid id);
         Task<SanPham> AddSanPham(SanPhamDtos sanPhamDto);
         Task<SanPham> UpdateSanPham(SanPhamDtos sanPhamDto);
