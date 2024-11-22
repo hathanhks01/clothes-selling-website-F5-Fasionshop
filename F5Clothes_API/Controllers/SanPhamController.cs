@@ -22,9 +22,9 @@ namespace F5Clothes_API.Controllers
             _sanPhamRepo = sanPhamRepo;
         }
         [HttpGet("GetAll")]
-        public async Task<List<SanPham>> GetAll()
+        public async Task<IEnumerable<object>> GetAll()
         {
-            return await _sanPhamSer.GetAllSanPham();
+            return await _sanPhamRepo.GetAllSanPham();
         }
 
         [HttpGet("{id}")]
@@ -38,7 +38,7 @@ namespace F5Clothes_API.Controllers
             return await _sanPhamRepo.GetAllSanPhamsWithDetailsAsync();
         }
 
-        [HttpGet("{id}/details")]
+        [HttpGet("details/{id}")]
         public async Task<object> GetSanPhamDetailsByIdAsync(Guid id)
         {
             return await _sanPhamRepo.GetSanPhamWithDetailsAsync(id);
