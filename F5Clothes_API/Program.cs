@@ -75,8 +75,8 @@ builder.Services.AddScoped<IDanhMucService, DanhMucService>();
 builder.Services.AddScoped<IDiaChiRepo, DiaChiRepo>();
 builder.Services.AddScoped<IGiamGiaRepo, GiamGiaRepo>();
 builder.Services.AddScoped<IGiamGiaService, GiamGiaService>();
-//builder.Services.AddScoped<IGioHangChiTietRepo, GHCTRepo>();
-//builder.Services.AddScoped<IGioHangRepo, GiohangRepo>();
+
+builder.Services.AddScoped<IGioHangRepo, GiohangRepo>();
 builder.Services.AddScoped<IHDCTRepo,HDCTRepo>();
 builder.Services.AddScoped<IHoaDonRepo, HoaDonRepo >();
 builder.Services.AddScoped<IImageRepo, ImageRepo>();
@@ -100,6 +100,7 @@ builder.Services.AddScoped<IXuatXuRepo, XuatXuRepo>();
 builder.Services.AddScoped<IXuatXuService, XuatXuService>();
 builder.Services.AddScoped<IHinhThucThanhToanRepo, HinhThucThanhToanRepo>();
 builder.Services.AddScoped<IVoucherService, VoucherService>();
+builder.Services.AddScoped<IGioHangServices, GioHangServices>();
 
 
 var app = builder.Build();

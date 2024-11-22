@@ -46,5 +46,11 @@ namespace F5Clothes_DAL.Reponsitories
             _context.Entry(Hd).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
+        public async Task<HoaDon> GetLatestOrderAsync()
+        {
+            return await _context.HoaDons
+                .OrderByDescending(hd => hd.MaHoaDon)
+                .FirstOrDefaultAsync();
+        }
     }
 }

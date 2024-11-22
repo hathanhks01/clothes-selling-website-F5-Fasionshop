@@ -9,16 +9,18 @@ namespace F5Clothes_DAL.DTOs
     public class GiohangDtos
     {
         public Guid Id { get; set; }
+        public Guid IdGh { get; set; }
+        public string TenSp { get; set; }
+        public string TenMauSac { get; set; }
+        public string TenSize { get; set; }
+        public string HinhAnh { get; set; }
+        public Guid IdSpct { get; set; }
+        public decimal? DonGiaKhiGiam { get; set; }
+        public int SoLuong { get; set; }
 
-        public Guid? IdKh { get; set; }
+        public decimal DonGia { get; set; }
+        public decimal TongTien { get; set; }
 
-        public DateTime? NgayTao { get; set; }
-
-        public DateTime? NgayCapNhat { get; set; }
-
-        public string? GhiChu { get; set; }
-
-        public int? TrangThai { get; set; }
 
     }
 }

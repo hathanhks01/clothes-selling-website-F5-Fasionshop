@@ -15,5 +15,6 @@ namespace F5Clothes_DAL.IReponsitories
         Task AddHd(HoaDon Hd);
         Task UpdateHd(HoaDon Hd);
         Task DeleteHd(Guid Id);
+        Task<HoaDon> GetLatestOrderAsync();
     }
 }

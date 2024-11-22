@@ -15,7 +15,10 @@ namespace F5Clothes_DAL.IReponsitories
         Task<List<KhachHangDtos>> GetKhachHang(ListKhachHangModel valid);
         Task<KhachHang> GetByMaKhachHang(string maKH);
         Task<KhachHang> GetByKhachHang(Guid id);
+        Task<KhachHang> GetByTK(string username);
         Task UpdateKh(KhachHang Kh);
         Task DeleteKh(Guid Id);
+        Task<bool> ChangePassword(Guid id, string oldPassword, string newPassword);
+        Task<bool> UpdateProfile(Guid id, KhachHangProfileUpdateDto profileUpdateDto);
     }
 }
