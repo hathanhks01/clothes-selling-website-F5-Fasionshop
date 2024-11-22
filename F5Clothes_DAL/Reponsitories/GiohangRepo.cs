@@ -42,29 +42,39 @@ namespace F5Clothes_DAL.Reponsitories
                 // Set the new cart for the customer
                 existingCart = newCart;
             }
+           
+                var gioHangDtos = await _context.GioHangChiTiets
+                    .Where(ghct => ghct.IdGh == existingCart.Id)
+                    .Include(ghct => ghct.IdSpctNavigation)
+                        .ThenInclude(spct => spct.IdSpNavigation)
+                    .Include(ghct => ghct.IdSpctNavigation.IdMsNavigation) // Include navigation for color
+                    .Include(ghct => ghct.IdSpctNavigation.IdSizeNavigation) // Include navigation for size
+                    .Select(ghct => new GiohangDtos
+                    {
+                        Id = ghct.Id,
+                        IdGh = ghct.IdGh,
+                        IdSpct = ghct.IdSpct,
+                        TenSp = ghct.IdSpctNavigation.IdSpNavigation.TenSp,
+                        HinhAnh = ghct.IdSpctNavigation.IdSpNavigation.ImageDefaul,
+                        TenMauSac = ghct.IdSpctNavigation.IdMsNavigation.TenMauSac,
+                        TenSize = ghct.IdSpctNavigation.IdSizeNavigation.TenSize,
+                        SoLuong = ghct.SoLuong,
+                        DonGia = ghct.DonGia,
+                        TongTien = ghct.SoLuong * ghct.DonGia
+                    })
+                    .ToListAsync();
 
-            // Fetch cart details
-            var gioHangDtos = await _context.GioHangChiTiets
-                .Where(ghct => ghct.IdGh == existingCart.Id)
-                .Include(ghct => ghct.IdSpctNavigation)
-                    .ThenInclude(spct => spct.IdSpNavigation)
-                .Select(ghct => new GiohangDtos
-                {
-                    Id = ghct.Id,
-                    IdGh = ghct.IdGh,
-                    IdSpct = ghct.IdSpct,
-                    TenSp = ghct.IdSpctNavigation.IdSpNavigation.TenSp,
-                    HinhAnh = ghct.IdSpctNavigation.IdSpNavigation.ImageDefaul,
-                    TenMauSac = ghct.IdSpctNavigation.IdMsNavigation.TenMauSac,
-                    TenSize = ghct.IdSpctNavigation.IdSizeNavigation.TenSize,
-                    SoLuong = ghct.SoLuong,
-                    DonGia = ghct.DonGia,
-                    TongTien = ghct.SoLuong * ghct.DonGia
-                })
-                .ToListAsync();
-
+                
+                
+                    Console.WriteLine("Chi tiết giỏ hàng đã được lấy thành công.");
+                    // You can process or return gioHangDtos as needed.
+                
             return gioHangDtos;
-        }
+            }
+
+      
+
+       
 
         // Get a specific cart item by its ID
         public async Task<GiohangDtos> GetGioHangByIdAsync(Guid id)

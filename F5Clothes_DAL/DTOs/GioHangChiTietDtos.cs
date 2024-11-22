@@ -9,7 +9,7 @@ namespace F5Clothes_DAL.DTOs
     public class AddGioHangDtos
     {
 
-        public Guid Id { get; set; }= Guid.NewGuid();
+        public Guid Id { get; set; } 
         public Guid IdGh { get; set; }
 
         public Guid IdSpct { get; set; }

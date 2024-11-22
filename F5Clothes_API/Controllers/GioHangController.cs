@@ -25,14 +25,24 @@ public class GioHangController : ControllerBase
     {
         try
         {
+            // Fetch cart items
             var cartItems = await _gioHangServices.GetAllGioHangAsync(idKh);
+
+            // Check if the cart is empty
+            if (cartItems == null || !cartItems.Any())
+            {
+                return NotFound(new { message = "Không có sản phẩm nào trong giỏ hàng." }); // 404 Not Found with a message
+            }
+
             return Ok(cartItems); // 200 OK with list of cart items
         }
         catch (Exception ex)
         {
+            // Handle exceptions and return a 400 Bad Request
             return BadRequest(new { message = ex.Message });
         }
     }
+
 
     // Get a specific cart item by ID
     [HttpGet("GetGioHangById/{id}")]
