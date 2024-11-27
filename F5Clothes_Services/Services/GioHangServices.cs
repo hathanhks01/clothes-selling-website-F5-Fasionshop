@@ -108,20 +108,30 @@ namespace F5Clothes_Services.Services
         public async Task PlaceOrderAsync(Guid customerId, OrderInfoDto orderInfo)
         {
             string diaChiNhanHang;
-            var diaChiList = await _diaChiRepo.GetByDiaChi(customerId);
+            const string DiaChiCuaHang = "Số 123 Đường ABC, Quận 1, TP. Hồ Chí Minh";
 
-            if (diaChiList == null || !diaChiList.Any())
-                throw new Exception("Không tìm thấy địa chỉ nào cho khách hàng.");
+            // Nếu IdDiaChi là GUID mặc định thì sử dụng địa chỉ cố định
+            if (orderInfo.IdDiaChi == null)
+            {
+                diaChiNhanHang = DiaChiCuaHang;
+            }
+            else
+            {
+                // Lấy danh sách địa chỉ của khách hàng
+                var diaChiList = await _diaChiRepo.GetByDiaChi(customerId);
 
-            // Tìm địa chỉ theo IdDiaChi trong orderInfo, nếu không tìm thấy thì lấy địa chỉ đầu tiên
-            var diaChi = diaChiList.FirstOrDefault(x => x.Id == orderInfo.IdDiaChi)
-                         ?? diaChiList.FirstOrDefault(); 
+                if (diaChiList == null || !diaChiList.Any())
+                    throw new Exception("Không tìm thấy địa chỉ nào cho khách hàng.");
 
-            if (diaChi == null || string.IsNullOrEmpty(diaChi.DiaChiChiTiet))
-                throw new Exception("Không có địa chỉ nhận hàng hợp lệ.");
+                // Tìm địa chỉ theo IdDiaChi trong orderInfo, nếu không tìm thấy thì lấy địa chỉ đầu tiên
+                var diaChi = diaChiList.FirstOrDefault(x => x.Id == orderInfo.IdDiaChi)
+                             ?? diaChiList.FirstOrDefault();
 
-            diaChiNhanHang = $"{diaChi.DiaChiChiTiet ?? ""}, {diaChi.PhuongXa ?? ""}, {diaChi.QuanHuyen ?? ""}, {diaChi.TinhThanh ?? ""}";
+                if (diaChi == null || string.IsNullOrEmpty(diaChi.DiaChiChiTiet))
+                    throw new Exception("Không có địa chỉ nhận hàng hợp lệ.");
 
+                diaChiNhanHang = $"{diaChi.DiaChiChiTiet ?? ""}, {diaChi.PhuongXa ?? ""}, {diaChi.QuanHuyen ?? ""}, {diaChi.TinhThanh ?? ""}";
+            }
 
 
             var cartItems = await _gioHangRepo.GetAllGioHangAsync(customerId);
@@ -152,15 +162,16 @@ namespace F5Clothes_Services.Services
                 IdKh = customerId,
                 NgayTao = DateTime.Now,
                 TrangThai = 0,
-                LoaiHoaDon = 1,
+                LoaiHoaDon = 2,
                 DiaChiNhanHang = diaChiNhanHang, // Gán địa chỉ nhận hàng
                 TenNguoiNhan = orderInfo.TenNguoiNhan,
                 SdtnguoiNhan = orderInfo.SdtNguoiNhan,
+                NgayNhanHang = orderInfo.NgayNhanHang,
                 IdVouCher = orderInfo.VoucherId,
                 ThanhTien = tongTien,
                 GiaTriGiam = giaTriGiam,
                 GhiChu = orderInfo.GhiChu
-           
+
 
             };
 
@@ -181,6 +192,7 @@ namespace F5Clothes_Services.Services
                     IdSpct = item.IdSpct,
                     SoLuong = item.SoLuong,
                     DonGia = item.DonGia,
+                
                     NgayTao = DateTime.Now,
                     DonGiaKhiGiam = item.DonGiaKhiGiam
                 };
@@ -280,6 +292,9 @@ namespace F5Clothes_Services.Services
             await _gioHangRepo.DeleteGioHangAsync(id);
         }
 
-       
+        public async Task<GioHang> GetByGioHang(Guid idKh)
+        {
+            return await _gioHangRepo.GetByGioHang(idKh);
+        }
     }
 }

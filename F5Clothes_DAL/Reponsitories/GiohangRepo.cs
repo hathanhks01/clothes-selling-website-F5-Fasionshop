@@ -23,58 +23,63 @@ namespace F5Clothes_DAL.Reponsitories
         // Get all cart items for a specific customer
         public async Task<List<GiohangDtos>> GetAllGioHangAsync(Guid idKh)
         {
-            var existingCart = await _context.GioHangs
-         .FirstOrDefaultAsync(gh => gh.IdKh == idKh);
+            var existingCart = await GetByGioHang(idKh); // Ensure the cart exists or is created.
 
-            // If no cart exists, create one
+            // Retrieve all details of the cart
+            var gioHangDtos = await _context.GioHangChiTiets
+                .Where(ghct => ghct.IdGh == existingCart.Id)
+                .Include(ghct => ghct.IdSpctNavigation)
+                    .ThenInclude(spct => spct.IdSpNavigation)
+                .Include(ghct => ghct.IdSpctNavigation.IdMsNavigation)  // Include color information
+                .Include(ghct => ghct.IdSpctNavigation.IdSizeNavigation) // Include size information
+                .Select(ghct => new GiohangDtos
+                {
+                    Id = ghct.Id,
+                    IdGh = ghct.IdGh,
+                    IdSpct = ghct.IdSpct,
+                    TenSp = ghct.IdSpctNavigation.IdSpNavigation.TenSp,
+                    HinhAnh = ghct.IdSpctNavigation.IdSpNavigation.ImageDefaul,
+                    TenMauSac = ghct.IdSpctNavigation.IdMsNavigation.TenMauSac,
+                    TenSize = ghct.IdSpctNavigation.IdSizeNavigation.TenSize,
+                    SoLuong = ghct.SoLuong,
+                    DonGia = ghct.DonGia,
+                    TongTien = ghct.SoLuong * ghct.DonGia
+                })
+                .ToListAsync();
+
+            Console.WriteLine("Chi tiết giỏ hàng đã được lấy thành công.");
+            return gioHangDtos;
+        }
+
+
+
+        public async Task<GioHang> GetByGioHang(Guid idKh)
+        {
+            // Fetch the existing cart for the given customer ID
+            var existingCart = await _context.GioHangs
+                .FirstOrDefaultAsync(g => g.IdKh == idKh);
+
+            // If no cart exists for the customer, create a new one
             if (existingCart == null)
             {
                 var newCart = new GioHang
                 {
-                    Id = Guid.NewGuid(), // Generate a new unique ID for the cart
+                    Id = Guid.NewGuid(),  // Generate a new unique ID for the cart
                     IdKh = idKh,
-                    NgayTao = DateTime.UtcNow, // Add the current timestamp
-                                               // Add other default values as needed
+                    NgayTao = DateTime.UtcNow,  // Set the creation date to now
                 };
-                _context.GioHangs.Add(newCart);
-                await _context.SaveChangesAsync();
 
-                // Set the new cart for the customer
-                existingCart = newCart;
-            }
-           
-                var gioHangDtos = await _context.GioHangChiTiets
-                    .Where(ghct => ghct.IdGh == existingCart.Id)
-                    .Include(ghct => ghct.IdSpctNavigation)
-                        .ThenInclude(spct => spct.IdSpNavigation)
-                    .Include(ghct => ghct.IdSpctNavigation.IdMsNavigation) // Include navigation for color
-                    .Include(ghct => ghct.IdSpctNavigation.IdSizeNavigation) // Include navigation for size
-                    .Select(ghct => new GiohangDtos
-                    {
-                        Id = ghct.Id,
-                        IdGh = ghct.IdGh,
-                        IdSpct = ghct.IdSpct,
-                        TenSp = ghct.IdSpctNavigation.IdSpNavigation.TenSp,
-                        HinhAnh = ghct.IdSpctNavigation.IdSpNavigation.ImageDefaul,
-                        TenMauSac = ghct.IdSpctNavigation.IdMsNavigation.TenMauSac,
-                        TenSize = ghct.IdSpctNavigation.IdSizeNavigation.TenSize,
-                        SoLuong = ghct.SoLuong,
-                        DonGia = ghct.DonGia,
-                        TongTien = ghct.SoLuong * ghct.DonGia
-                    })
-                    .ToListAsync();
+                _context.GioHangs.Add(newCart);  // Add the new cart to the context
+                await _context.SaveChangesAsync();  // Save the changes to the database
 
-                
-                
-                    Console.WriteLine("Chi tiết giỏ hàng đã được lấy thành công.");
-                    // You can process or return gioHangDtos as needed.
-                
-            return gioHangDtos;
+                return newCart;  // Return the newly created cart
             }
 
-      
+            // Return the existing cart if it already exists
+            return existingCart;
+        }
 
-       
+
 
         // Get a specific cart item by its ID
         public async Task<GiohangDtos> GetGioHangByIdAsync(Guid id)
@@ -87,6 +92,7 @@ namespace F5Clothes_DAL.Reponsitories
                 {
                     IdGh = ghct.IdGh,
                     IdSpct = ghct.IdSpct,
+
                     TenSp = ghct.IdSpctNavigation.IdSpNavigation.TenSp,
                     HinhAnh = ghct.IdSpctNavigation.IdSpNavigation.ImageDefaul,
                     TenMauSac = ghct.IdSpctNavigation.IdMsNavigation.TenMauSac,

@@ -70,9 +70,10 @@ namespace F5Clothes_DAL.DTOs
 
         public Guid Id { get; set; }
         public Guid? VoucherId { get; set; } // Mã voucher (nếu có)
-        public Guid IdDiaChi { get; set; }
+        public Guid? IdDiaChi { get; set; }
         public string TenNguoiNhan { get; set; } // Tên người nhận hàng
         public string SdtNguoiNhan { get; set; } // Số điện thoại người nhận
+        public DateTime? NgayNhanHang { get; set; }
         public string? GhiChu { get; set; } // Ghi chú đơn hàng
 
 

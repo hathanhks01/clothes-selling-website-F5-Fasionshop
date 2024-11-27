@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+
 using F5Clothes_DAL.DTOs;
 
 using F5Clothes_DAL.Models;
@@ -36,26 +37,44 @@ namespace F5Clothes_API.Controllers
 
             return Ok(mappeVc);
         }
+        [HttpGet("{ma}")]
+        public async Task<IActionResult> GetMaVouCher(string ma)
+        {
+            // Retrieve the voucher using the service
+            var voucher = await _VouCherSev.GetMaVouCher(ma);
 
-        [HttpGet("{id}")]
+            // Check if the voucher is null
+            if (voucher == null)
+            {
+                return NotFound(new { message = "Voucher not found" });
+            }
+
+            // Map the voucher to DTO
+            var mappedVoucher = _mapper.Map<VouCherDtos>(voucher);
+
+            // Return the result
+            return Ok(mappedVoucher);
+        }
+        [HttpGet("by-id/{id:guid}")]
         public async Task<IActionResult> GetByVouCher(Guid id)
         {
+            var voucher = await _VouCherSev.GetByVouCher(id);
 
-
-            var mappeVc = _mapper.Map<VouCherDtos>(await _VouCherSev.GetByVouCher(id));
-            if (!ModelState.IsValid)
+            if (voucher == null)
             {
-                return BadRequest(ModelState);
-
+                return NotFound(new { message = "Voucher not found" });
             }
-            return Ok(mappeVc);
+
+            var voucherDto = _mapper.Map<VouCherDtos>(voucher);
+            return Ok(voucherDto);
         }
+
 
         [HttpPost]
         [ProducesResponseType(201)] // Created
         [ProducesResponseType(400)] // Bad Request
         [ProducesResponseType(422)] // Unprocessable Entity
-        public async Task<IActionResult> CreateVouCher( VouCherDtos voucherCreate)
+        public async Task<IActionResult> CreateVouCher(VouCherDtos voucherCreate)
         {
             // Kiểm tra tính hợp lệ của model
             if (!ModelState.IsValid)
@@ -160,7 +179,7 @@ namespace F5Clothes_API.Controllers
             // Trả về voucher DTO đã được cập nhật
             var updatedVoucherDto = new VouCherDtos
             {
-                
+
                 MaVouCher = existingVoucher.MaVouCher,
                 TenVouCher = existingVoucher.TenVouCher,
                 NgayBatDau = existingVoucher.NgayBatDau,

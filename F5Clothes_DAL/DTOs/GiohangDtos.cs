@@ -10,6 +10,7 @@ namespace F5Clothes_DAL.DTOs
     {
         public Guid Id { get; set; }
         public Guid IdGh { get; set; }
+       
         public string TenSp { get; set; }
         public string TenMauSac { get; set; }
         public string TenSize { get; set; }
@@ -20,7 +21,5 @@ namespace F5Clothes_DAL.DTOs
 
         public decimal DonGia { get; set; }
         public decimal TongTien { get; set; }
-
-
     }
 }

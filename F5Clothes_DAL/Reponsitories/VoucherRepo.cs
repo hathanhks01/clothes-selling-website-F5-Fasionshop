@@ -40,6 +40,10 @@ namespace F5Clothes_DAL.Reponsitories
             return await _context.VouChers.FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<VouCher> GetMaVouCher(string Ma)
+        {
+            return await _context.VouChers.FirstOrDefaultAsync(x => x.MaVouCher == Ma);
+        }
         public async Task UpdateVc(VouCher Vc)
         {
             _context.Entry(Vc).State = EntityState.Modified;

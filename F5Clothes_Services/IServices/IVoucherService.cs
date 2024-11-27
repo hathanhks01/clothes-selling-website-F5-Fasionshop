@@ -14,6 +14,6 @@ namespace F5Clothes_Services.IServices
         Task<VouCher> GetByVouCher(Guid id);
         Task<VouCher> AddVc(VouCher Vc);
         Task<VouCher> UpdateVc(VouCher Vc);
-        
+        Task<VouCher> GetMaVouCher(string Ma);
     }
 }
