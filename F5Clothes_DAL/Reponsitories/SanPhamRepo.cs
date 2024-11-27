@@ -1,4 +1,4 @@
-﻿ using F5Clothes_DAL.DTOs;
+﻿using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
 using Microsoft.EntityFrameworkCore;
@@ -51,7 +51,6 @@ namespace F5Clothes_DAL.Reponsitories
                 existingSanPham.NgayThemGiamGia = sanPhamDto.NgayThemGiamGia;
                 existingSanPham.TrangThai = sanPhamDto.TrangThai;
 
-                // Update ChiTietSanPhams
                 foreach (var dtoChiTiet in sanPhamDto.ChiTietSanPhams)
                 {
                     var chiTiet = existingSanPham.SanPhamChiTiets
@@ -199,7 +198,7 @@ namespace F5Clothes_DAL.Reponsitories
                             ct.IdMsNavigation.Id,
                             ct.IdMsNavigation.TenMauSac
                         },
-                        KichThuoc = ct.IdSizeNavigation == null ? null : new
+                        Size = ct.IdSizeNavigation == null ? null : new
                         {
                             ct.IdSizeNavigation.Id,
                             ct.IdSizeNavigation.TenSize
@@ -324,6 +323,43 @@ namespace F5Clothes_DAL.Reponsitories
         }
 
 
+        //public async Task<object> GetSanPhamWithDetailsAsync(Guid sanPhamId)
+        //{
+        //    var result = await _context.SanPhams
+        //        .Where(sp => sp.Id == sanPhamId)
+        //        .Select(sp => new
+        //        {
+        //            sp.Id,
+        //            sp.MaSp,
+        //            sp.TenSp,
+        //            sp.GiaBan,
+        //            sp.MoTa,
+        //            sp.ImageDefaul,
+        //            ChatLieu = sp.IdClNavigation == null ? null : new { sp.IdClNavigation.Id, sp.IdClNavigation.TenChatLieu }, // Trả về id và name của chất liệu
+        //            MauSac = sp.SanPhamChiTiets
+        //                .Where(ct => ct.IdSp == sp.Id)
+        //                .Select(ct => ct.IdMsNavigation)
+        //                .Where(ms => ms != null)
+        //                .Select(ms => new { ms.Id, ms.TenMauSac })
+        //                .Distinct()
+        //                .ToList(), // Trả về danh sách màu sắc
+        //            Size = sp.SanPhamChiTiets
+        //                .Where(ct => ct.IdSp == sp.Id)
+        //                .Select(ct => ct.IdSizeNavigation)
+        //                .Where(size => size != null)
+        //                .Select(size => new { size.Id, size.TenSize })
+        //                .Distinct()
+        //                .ToList(),
+        //            Images = sp.Images
+        //                .Where(ct => ct.IdSp == sp.Id)
+        //                .Select(ct => new { ct.Id, ct.TenImage })
+        //                .Distinct()
+        //                .ToList()
+        //        })
+        //        .FirstOrDefaultAsync();
+
+        //    return result;
+        //}
         public async Task<object> GetSanPhamWithDetailsAsync(Guid sanPhamId)
         {
             var result = await _context.SanPhams
@@ -334,27 +370,36 @@ namespace F5Clothes_DAL.Reponsitories
                     sp.MaSp,
                     sp.TenSp,
                     sp.GiaBan,
-                    sp.GiaNhap,
-                    sp.NgayThem,
-                    sp.NgayThemGiamGia,
-                    sp.TheLoai,
                     sp.MoTa,
                     sp.ImageDefaul,
-                    sp.TrangThai,
-                    SanPhamChiTiets = sp.SanPhamChiTiets
+                    ChatLieu = sp.IdClNavigation == null ? null : new { sp.IdClNavigation.Id, sp.IdClNavigation.TenChatLieu }, // Trả về id và tên của chất liệu
+                    MauSac = sp.SanPhamChiTiets
                         .Where(ct => ct.IdSp == sp.Id)
                         .Select(ct => new
                         {
-                            ct.Id,
-                            MauSac = ct.IdMsNavigation == null ? null : new { ct.IdMsNavigation.Id, ct.IdMsNavigation.TenMauSac },
-                            Size = ct.IdSizeNavigation == null ? null : new { ct.IdSizeNavigation.Id, ct.IdSizeNavigation.TenSize },
-                            ct.SoLuongTon, // Giả sử có số lượng tồn trong SanPhamChiTiet
-                            ct.MoTa,
+                            SanPhamChiTietId = ct.Id, // ID của SanPhamChiTiet
+                            MauSacId = ct.IdMsNavigation.Id,
+                            MauSacTen = ct.IdMsNavigation.TenMauSac
                         })
-                        .ToList(), // Trả về danh sách chi tiết sản phẩm
-                    ChatLieu = sp.IdClNavigation == null ? null : new { sp.IdClNavigation.Id, sp.IdClNavigation.TenChatLieu },
-                    ThuongHieu = sp.IdThNavigation == null ? null : new { sp.IdThNavigation.Id, sp.IdThNavigation.TenThuongHieu },
-                    DanhMuc = sp.IdDmNavigation == null ? null : new { sp.IdDmNavigation.Id, sp.IdDmNavigation.TenDanhMuc },
+                        .Where(ct => ct.MauSacId != null)
+                        .Distinct()
+                        .ToList(), // Trả về danh sách màu sắc và ID của SanPhamChiTiet
+                    Size = sp.SanPhamChiTiets
+                        .Where(ct => ct.IdSp == sp.Id)
+                        .Select(ct => new
+                        {
+                            SanPhamChiTietId = ct.Id, // ID của SanPhamChiTiet
+                            SizeId = ct.IdSizeNavigation.Id,
+                            SizeTen = ct.IdSizeNavigation.TenSize
+                        })
+                        .Where(ct => ct.SizeId != null)
+                        .Distinct()
+                        .ToList(),
+                    Images = sp.Images
+                        .Where(image => image.IdSp == sp.Id)
+                        .Select(image => new { image.Id, image.TenImage })
+                        .Distinct()
+                        .ToList()
                 })
                 .FirstOrDefaultAsync();
 

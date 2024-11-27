@@ -41,6 +41,5 @@ namespace F5Clothes_DAL.DTOs
 
         public int? TrangThai { get; set; }
         public List<SanPhamChiTietDtos> ChiTietSanPhams { get; set; }
-        public List<ImageDtos> Images { get; set; } = new List<ImageDtos>();
     }
 }
