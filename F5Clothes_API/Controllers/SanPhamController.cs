@@ -44,7 +44,7 @@ namespace F5Clothes_API.Controllers
             return await _sanPhamRepo.GetSanPhamWithDetailsAsync(id);
         }
         [HttpPost]
-        public async Task<ActionResult> Add(SanPhamDtos sanPhamDto)
+        public async Task<ActionResult> Add([FromBody]SanPhamDtos sanPhamDto)
         {
             await _sanPhamSer.AddSanPham(sanPhamDto);
             return CreatedAtAction(nameof(GetById), new { id = sanPhamDto.Id }, sanPhamDto);
