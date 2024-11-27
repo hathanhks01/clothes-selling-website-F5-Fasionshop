@@ -144,7 +144,7 @@ namespace F5Clothes_Services.Services
             tongTien -= giaTriGiam ?? 0;
 
             // Generate MaHoaDon
-            var maHoaDon = await GenerateMaHoaDonAsync();
+            var maHoaDon = await _hoaDonRepo.GenerateMaHoaDon();
 
             var hoaDon = new HoaDon
             {
@@ -184,32 +184,13 @@ namespace F5Clothes_Services.Services
                     NgayTao = DateTime.Now,
                     DonGiaKhiGiam = item.DonGiaKhiGiam
                 };
-                await _hDCTRepo.AddHDCT(hoaDonChiTiet);
+                await _hDCTRepo.Create(hoaDonChiTiet);
 
                 await _gioHangRepo.DeleteGioHangAsync(item.Id);
             }
         }
 
-        private async Task<string> GenerateMaHoaDonAsync()
-        {
-            var latestHoaDon = await _hoaDonRepo.GetLatestOrderAsync();
-
-            if (latestHoaDon == null)
-            {
-                return "HD0001"; // No orders exist, start with DH00001
-            }
-
-            var lastOrderNumber = latestHoaDon.MaHoaDon;
-            var numericPart = lastOrderNumber.Substring(2); // Extracts part after "DH"
-            if (int.TryParse(numericPart, out int lastNumber))
-            {
-                return $"HD{(lastNumber + 1):D4}"; // Format as DHxxxxx
-            }
-            else
-            {
-                throw new Exception("Lỗi khi tạo mã hóa đơn.");
-            }
-        }
+       
 
 
 

@@ -17,32 +17,32 @@ namespace F5Clothes_DAL.Reponsitories
         {
             _context = context;
         }
-        public async Task AddHDCT(HoaDonChiTiet HDCT)
+        public async Task Create(HoaDonChiTiet hoaDonChiTiet)
         {
-            _context.Add(HDCT);
+            await _context.HoaDonChiTiets.AddAsync(hoaDonChiTiet);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteHDCT(Guid Id)
+        public async Task Delete(Guid id)
         {
-            var HDCT = await GetByHoaDonChiTiet(Id);
-            _context.Remove(HDCT);
+            var idHoaDonChiTiet = await GetById(id);
+            _context.HoaDonChiTiets.Remove(idHoaDonChiTiet);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<HoaDonChiTiet>> GetAllHoaDonChiTiet()
+        public async Task<List<HoaDonChiTiet>> GetAll()
         {
             return await _context.HoaDonChiTiets.ToListAsync();
         }
 
-        public async Task<HoaDonChiTiet> GetByHoaDonChiTiet(Guid id)
+        public async Task<HoaDonChiTiet> GetById(Guid id)
         {
-            return await _context.HoaDonChiTiets.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.HoaDonChiTiets.FindAsync(id);
         }
 
-        public async Task UpdateHDCT(HoaDonChiTiet HDCT)
+        public async Task Update(HoaDonChiTiet hoaDonChiTiet)
         {
-            _context.Entry(HDCT).State = EntityState.Modified;
+            _context.Entry(hoaDonChiTiet).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
     }

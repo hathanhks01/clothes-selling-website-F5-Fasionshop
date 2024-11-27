@@ -3,7 +3,7 @@
 using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
-
+using F5Clothes_Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace F5Clothes_API.Controllers
@@ -12,19 +12,19 @@ namespace F5Clothes_API.Controllers
     [ApiController]
     public class HDCTController : ControllerBase
     {
-        private readonly IHDCTRepo _HoaDonChiTietRepo;
+        private readonly IHoaDonChiTietServices _HoaDonChiTietRepo;
         private readonly IMapper _mapper;
 
-        public HDCTController(IHDCTRepo HDCTRepo, IMapper mapper)
+        public HDCTController(IHoaDonChiTietServices HDCTSV, IMapper mapper)
         {
-            _HoaDonChiTietRepo = HDCTRepo;
+            _HoaDonChiTietRepo = HDCTSV;
             _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<HoaDonChiTiet>>> GetAll()
         {
-            var HoaDonChiTietList = await _HoaDonChiTietRepo.GetAllHoaDonChiTiet();
+            var HoaDonChiTietList = await _HoaDonChiTietRepo.GetAll();
             var mappeHDCT = _mapper.Map<List<HoaDonChiTietDtos>>(HoaDonChiTietList);
 
             if (!ModelState.IsValid)
@@ -40,7 +40,7 @@ namespace F5Clothes_API.Controllers
         {
 
 
-            var mappedHDCT = _mapper.Map<HoaDonChiTietDtos>(await _HoaDonChiTietRepo.GetByHoaDonChiTiet(id));
+            var mappedHDCT = _mapper.Map<HoaDonChiTietDtos>(await _HoaDonChiTietRepo.GetById(id));
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -52,19 +52,19 @@ namespace F5Clothes_API.Controllers
         [HttpPost]
         public async Task GetAll(HoaDonChiTiet HDCT)
         {
-            await _HoaDonChiTietRepo.AddHDCT(HDCT);
+            await _HoaDonChiTietRepo.Create(HDCT);
         }
 
         [HttpPut]
         public async Task Update(HoaDonChiTiet HDCT)
         {
-            await _HoaDonChiTietRepo.UpdateHDCT(HDCT);
+            await _HoaDonChiTietRepo.Update(HDCT);
         }
 
         [HttpDelete("{id}")]
         public async Task Delete(Guid id)
         {
-            await _HoaDonChiTietRepo.DeleteHDCT(id);
+            await _HoaDonChiTietRepo.Delete(id);
         }
     }
 }
