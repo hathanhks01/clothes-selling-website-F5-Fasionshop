@@ -30,19 +30,36 @@ namespace F5Clothes_DAL.Reponsitories
         // Hàm đăng nhập khách hàng
         public async Task<object> LoginCustomer(string username, string password)
         {
+            // Tìm người dùng trong bảng khách hàng
             var customer = await _context.KhachHangs.FirstOrDefaultAsync(u => u.TaiKhoan == username);
             if (customer != null)
             {
                 if (BCrypt.Net.BCrypt.Verify(password, customer.MatKhau))
                 {
                     var token = GenerateToken(customer, "Customer");
-                    return new { user = customer, token };
+                    return new { user = customer, role = "Customer", token };
                 }
                 else
                 {
                     throw new Exception("Invalid password.");
                 }
             }
+
+            // Tìm người dùng trong bảng nhân viên
+            var employee = await _context.NhanViens.FirstOrDefaultAsync(u => u.TaiKhoan == username);
+            if (employee != null)
+            {
+                if (BCrypt.Net.BCrypt.Verify(password, employee.MatKhau))
+                {
+                    var token = GenerateToken(employee, "Employee");
+                    return new { user = employee, role = "Employee", token };
+                }
+                else
+                {
+                    throw new Exception("Invalid password.");
+                }
+            }
+
             throw new Exception("User not found.");
         }
 
@@ -159,7 +176,8 @@ namespace F5Clothes_DAL.Reponsitories
                     new Claim("MaNv", nhanVien.MaNv),
                     new Claim("HoVaTenNv", nhanVien.HoVaTenNv),
                     new Claim("TaiKhoan", nhanVien.TaiKhoan),
-               
+                    new Claim("IdNhanVien", nhanVien.Id.ToString()),
+
                 });
             }
             // Kiểm tra nếu user là KhachHang

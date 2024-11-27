@@ -20,33 +20,132 @@ namespace F5Clothes_DAL.Reponsitories
         {
             _context = context;
         }
-
         public async Task<SanPham> AddSanPham(SanPhamDtos sanPhamDto)
         {
-            var sanPham = new SanPham
+            if (sanPhamDto == null)
+                throw new ArgumentNullException(nameof(sanPhamDto), "SanPhamDto cannot be null.");
+
+            SanPham sanPham; // Khai báo biến trước khối if-else
+
+            var existingSanPham = await _context.SanPhams
+                .Include(sp => sp.SanPhamChiTiets)
+                .Include(i => i.Images)
+                .FirstOrDefaultAsync(sp => sp.Id == sanPhamDto.Id);
+
+            if (existingSanPham != null)
             {
-                Id = Guid.NewGuid(),
-                MaSp = sanPhamDto.MaSp,
-                TenSp = sanPhamDto.TenSp,
-                GiaBan = sanPhamDto.GiaBan,
-                GiaNhap = sanPhamDto.GiaNhap,
-                DonGiaKhiGiam = sanPhamDto.DonGiaKhiGiam,
-                MoTa = sanPhamDto.MoTa,
-                IdDm = sanPhamDto.IdDm,
-                IdTh = sanPhamDto.IdTh,
-                IdXx = sanPhamDto.IdXx,
-                IdCl = sanPhamDto.IdCl,
-                IdGg = sanPhamDto.IdGg,
-                TheLoai = sanPhamDto.TheLoai,
-                ImageDefaul = sanPhamDto.ImageDefaul,
-                NgayThem = DateTime.UtcNow, // Cập nhật ngày thêm
-                NgayThemGiamGia = sanPhamDto.NgayThemGiamGia,
-                TrangThai = sanPhamDto.TrangThai
-            };
-            await _context.SanPhams.AddAsync(sanPham);
-            _context.SaveChanges();
+                // Update sản phẩm
+                existingSanPham.MaSp = sanPhamDto.MaSp;
+                existingSanPham.TenSp = sanPhamDto.TenSp;
+                existingSanPham.GiaBan = sanPhamDto.GiaBan;
+                existingSanPham.GiaNhap = sanPhamDto.GiaNhap;
+                existingSanPham.DonGiaKhiGiam = sanPhamDto.DonGiaKhiGiam;
+                existingSanPham.MoTa = sanPhamDto.MoTa;
+                existingSanPham.IdDm = sanPhamDto.IdDm;
+                existingSanPham.IdTh = sanPhamDto.IdTh;
+                existingSanPham.IdXx = sanPhamDto.IdXx;
+                existingSanPham.IdCl = sanPhamDto.IdCl;
+                existingSanPham.IdGg = sanPhamDto.IdGg;
+                existingSanPham.TheLoai = sanPhamDto.TheLoai;
+                existingSanPham.ImageDefaul = sanPhamDto.ImageDefaul;
+                existingSanPham.NgayThemGiamGia = sanPhamDto.NgayThemGiamGia;
+                existingSanPham.TrangThai = sanPhamDto.TrangThai;
+
+                // Update ChiTietSanPhams
+                foreach (var dtoChiTiet in sanPhamDto.ChiTietSanPhams)
+                {
+                    var chiTiet = existingSanPham.SanPhamChiTiets
+                        .FirstOrDefault(ct => ct.IdMs == dtoChiTiet.IdMs && ct.IdSize == dtoChiTiet.IdSize);
+
+                    if (chiTiet != null)
+                    {
+                        chiTiet.SoLuongTon = dtoChiTiet.SoLuongTon;
+                        chiTiet.MoTa = dtoChiTiet.MoTa;
+                        chiTiet.TrangThai = dtoChiTiet.TrangThai;
+                    }
+                    else
+                    {
+                        existingSanPham.SanPhamChiTiets.Add(new SanPhamChiTiet
+                        {
+                            IdMs = dtoChiTiet.IdMs,
+                            IdSize = dtoChiTiet.IdSize,
+                            SoLuongTon = dtoChiTiet.SoLuongTon,
+                            MoTa = dtoChiTiet.MoTa,
+                            TrangThai = dtoChiTiet.TrangThai
+                        });
+                    }
+                }
+                sanPham = existingSanPham;
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Thêm mới sản phẩm
+                var newSanPhamId = Guid.NewGuid();
+                sanPham = new SanPham
+                {
+                    Id = newSanPhamId,
+                    MaSp = sanPhamDto.MaSp,
+                    TenSp = sanPhamDto.TenSp,
+                    GiaBan = sanPhamDto.GiaBan,
+                    GiaNhap = sanPhamDto.GiaNhap,
+                    DonGiaKhiGiam = sanPhamDto.DonGiaKhiGiam,
+                    MoTa = sanPhamDto.MoTa,
+                    IdDm = sanPhamDto.IdDm,
+                    IdTh = sanPhamDto.IdTh,
+                    IdXx = sanPhamDto.IdXx,
+                    IdCl = sanPhamDto.IdCl,
+                    IdGg = sanPhamDto.IdGg,
+                    TheLoai = sanPhamDto.TheLoai,
+                    ImageDefaul = sanPhamDto.ImageDefaul,
+                    NgayThem = DateTime.UtcNow,
+                    NgayThemGiamGia = sanPhamDto.NgayThemGiamGia,
+                    TrangThai = sanPhamDto.TrangThai,
+                    SanPhamChiTiets = sanPhamDto.ChiTietSanPhams.Select(dtoChiTiet => new SanPhamChiTiet
+                    {
+                        IdMs = dtoChiTiet.IdMs,
+                        IdSize = dtoChiTiet.IdSize,
+                        SoLuongTon = dtoChiTiet.SoLuongTon,
+                        MoTa = dtoChiTiet.MoTa,
+                        TrangThai = dtoChiTiet.TrangThai
+                    }).ToList(),
+                    
+                };
+
+                await _context.SanPhams.AddAsync(sanPham);
+            }
+
+            await _context.SaveChangesAsync();
             return sanPham;
         }
+
+
+        //public async Task<SanPham> AddSanPham(SanPhamDtos sanPhamDto)
+        //{
+        //    var sanPham = new SanPham
+        //    {
+        //        Id = Guid.NewGuid(),
+        //        MaSp = sanPhamDto.MaSp,
+        //        TenSp = sanPhamDto.TenSp,
+        //        GiaBan = sanPhamDto.GiaBan,
+        //        GiaNhap = sanPhamDto.GiaNhap,
+        //        DonGiaKhiGiam = sanPhamDto.DonGiaKhiGiam,
+        //        MoTa = sanPhamDto.MoTa,
+        //        IdDm = sanPhamDto.IdDm,
+        //        IdTh = sanPhamDto.IdTh,
+        //        IdXx = sanPhamDto.IdXx,
+        //        IdCl = sanPhamDto.IdCl,
+        //        IdGg = sanPhamDto.IdGg,
+        //        TheLoai = sanPhamDto.TheLoai,
+        //        ImageDefaul = sanPhamDto.ImageDefaul,
+        //        NgayThem = DateTime.UtcNow,
+        //        NgayThemGiamGia = sanPhamDto.NgayThemGiamGia,
+        //        TrangThai = sanPhamDto.TrangThai
+        //    };
+        //    await _context.SanPhams.AddAsync(sanPham);
+        //    _context.SaveChanges();
+        //    return sanPham;
+        //}
 
         public async Task DeleteSanPham(Guid id)
         {
@@ -120,8 +219,10 @@ namespace F5Clothes_DAL.Reponsitories
         public async Task<SanPham> UpdateSanPham(SanPhamDtos sanPhamDto)
         {
             var existingSanPham = await _context.SanPhams
-                .Where(cl => cl.Id == sanPhamDto.Id)
+                .Include(sp => sp.SanPhamChiTiets) // Bao gồm chi tiết sản phẩm
+                .Where(sp => sp.Id == sanPhamDto.Id)
                 .FirstOrDefaultAsync();
+
             if (existingSanPham != null)
             {
                 existingSanPham.MaSp = sanPhamDto.MaSp;
@@ -141,8 +242,43 @@ namespace F5Clothes_DAL.Reponsitories
                 existingSanPham.NgayThemGiamGia = sanPhamDto.NgayThemGiamGia;
                 existingSanPham.TrangThai = sanPhamDto.TrangThai;
 
+                // Xử lý ChiTietSanPhams
+                var existingChiTietSanPhams = existingSanPham.SanPhamChiTiets.ToList();
+                foreach (var chiTiet in existingChiTietSanPhams)
+                {
+                    var dtoChiTiet = sanPhamDto.ChiTietSanPhams.FirstOrDefault(ct => ct.Id == chiTiet.Id);
+                    if (dtoChiTiet != null)
+                    {
+                        chiTiet.IdMs = dtoChiTiet.IdMs;
+                        chiTiet.IdSize = dtoChiTiet.IdSize;
+                        chiTiet.SoLuongTon = dtoChiTiet.SoLuongTon;
+                        chiTiet.MoTa = dtoChiTiet.MoTa;
+                        chiTiet.TrangThai = dtoChiTiet.TrangThai;
+                    }
+                    else
+                    {
+                        _context.SanPhamChiTiets.Remove(chiTiet); // Xóa nếu không có trong danh sách DTO
+                    }
+                }
+
+                foreach (var dtoChiTiet in sanPhamDto.ChiTietSanPhams)
+                {
+                    if (!existingSanPham.SanPhamChiTiets.Any(ct => ct.Id == dtoChiTiet.Id))
+                    {
+                        existingSanPham.SanPhamChiTiets.Add(new SanPhamChiTiet
+                        {
+                            IdMs = dtoChiTiet.IdMs,
+                            IdSize = dtoChiTiet.IdSize,
+                            SoLuongTon = dtoChiTiet.SoLuongTon,
+                            MoTa = dtoChiTiet.MoTa,
+                            TrangThai = dtoChiTiet.TrangThai
+                        });
+                    }
+                }
+
                 await _context.SaveChangesAsync();
             }
+
             return existingSanPham ?? new SanPham();
         }
 
@@ -156,6 +292,7 @@ namespace F5Clothes_DAL.Reponsitories
             .ThenInclude(ct => ct.IdMsNavigation) // Bao gồm thông tin Màu sắc
             .Include(sp => sp.SanPhamChiTiets)
             .ThenInclude(ct => ct.IdSizeNavigation) // Bao gồm thông tin Size
+            .Where(sp => sp.TrangThai == 1) // Chỉ lấy các sản phẩm có trạng thái = 1
             .Select(sp => new
             {
                 sp.Id,
@@ -197,28 +334,27 @@ namespace F5Clothes_DAL.Reponsitories
                     sp.MaSp,
                     sp.TenSp,
                     sp.GiaBan,
+                    sp.GiaNhap,
+                    sp.NgayThem,
+                    sp.NgayThemGiamGia,
+                    sp.TheLoai,
                     sp.MoTa,
                     sp.ImageDefaul,
-                    ChatLieu = sp.IdClNavigation == null ? null : new { sp.IdClNavigation.Id, sp.IdClNavigation.TenChatLieu }, // Trả về id và name của chất liệu
-                    MauSac = sp.SanPhamChiTiets
+                    sp.TrangThai,
+                    SanPhamChiTiets = sp.SanPhamChiTiets
                         .Where(ct => ct.IdSp == sp.Id)
-                        .Select(ct => ct.IdMsNavigation)
-                        .Where(ms => ms != null)
-                        .Select(ms => new { ms.Id, ms.TenMauSac })
-                        .Distinct()
-                        .ToList(), // Trả về danh sách màu sắc
-                    Size = sp.SanPhamChiTiets
-                        .Where(ct => ct.IdSp == sp.Id)
-                        .Select(ct => ct.IdSizeNavigation)
-                        .Where(size => size != null)
-                        .Select(size => new { size.Id, size.TenSize })
-                        .Distinct()
-                        .ToList(),
-                    Images = sp.Images
-                        .Where(ct => ct.IdSp == sp.Id)
-                        .Select(ct => new { ct.Id, ct.TenImage })
-                        .Distinct()
-                        .ToList()
+                        .Select(ct => new
+                        {
+                            ct.Id,
+                            MauSac = ct.IdMsNavigation == null ? null : new { ct.IdMsNavigation.Id, ct.IdMsNavigation.TenMauSac },
+                            Size = ct.IdSizeNavigation == null ? null : new { ct.IdSizeNavigation.Id, ct.IdSizeNavigation.TenSize },
+                            ct.SoLuongTon, // Giả sử có số lượng tồn trong SanPhamChiTiet
+                            ct.MoTa,
+                        })
+                        .ToList(), // Trả về danh sách chi tiết sản phẩm
+                    ChatLieu = sp.IdClNavigation == null ? null : new { sp.IdClNavigation.Id, sp.IdClNavigation.TenChatLieu },
+                    ThuongHieu = sp.IdThNavigation == null ? null : new { sp.IdThNavigation.Id, sp.IdThNavigation.TenThuongHieu },
+                    DanhMuc = sp.IdDmNavigation == null ? null : new { sp.IdDmNavigation.Id, sp.IdDmNavigation.TenDanhMuc },
                 })
                 .FirstOrDefaultAsync();
 
