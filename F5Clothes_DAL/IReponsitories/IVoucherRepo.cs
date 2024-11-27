@@ -14,6 +14,8 @@ namespace F5Clothes_DAL.IReponsitories
         Task<VouCher> GetByVouCher(Guid id);
         Task AddVc(VouCher Vc);
         Task UpdateVc(VouCher Vc);
-       
+        Task<VouCher> GetMaVouCher(string Ma);
+
+
     }
 }

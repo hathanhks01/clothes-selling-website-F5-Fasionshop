@@ -36,21 +36,27 @@ namespace F5Clothes_API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetBySp(Guid id)
+        public async Task<IActionResult> GetAllDiaChiByCustomerId(Guid id)
         {
+            // Lấy danh sách các địa chỉ của khách hàng từ repository
+            var diaChiList = await _DiaChiRepo.GetByDiaChi(id);
 
-
-            var mappeddc = _mapper.Map<DiaChiDtos>(await _DiaChiRepo.GetByDiaChi(id));  // Mapping single object
-            if (!ModelState.IsValid)
+            // Nếu không tìm thấy địa chỉ nào, trả về NotFound
+            if (diaChiList == null || !diaChiList.Any())
             {
-                return BadRequest(ModelState);
-
+                return NotFound("Không tìm thấy địa chỉ cho khách hàng này.");
             }
+
+            // Chuyển đổi danh sách DiaChi sang DTO
+            var mappeddc = _mapper.Map<List<DiaChiDtos>>(diaChiList);
+
+            // Trả về danh sách địa chỉ đã được map sang DTO
             return Ok(mappeddc);
         }
 
+
         [HttpPost]
-        public async Task<IActionResult> DiaChiStore(DiaChiDtos dc)
+        public async Task<IActionResult> DiaChiAdd(DiaChiDtos dc)
         {
             if (dc == null || dc.IdKh == null)
             {

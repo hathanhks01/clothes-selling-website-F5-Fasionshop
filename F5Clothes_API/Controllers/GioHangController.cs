@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 
 using F5Clothes_DAL.DTOs;
+using F5Clothes_DAL.Models;
 
 using F5Clothes_Services.IServices;
 using F5Clothes_Services.Services;
@@ -23,23 +24,38 @@ public class GioHangController : ControllerBase
     [HttpGet("GetAllGioHang/{idKh}")]
     public async Task<IActionResult> GetAllGioHang(Guid idKh)
     {
+        var cartItems = await _gioHangServices.GetAllGioHangAsync(idKh);
+        if (cartItems == null || !cartItems.Any())
+        {
+            // Nếu giỏ hàng rỗng, trả về một mảng rỗng thay vì lỗi
+            return Ok(new List<GioHangChiTiet>());
+        }
+        return Ok(cartItems);
+    }
+
+    // Get the entire cart for a specific customer by customer ID (idKh)
+    [HttpGet("GetByGioHang/{idKh}")]
+    public async Task<IActionResult> GetByGioHang(Guid idKh)
+    {
         try
         {
-            // Fetch cart items
-            var cartItems = await _gioHangServices.GetAllGioHangAsync(idKh);
+            // Call the service method to retrieve the cart for the customer
+            var gioHang = await _gioHangServices.GetByGioHang(idKh);
 
-            // Check if the cart is empty
-            if (cartItems == null || !cartItems.Any())
+            // Check if the cart exists
+            if (gioHang == null)
             {
-                return NotFound(new { message = "Không có sản phẩm nào trong giỏ hàng." }); // 404 Not Found with a message
+                return NotFound(new { Message = "Giỏ hàng không tồn tại." });
             }
 
-            return Ok(cartItems); // 200 OK with list of cart items
+            // Return the cart details
+            return Ok(gioHang);  // 200 OK with the cart details
         }
         catch (Exception ex)
         {
-            // Handle exceptions and return a 400 Bad Request
-            return BadRequest(new { message = ex.Message });
+            // Log the error and return a bad request response
+            
+            return StatusCode(500, new { Message = "Đã xảy ra lỗi khi lấy thông tin giỏ hàng.", Error = ex.Message });
         }
     }
 
@@ -60,19 +76,39 @@ public class GioHangController : ControllerBase
     }
 
     // Add a new cart item
-    [HttpPost("AddGioHang")]
+    [HttpPost]
     public async Task<IActionResult> AddGioHang([FromBody] AddGioHangDtos addDto)
     {
+        // Kiểm tra xem addDto có null không
+        if (addDto == null)
+        {
+            return BadRequest("Dữ liệu không hợp lệ.");
+        }
+
+        // Kiểm tra idGh có hợp lệ không
+        if (addDto.IdGh == Guid.Empty)
+        {
+            return BadRequest("ID Giỏ hàng không hợp lệ.");
+        }
+
+        // Kiểm tra IdSpct có hợp lệ không
+        if (addDto.IdSpct == Guid.Empty)
+        {
+            return BadRequest("ID Sản phẩm chi tiết không hợp lệ.");
+        }
+
+        // Thực hiện logic thêm giỏ hàng
         try
         {
             await _gioHangServices.AddGioHangAsync(addDto);
-            return CreatedAtAction(nameof(GetGioHangById), new { id = addDto.Id }, addDto); // 201 Created
+            return Ok("Thêm giỏ hàng thành công.");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { message = ex.Message });
+            return BadRequest($"Đã xảy ra lỗi: {ex.Message}");
         }
     }
+
 
     // Update an existing cart item
     [HttpPut("UpdateGioHang")]

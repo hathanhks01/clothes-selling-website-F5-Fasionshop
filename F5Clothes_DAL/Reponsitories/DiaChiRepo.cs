@@ -34,10 +34,10 @@ namespace F5Clothes_DAL.Reponsitories
                     DiaChiChiTiet = dc.DiaChiChiTiet,
                     GhiChu = dc.GhiChu,
                     QuanHuyen = dc.QuanHuyen,
-                    NgayTao = dc.NgayTao,
+                    NgayTao = DateTime.Now,
                     PhuongXa = dc.PhuongXa,
-                    QuocGia = dc.QuocGia,
-                    TrangThai = dc.TrangThai,
+                    QuocGia = "Việt Nam",
+                    TrangThai = 1,
                 };
 
                 _context.DiaChis.Add(diaChis);
@@ -50,10 +50,10 @@ namespace F5Clothes_DAL.Reponsitories
                 diaChi.DiaChiChiTiet = dc.DiaChiChiTiet;
                 diaChi.GhiChu = dc.GhiChu;
                 diaChi.QuanHuyen = dc.QuanHuyen;
-                diaChi.NgayTao = dc.NgayTao;
+                diaChi.NgayTao = DateTime.Now;
                 diaChi.PhuongXa = dc.PhuongXa;
-                diaChi.QuocGia = dc.QuocGia;
-                diaChi.TrangThai = dc.TrangThai;
+                diaChi.QuocGia = "Việt Nam";
+                diaChi.TrangThai = 1;
 
                 await _context.SaveChangesAsync();
                 return diaChi;
