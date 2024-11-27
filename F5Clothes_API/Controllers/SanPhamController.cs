@@ -51,7 +51,7 @@ namespace F5Clothes_API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, SanPhamDtos sanPhamDto)
+        public async Task<IActionResult> Update(Guid id, [FromBody] SanPhamDtos sanPhamDto)
         {
             if (id != sanPhamDto.Id)
             {
