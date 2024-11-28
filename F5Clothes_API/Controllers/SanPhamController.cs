@@ -74,6 +74,64 @@ namespace F5Clothes_API.Controllers
         {
             await _sanPhamSer.DeleteSanPham(id);
         }
+        [HttpPost]
+        [Route("AddOrUpdate")]
+        public async Task<IActionResult> AddOrUpdateSanPhamChiTiet(Guid sanPhamId, [FromBody] IEnumerable<SanPhamChiTietDtos> chiTietDtos)
+        {
+            if (chiTietDtos == null)
+            {
+                return BadRequest("Chi tiết sản phẩm không hợp lệ.");
+            }
+
+            try
+            {
+                await _sanPhamRepo.AddOrUpdateSanPhamChiTiet(sanPhamId, chiTietDtos);
+                return Ok("Chi tiết sản phẩm đã được thêm hoặc cập nhật thành công.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Đã xảy ra lỗi: {ex.Message}");
+            }
+        }
+
+        [HttpPut]
+        [Route("Update")]
+        public async Task<IActionResult> UpdateSanPhamChiTiet(Guid sanPhamId, [FromBody] IEnumerable<SanPhamChiTietDtos> chiTietDtos)
+        {
+            if (chiTietDtos == null)
+            {
+                return BadRequest("Chi tiết sản phẩm không hợp lệ.");
+            }
+
+            try
+            {
+                await _sanPhamRepo.UpdateSanPhamChiTiet(sanPhamId, chiTietDtos);
+                return Ok("Chi tiết sản phẩm đã được cập nhật thành công.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Đã xảy ra lỗi: {ex.Message}");
+            }
+        }
+        [HttpGet]
+        [Route("GetBySanPhamId/{sanPhamId}")]
+        public async Task<IActionResult> GetSanPhamChiTietBySanPhamId(Guid sanPhamId)
+        {
+            try
+            {
+                var chiTietSanPhams = await _sanPhamRepo.GetSanPhamChiTietBySanPhamId(sanPhamId);
+                if (chiTietSanPhams == null || !chiTietSanPhams.Any())
+                {
+                    return NotFound("Không tìm thấy chi tiết sản phẩm cho sản phẩm này.");
+                }
+
+                return Ok(chiTietSanPhams);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Đã xảy ra lỗi: {ex.Message}");
+            }
+        }
     } 
 
 }

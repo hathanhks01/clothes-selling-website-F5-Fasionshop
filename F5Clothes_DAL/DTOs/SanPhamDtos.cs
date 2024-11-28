@@ -40,6 +40,5 @@ namespace F5Clothes_DAL.DTOs
         public string? MoTa { get; set; }
 
         public int? TrangThai { get; set; }
-        public List<SanPhamChiTietDtos> ChiTietSanPhams { get; set; }
     }
 }

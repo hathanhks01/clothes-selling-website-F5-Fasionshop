@@ -31,7 +31,7 @@ namespace F5Clothes_DAL.Helper
                     .ForMember(dest => dest.TongTien, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.GiaBan * c.SoLuong));
             CreateMap<AddGioHangDtos, GioHangChiTiet>();
             CreateMap<GioHangUpdate, GioHangChiTiet>();
-            
+            CreateMap<SanPhamChiTietDtos, SanPhamChiTiet>();
             CreateMap<GiohangDtos, GioHangChiTiet>();
             CreateMap<HoaDon, HoaDonDtos>();
             CreateMap<HoaDonChiTiet, HoaDonChiTietDtos>();
