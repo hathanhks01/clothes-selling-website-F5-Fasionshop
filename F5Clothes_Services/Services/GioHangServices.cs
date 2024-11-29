@@ -175,7 +175,7 @@ namespace F5Clothes_Services.Services
 
             };
 
-            await _hoaDonRepo.AddHd(hoaDon);
+            await _hoaDonRepo.AddHdgioHang(hoaDon);
 
             foreach (var item in cartItems)
             {
@@ -196,13 +196,13 @@ namespace F5Clothes_Services.Services
                     NgayTao = DateTime.Now,
                     DonGiaKhiGiam = item.DonGiaKhiGiam
                 };
-                await _hDCTRepo.Create(hoaDonChiTiet);
+                await _hDCTRepo.CreateDatHang(hoaDonChiTiet);
 
                 await _gioHangRepo.DeleteGioHangAsync(item.Id);
             }
         }
+        
 
-       
 
 
 

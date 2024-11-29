@@ -167,5 +167,11 @@ namespace F5Clothes_DAL.Reponsitories
 
             return await Task.FromResult($"{prefix}{datePart}{randomPart}");
         }
+
+        public async Task AddHdgioHang(HoaDon Hd)
+        {
+            _context.Add(Hd);
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -61,11 +61,9 @@ public partial class DbduAnTnContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 
-<<<<<<< HEAD
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-IJA3FLB;Database=DBDuAnTN;TrustServerCertificate=True;Trusted_Connection=True;");
-=======
-        => optionsBuilder.UseSqlServer("Server=MSI\\SQLEXPRESS;Database=DBDuAnTN;TrustServerCertificate=True;Trusted_Connection=True;");
->>>>>>> 38d1cd7dd569f6c85b95270bc29fd33a58375fe5
+
+        => optionsBuilder.UseSqlServer("Server=WINDOWS-11\\DUYAN;Database=DBDuAnTN;TrustServerCertificate=True;Trusted_Connection=True;");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ChatLieu>(entity =>

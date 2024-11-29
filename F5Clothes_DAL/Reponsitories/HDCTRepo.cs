@@ -23,6 +23,12 @@ namespace F5Clothes_DAL.Reponsitories
             await _context.SaveChangesAsync();
         }
 
+        public async Task CreateDatHang(HoaDonChiTiet hoaDonChiTiet)
+        {
+            _context.Add(hoaDonChiTiet);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task Delete(Guid id)
         {
             var idHoaDonChiTiet = await GetById(id);
