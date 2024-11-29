@@ -14,13 +14,15 @@ namespace F5Clothes_DAL.IReponsitories
     {
         Task<IEnumerable<object>> GetAllSanPham();
         Task<SanPham> GetByIdSanPham(Guid id);
+        Task<SanPhamChiTiet> GetByIdSanPhamChiTiet(Guid id);
         Task<SanPham> AddSanPham(SanPhamDtos sanPhamDto);
         Task<SanPham> UpdateSanPham(SanPhamDtos sanPhamDto);
         Task DeleteSanPham(Guid id);
         Task<IEnumerable<object>> GetAllSanPhamsWithDetailsAsync(); 
         Task<object> GetSanPhamWithDetailsAsync(Guid sanPhamId);
-        Task AddOrUpdateSanPhamChiTiet(Guid sanPhamId, IEnumerable<SanPhamChiTietDtos> chiTietDtos);
+        Task<SanPhamChiTiet> AddOrUpdateSanPhamChiTiet(SanPhamChiTietDtos chiTietDtos);
         Task UpdateSanPhamChiTiet(Guid sanPhamId, IEnumerable<SanPhamChiTietDtos> chiTietDtos);
         Task<IEnumerable<SanPhamChiTiet>> GetSanPhamChiTietBySanPhamId(Guid sanPhamId);
+        
     }
 }

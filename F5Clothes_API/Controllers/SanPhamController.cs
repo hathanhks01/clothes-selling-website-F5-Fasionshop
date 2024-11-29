@@ -32,6 +32,11 @@ namespace F5Clothes_API.Controllers
         {
             return await _sanPhamSer.GetByIdSanPham(id);
         }
+        [HttpGet("sanPhamChiTiet/{id}")]
+        public async Task<SanPhamChiTiet> GetByIdSanPhamChiTiet(Guid id)
+        {
+            return await _sanPhamRepo.GetByIdSanPhamChiTiet(id);
+        }
         [HttpGet("store")]
         public async Task<IEnumerable<object>> GetAllSanPhamsAsync()
         {
@@ -76,22 +81,10 @@ namespace F5Clothes_API.Controllers
         }
         [HttpPost]
         [Route("AddOrUpdate")]
-        public async Task<IActionResult> AddOrUpdateSanPhamChiTiet(Guid sanPhamId, [FromBody] IEnumerable<SanPhamChiTietDtos> chiTietDtos)
+        public async Task<IActionResult> AddOrUpdateSanPhamChiTiet([FromBody] SanPhamChiTietDtos chiTietDtos)
         {
-            if (chiTietDtos == null)
-            {
-                return BadRequest("Chi tiết sản phẩm không hợp lệ.");
-            }
-
-            try
-            {
-                await _sanPhamRepo.AddOrUpdateSanPhamChiTiet(sanPhamId, chiTietDtos);
-                return Ok("Chi tiết sản phẩm đã được thêm hoặc cập nhật thành công.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Đã xảy ra lỗi: {ex.Message}");
-            }
+            await _sanPhamRepo.AddOrUpdateSanPhamChiTiet(chiTietDtos);
+            return CreatedAtAction(nameof(GetByIdSanPhamChiTiet), new { id = chiTietDtos.Id }, chiTietDtos);
         }
 
         [HttpPut]

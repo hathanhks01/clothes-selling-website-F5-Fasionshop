@@ -1,8 +1,8 @@
 # Chặn tất cả các file có đuôi .bin
 *.bin
 /.vs
-/bin
-/obj
+/.bin
+/.obj
 
 # Chặn các file nhị phân khác như .exe, .dll, .dat
 *.exe

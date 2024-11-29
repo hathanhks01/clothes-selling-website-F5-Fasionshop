@@ -269,40 +269,40 @@ namespace F5Clothes_DAL.Reponsitories
 
             return result;
         }
-        public async Task AddOrUpdateSanPhamChiTiet(Guid sanPhamId, IEnumerable<SanPhamChiTietDtos> chiTietDtos)
+        public async Task<SanPhamChiTiet> AddOrUpdateSanPhamChiTiet(SanPhamChiTietDtos chiTietDtos)
         {
-            var sanPham = await _context.SanPhams
-                .Include(sp => sp.SanPhamChiTiets)
-                .FirstOrDefaultAsync(sp => sp.Id == sanPhamId);
+            if (chiTietDtos == null)
+                throw new ArgumentNullException(nameof(chiTietDtos), "SanPhamDto cannot be null.");
 
-            if (sanPham == null)
-                throw new InvalidOperationException("SanPham không tồn tại.");
+            var existingSanPham = chiTietDtos.Id != Guid.Empty
+            ? await _context.SanPhamChiTiets.FirstOrDefaultAsync(sp => sp.Id == chiTietDtos.Id): null;
 
-            foreach (var dtoChiTiet in chiTietDtos)
+            if (existingSanPham != null)
             {
-                var chiTiet = sanPham.SanPhamChiTiets
-                    .FirstOrDefault(ct => ct.IdMs == dtoChiTiet.IdMs && ct.IdSize == dtoChiTiet.IdSize);
+                existingSanPham.IdMs = chiTietDtos.IdMs;
+                existingSanPham.IdSize = chiTietDtos.IdSize;
+                existingSanPham.SoLuongTon = chiTietDtos.SoLuongTon;
+            }
+            else
+            {
+                existingSanPham = new SanPhamChiTiet
+                {
+                    Id = Guid.NewGuid(),
+                    IdSp = chiTietDtos.IdSp,
+                    IdMs = chiTietDtos.IdMs,
+                    IdSize = chiTietDtos.IdSize,
+                    SoLuongTon = chiTietDtos.SoLuongTon,
+                    TrangThai = chiTietDtos.TrangThai,
+                    MoTa = chiTietDtos.MoTa,
+                    NgayTao = chiTietDtos.NgayTao,
+                    QrCode = chiTietDtos.QrCode
+                };
 
-                if (chiTiet != null)
-                {
-                    chiTiet.SoLuongTon = dtoChiTiet.SoLuongTon;
-                    chiTiet.MoTa = dtoChiTiet.MoTa;
-                    chiTiet.TrangThai = dtoChiTiet.TrangThai;
-                }
-                else
-                {
-                    sanPham.SanPhamChiTiets.Add(new SanPhamChiTiet
-                    {
-                        IdMs = dtoChiTiet.IdMs,
-                        IdSize = dtoChiTiet.IdSize,
-                        SoLuongTon = dtoChiTiet.SoLuongTon,
-                        MoTa = dtoChiTiet.MoTa,
-                        TrangThai = dtoChiTiet.TrangThai
-                    });
-                }
+                await _context.SanPhamChiTiets.AddAsync(existingSanPham);
             }
 
             await _context.SaveChangesAsync();
+            return existingSanPham;
         }
         public async Task UpdateSanPhamChiTiet(Guid sanPhamId, IEnumerable<SanPhamChiTietDtos> chiTietDtos)
         {
@@ -314,7 +314,6 @@ namespace F5Clothes_DAL.Reponsitories
 
             var existingChiTietSanPhams = existingSanPham.SanPhamChiTiets.ToList();
 
-            // Cập nhật và xóa chi tiết
             foreach (var chiTiet in existingChiTietSanPhams)
             {
                 var dtoChiTiet = chiTietDtos.FirstOrDefault(ct => ct.Id == chiTiet.Id);
@@ -372,6 +371,11 @@ namespace F5Clothes_DAL.Reponsitories
                 .ToListAsync();
 
             return chiTietSanPhams;
+        }
+
+        public async Task<SanPhamChiTiet> GetByIdSanPhamChiTiet(Guid id)
+        {
+            return await _context.SanPhamChiTiets.FirstOrDefaultAsync(x => x.Id == id);
         }
     }
 }
