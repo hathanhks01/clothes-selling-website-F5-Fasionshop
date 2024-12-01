@@ -74,7 +74,7 @@ namespace F5Clothes_DAL.Reponsitories
                 hoaDon.NgayTao = DateTime.Now;
                 hoaDon.NgayCapNhat = DateTime.Now;
                 hoaDon.NgayXacNhan = hoaDon.LoaiHoaDon == 1 ? DateTime.Now : null;
-                hoaDon.TrangThai = 1;
+                hoaDon.TrangThai = hoaDon.TrangThai;
 
                 // Tạo danh sách chi tiết hóa đơn mới
                 var chiTietList = hoaDon.HoaDonChiTiets.ToList();
