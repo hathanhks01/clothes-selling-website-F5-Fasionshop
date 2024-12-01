@@ -46,10 +46,9 @@ namespace F5Clothes_Services.Services
             return await _hoaDonRepo.GetByHoaDon(id);
         }
 
-        public async Task Update(HoaDon hoaDon)
+        public async Task<bool> UpdateHoaDonAsync(HoaDon hoaDon)
         {
-            await _hoaDonRepo.UpdateHd(hoaDon);
+            return await _hoaDonRepo.UpdateHd(hoaDon);
         }
-      
     }
 }

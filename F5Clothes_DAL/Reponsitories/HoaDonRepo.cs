@@ -56,11 +56,6 @@ namespace F5Clothes_DAL.Reponsitories
             return await _context.HoaDons.FindAsync(id);
         }
 
-        public async Task UpdateHd(HoaDon Hd)
-        {
-            _context.Entry(Hd).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-        }
         public async Task<int> CountHdByMaHoaDonPrefix(string prefix)
         {
             return await _context.HoaDons
@@ -166,6 +161,157 @@ namespace F5Clothes_DAL.Reponsitories
             string randomPart = new Random().Next(1000, 9999).ToString();
 
             return await Task.FromResult($"{prefix}{datePart}{randomPart}");
+        }
+        public async Task<bool> UpdateHd(HoaDon Hd)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Find the existing invoice
+                var existingHoaDon = await _context.HoaDons
+                    .Include(h => h.HoaDonChiTiets)
+                    .Include(h => h.LichSuHoaDons)
+                    .FirstOrDefaultAsync(h => h.Id == Hd.Id);
+
+                if (existingHoaDon == null)
+                {
+                    throw new Exception("Hóa đơn không tồn tại");
+                }
+
+                // Update basic invoice information
+                UpdateInvoiceBasicInfo(existingHoaDon, Hd);
+
+                // Update delivery information
+                UpdateDeliveryInfo(existingHoaDon, Hd);
+
+                // Update financial information
+                UpdateFinancialInfo(existingHoaDon, Hd);
+
+                // Update invoice details
+                await UpdateHoaDonChiTiets(existingHoaDon, Hd);
+
+                // Track status changes
+                TrackStatusChanges(existingHoaDon, Hd);
+
+                // Update last modified date
+                existingHoaDon.NgayCapNhat = DateTime.Now;
+
+                // Save changes
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                // Log the exception
+                return false;
+            }
+        }
+        private void UpdateInvoiceBasicInfo(HoaDon existingHoaDon, HoaDon hoaDon)
+        {
+            // Update staff, customer, and voucher
+            existingHoaDon.IdNv = hoaDon.IdNv ?? existingHoaDon.IdNv;
+            existingHoaDon.IdKh = hoaDon.IdKh ?? existingHoaDon.IdKh;
+            existingHoaDon.IdVouCher = hoaDon.IdVouCher ?? existingHoaDon.IdVouCher;
+
+            // Update time-related fields
+            existingHoaDon.NgayXacNhan = hoaDon.NgayXacNhan ?? existingHoaDon.NgayXacNhan;
+            existingHoaDon.NgayChoGiaoHang = hoaDon.NgayChoGiaoHang ?? existingHoaDon.NgayChoGiaoHang;
+            existingHoaDon.NgayGiaoHang = hoaDon.NgayGiaoHang ?? existingHoaDon.NgayGiaoHang;
+            existingHoaDon.NgayNhanHang = hoaDon.NgayNhanHang ?? existingHoaDon.NgayNhanHang;
+            existingHoaDon.NgayThanhToan = hoaDon.NgayThanhToan ?? existingHoaDon.NgayThanhToan;
+            existingHoaDon.NgayHuy = hoaDon.NgayHuy ?? existingHoaDon.NgayHuy;
+
+            // Update other basic fields
+            existingHoaDon.GhiChu = hoaDon.GhiChu ?? existingHoaDon.GhiChu;
+            existingHoaDon.LoaiHoaDon = hoaDon.LoaiHoaDon ?? existingHoaDon.LoaiHoaDon;
+            existingHoaDon.TrangThai = hoaDon.TrangThai ?? existingHoaDon.TrangThai;
+        }
+
+        private void UpdateDeliveryInfo(HoaDon existingHoaDon, HoaDon hoaDon)
+        {
+            // Update delivery company information
+            existingHoaDon.DonViGiaoHang = hoaDon.DonViGiaoHang ?? existingHoaDon.DonViGiaoHang;
+            existingHoaDon.TenNguoiGiao = hoaDon.TenNguoiGiao ?? existingHoaDon.TenNguoiGiao;
+            existingHoaDon.SdtnguoiGiao = hoaDon.SdtnguoiGiao ?? existingHoaDon.SdtnguoiGiao;
+            existingHoaDon.TienGiaoHang = hoaDon.TienGiaoHang ?? existingHoaDon.TienGiaoHang;
+
+            // Update recipient information
+            existingHoaDon.TenNguoiNhan = hoaDon.TenNguoiNhan ?? existingHoaDon.TenNguoiNhan;
+            existingHoaDon.SdtnguoiNhan = hoaDon.SdtnguoiNhan ?? existingHoaDon.SdtnguoiNhan;
+            existingHoaDon.EmailNguoiNhan = hoaDon.EmailNguoiNhan ?? existingHoaDon.EmailNguoiNhan;
+            existingHoaDon.DiaChiNhanHang = hoaDon.DiaChiNhanHang ?? existingHoaDon.DiaChiNhanHang;
+        }
+
+        private void UpdateFinancialInfo(HoaDon existingHoaDon, HoaDon hoaDon)
+        {
+            // Update financial information
+            existingHoaDon.GiaTriGiam = hoaDon.GiaTriGiam ?? existingHoaDon.GiaTriGiam;
+            existingHoaDon.TienKhachTra = hoaDon.TienKhachTra ?? existingHoaDon.TienKhachTra;
+            existingHoaDon.TienThua = hoaDon.TienThua ?? existingHoaDon.TienThua;
+            existingHoaDon.ThanhTien = hoaDon.ThanhTien ?? existingHoaDon.ThanhTien;
+        }
+
+        private async Task UpdateHoaDonChiTiets(HoaDon existingHoaDon, HoaDon hoaDon)
+        {
+            if (hoaDon.HoaDonChiTiets == null || !hoaDon.HoaDonChiTiets.Any())
+                return;
+
+            foreach (var updateChiTiet in hoaDon.HoaDonChiTiets)
+            {
+                var existingChiTiet = existingHoaDon.HoaDonChiTiets
+                    .FirstOrDefault(x => x.Id == updateChiTiet.Id);
+
+                if (existingChiTiet == null)
+                {
+                    // If the detail doesn't exist, create a new one
+                    var newChiTiet = new HoaDonChiTiet
+                    {
+                        Id = Guid.NewGuid(),
+                        IdHd = existingHoaDon.Id,
+                        IdSpct = updateChiTiet.IdSpct,
+                        SoLuong = updateChiTiet.SoLuong ?? 0,
+                        DonGia = updateChiTiet.DonGia,
+                        DonGiaKhiGiam = updateChiTiet.DonGiaKhiGiam,
+                        GhiChu = updateChiTiet.GhiChu,
+                        TrangThai = updateChiTiet.TrangThai ?? 1,
+                        NgayTao = DateTime.Now
+                    };
+
+                    existingHoaDon.HoaDonChiTiets.Add(newChiTiet);
+                    continue;
+                }
+
+                // Update existing detail
+                existingChiTiet.IdSpct = updateChiTiet.IdSpct ?? existingChiTiet.IdSpct;
+                existingChiTiet.SoLuong = updateChiTiet.SoLuong ?? existingChiTiet.SoLuong;
+                existingChiTiet.DonGia = updateChiTiet.DonGia ?? existingChiTiet.DonGia;
+                existingChiTiet.DonGiaKhiGiam = updateChiTiet.DonGiaKhiGiam ?? existingChiTiet.DonGiaKhiGiam;
+                existingChiTiet.GhiChu = updateChiTiet.GhiChu ?? existingChiTiet.GhiChu;
+                existingChiTiet.TrangThai = updateChiTiet.TrangThai ?? existingChiTiet.TrangThai;
+                existingChiTiet.NgayCapNhat = DateTime.Now;
+            }
+        }
+
+        private void TrackStatusChanges(HoaDon existingHoaDon, HoaDon hoaDon)
+        {
+            // Track status changes in the history
+            if (hoaDon.TrangThai.HasValue && hoaDon.TrangThai != existingHoaDon.TrangThai)
+            {
+                var lichSuHoaDon = new LichSuHoaDon
+                {
+                    Id = Guid.NewGuid(),
+                    IdHd = existingHoaDon.Id,
+                    NguoiThaoTac = existingHoaDon.IdNvNavigation?.HoVaTenNv ?? "Hệ thống", // Optional: add the name of the user making the change
+                    GhiChu = $"Thay đổi trạng thái từ {existingHoaDon.TrangThai} sang {hoaDon.TrangThai}",
+                    TrangThai = hoaDon.TrangThai,
+                    NgayTao = DateTime.Now
+                };
+
+                existingHoaDon.LichSuHoaDons.Add(lichSuHoaDon);
+            }
         }
     }
 }

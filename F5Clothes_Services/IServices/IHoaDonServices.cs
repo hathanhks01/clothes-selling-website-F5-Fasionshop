@@ -13,7 +13,7 @@ namespace F5Clothes_Services.IServices
         Task<List<HoaDon>> GetAll();
         Task<HoaDon> GetById(Guid id);
         Task<HoaDon> Create(HoaDon hoaDon);
-        Task Update(HoaDon hoaDon);
+        Task<bool> UpdateHoaDonAsync(HoaDon hoaDon);
         Task Delete(Guid id);
     }
 }
