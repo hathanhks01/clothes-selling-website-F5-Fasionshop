@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using F5Clothes_DAL.Reponsitories;
+using Microsoft.EntityFrameworkCore;
 
 namespace F5Clothes_Services.Services
 {
@@ -268,18 +269,24 @@ namespace F5Clothes_Services.Services
         // Update an existing cart item
         public async Task UpdateGioHangAsync(GioHangUpdate updateDto)
         {
-            /*  var existingCartItem = await _gioHangRepo.GetGioHangByIdAsync(updateDto.id);
-             if (existingCartItem == null) throw new Exception("Cart item not found.");
+            // Fetch the existing cart item from the repository ()
+            var existingCartItem = await _gioHangRepo.GetGioHangById(updateDto.id);
 
-             // Use AutoMapper to map the updateDto to the existing entity
-             _mapper.Map(updateDto, existingCartItem);  // This will update all properties from the DTO
+            if (existingCartItem == null)
+                throw new Exception("Cart item not found.");
 
-             // Ensure that other fields like SoLuong are set explicitly if needed
-             existingCartItem.SoLuong = updateDto.SoLuong;
+            // Map DTO fields to the entity manually
+            existingCartItem.SoLuong = updateDto.SoLuong;
+            // Set other fields if needed
+            // Example: existingCartItem.IdSpct = updateDto.IdSpct;
 
-             // Update the cart item in the repository
-             await _gioHangRepo.UpdateGioHangAsync(existingCartItem);*/
+            // Update the cart item in the repository
+            await _gioHangRepo.UpdateGioHangAsync(existingCartItem);
         }
+
+
+
+
 
 
         // Delete a cart item

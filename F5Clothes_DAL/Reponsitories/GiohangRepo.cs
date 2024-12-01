@@ -130,9 +130,24 @@ namespace F5Clothes_DAL.Reponsitories
         // Update a cart item
         public async Task UpdateGioHangAsync(GioHangChiTiet updatedCartItem)
         {
-            _context.GioHangChiTiets.Update(updatedCartItem);  // Cập nhật bản ghi trong cơ sở dữ liệu
-            await _context.SaveChangesAsync();  // Lưu thay đổi vào database
+            // Find the existing cart item
+            var existingCartItem = await _context.GioHangChiTiets
+                .FirstOrDefaultAsync(ghct => ghct.Id == updatedCartItem.Id);
+
+            if (existingCartItem == null)
+            {
+                throw new Exception("Cart item not found.");
+            }
+
+            // Update the fields with the new values
+            existingCartItem.SoLuong = updatedCartItem.SoLuong;
+            existingCartItem.NgayCapNhat = DateTime.Now;
+            // You can set other properties explicitly if needed, like DonGia, IdSpct, etc.
+
+            // Save the changes
+            await _context.SaveChangesAsync();
         }
+
 
 
         // Delete a cart item
@@ -145,6 +160,11 @@ namespace F5Clothes_DAL.Reponsitories
                 await _context.SaveChangesAsync();
             }
             if (gioHangChiTiet == null) throw new Exception("Cart item not found.");
+        }
+
+        public async Task<GioHangChiTiet> GetGioHangById(Guid id)
+        {
+            return await _context.GioHangChiTiets.FirstOrDefaultAsync(ghct => ghct.Id == id);
         }
     }
 }

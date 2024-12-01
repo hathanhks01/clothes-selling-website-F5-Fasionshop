@@ -390,7 +390,8 @@ namespace F5Clothes_DAL.Reponsitories
                         {
                             SanPhamChiTietId = ct.Id, // ID của SanPhamChiTiet
                             SizeId = ct.IdSizeNavigation.Id,
-                            SizeTen = ct.IdSizeNavigation.TenSize
+                            SizeTen = ct.IdSizeNavigation.TenSize,
+                            SoLuongTon = ct.SoLuongTon
                         })
                         .Where(ct => ct.SizeId != null)
                         .Distinct()

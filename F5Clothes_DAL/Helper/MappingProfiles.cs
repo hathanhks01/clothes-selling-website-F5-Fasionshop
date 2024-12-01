@@ -21,18 +21,36 @@ namespace F5Clothes_DAL.Helper
             CreateMap<DanhMuc, DanhMucDtos>();
             CreateMap<DiaChi, DiaChiDtos>();
             CreateMap<GiamGium, GiamGiaDtos>();
+            // Map from GioHangChiTiet to GiohangDtos
             CreateMap<GioHangChiTiet, GiohangDtos>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                    .ForMember(dest => dest.TenSp, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.TenSp))
-                    .ForMember(dest => dest.HinhAnh, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.ImageDefaul))
-                    .ForMember(dest => dest.DonGia, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.GiaBan))
-                     .ForMember(dest => dest.DonGia, src => src.MapFrom(c => c.IdSpctNavigation.IdMsNavigation.TenMauSac))
-                       .ForMember(dest => dest.DonGia, src => src.MapFrom(c => c.IdSpctNavigation.IdSizeNavigation.TenSize))
-                    .ForMember(dest => dest.TongTien, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.GiaBan * c.SoLuong));
+                .ForMember(dest => dest.TenSp, opt => opt.MapFrom(src => src.IdSpctNavigation.IdSpNavigation.TenSp))  // Mapping for product name
+                .ForMember(dest => dest.HinhAnh, opt => opt.MapFrom(src => src.IdSpctNavigation.IdSpNavigation.ImageDefaul))  // Mapping for image
+                .ForMember(dest => dest.DonGia, opt => opt.MapFrom(src => src.IdSpctNavigation.IdSpNavigation.GiaBan))  // Mapping for price
+                .ForMember(dest => dest.TenMauSac, opt => opt.MapFrom(src => src.IdSpctNavigation.IdMsNavigation.TenMauSac))  // Mapping for color
+                .ForMember(dest => dest.TenSize, opt => opt.MapFrom(src => src.IdSpctNavigation.IdSizeNavigation.TenSize))  // Mapping for size
+                .ForMember(dest => dest.TongTien, opt => opt.MapFrom(src => src.IdSpctNavigation.IdSpNavigation.GiaBan * src.SoLuong));  // Mapping total price
+
+            // Map from AddGioHangDtos to GioHangChiTiet (likely for creating cart items)
             CreateMap<AddGioHangDtos, GioHangChiTiet>();
-            CreateMap<GioHangUpdate, GioHangChiTiet>();
+
+            // Map from GioHangUpdate to GioHangChiTiet (for updating cart items)
             
-            CreateMap<GiohangDtos, GioHangChiTiet>();
+            CreateMap<GiohangDtos, GioHangChiTiet>()
+                       .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.IdGh, opt => opt.MapFrom(src => src.IdGh))
+            .ForMember(dest => dest.IdSpct, opt => opt.MapFrom(src => src.IdSpct))
+            .ForMember(dest => dest.DonGia, opt => opt.MapFrom(src => src.DonGia))
+            .ForMember(dest => dest.DonGiaKhiGiam, opt => opt.MapFrom(src => src.DonGiaKhiGiam))
+            .ForMember(dest => dest.SoLuong, opt => opt.MapFrom(src => src.SoLuong))
+            
+            .ForMember(dest => dest.GhiChu, opt => opt.Ignore()) // Cũng có thể bỏ qua nếu không cần
+            .ForMember(dest => dest.TrangThai, opt => opt.Ignore()) // Cũng có thể bỏ qua nếu không cần
+            .ForMember(dest => dest.NgayTao, opt => opt.Ignore()) // Cũng có thể bỏ qua nếu không cần
+            .ForMember(dest => dest.NgayCapNhat, opt => opt.Ignore()) // Bỏ qua nếu không có trong DTO
+            .ForMember(dest => dest.IdGhNavigation, opt => opt.Ignore()) // Không cần ánh xạ liên kết
+            .ForMember(dest => dest.IdSpctNavigation, opt => opt.Ignore());
+
             CreateMap<HoaDon, HoaDonDtos>();
             CreateMap<HoaDonChiTiet, HoaDonChiTietDtos>();
             CreateMap<KhachHang, KhachHangDtos>();

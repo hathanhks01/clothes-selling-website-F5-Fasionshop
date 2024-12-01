@@ -114,14 +114,19 @@ public class GioHangController : ControllerBase
     [HttpPut("UpdateGioHang")]
     public async Task<IActionResult> UpdateGioHang([FromBody] GioHangUpdate updateDto)
     {
+        if (updateDto == null || updateDto.id == Guid.Empty)
+        {
+            return BadRequest("Invalid input data.");
+        }
+
         try
         {
             await _gioHangServices.UpdateGioHangAsync(updateDto);
-            return Ok(new { message = "Cart item updated successfully." }); // 200 OK
+            return Ok(new { Message = "Cập nhật số lượng thành công!" });
         }
         catch (Exception ex)
         {
-            return NotFound(new { message = ex.Message });
+            return NotFound(new { Message = ex.Message });
         }
     }
 

@@ -20,6 +20,7 @@ namespace F5Clothes_DAL.DTOs
     public class GioHangUpdate
     {
         public Guid id { get; set; }
+      
         public int SoLuong { get; set; }
 
     }
