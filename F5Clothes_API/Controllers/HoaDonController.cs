@@ -27,28 +27,25 @@ namespace F5Clothes_API.Controllers
         public async Task<ActionResult<IEnumerable<HoaDon>>> GetAll()
         {
             var HoaDonList = await _HoaDonSV.GetAll();
-            var mappehd = _mapper.Map<List<HoaDonDtos>>(HoaDonList);
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            return Ok(mappehd);
+            return Ok(HoaDonList);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBySp(Guid id)
         {
-
-
-            var mappeHdd = _mapper.Map<HoaDonDtos>(await _HoaDonSV.GetById(id));
+            var hd= await _HoaDonSV.GetById(id);
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
 
             }
-            return Ok(mappeHdd);
+            return Ok(hd);
         }
 
         [HttpPost]

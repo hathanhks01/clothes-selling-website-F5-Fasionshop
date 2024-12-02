@@ -11,7 +11,7 @@ namespace F5Clothes_DAL.IReponsitories
     public interface IHoaDonRepo
     {
         Task<List<HoaDon>> GetAllHoaDon();
-        Task<HoaDon> GetByHoaDon(Guid id);
+        Task<object> GetByHoaDon(Guid id);
         Task<HoaDon> AddHd(HoaDon Hd);
         Task<bool> UpdateHd(HoaDon Hd);
         Task DeleteHd(Guid Id);

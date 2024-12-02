@@ -41,7 +41,7 @@ namespace F5Clothes_Services.Services
             return await _hoaDonRepo.GetAllHoaDon(); 
         }
 
-        public async Task<HoaDon> GetById(Guid id)
+        public async Task<object> GetById(Guid id)
         {
             return await _hoaDonRepo.GetByHoaDon(id);
         }

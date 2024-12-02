@@ -46,14 +46,104 @@ namespace F5Clothes_DAL.Reponsitories
         public async Task<List<HoaDon>> GetAllHoaDon()
         {
             return await _context.HoaDons
-                         .Include(hd => hd.IdNvNavigation)
-                         .Include(hd => hd.IdKhNavigation)
-                         .ToListAsync();
+         .Include(hd => hd.IdNvNavigation) // Include the NhanVien navigation
+         .Include(hd => hd.IdKhNavigation) // Include the KhachHang navigation
+         .Include(hd => hd.IdVouCherNavigation) // Include VouCher
+         .Select(hd => new HoaDon
+         {
+             Id = hd.Id,
+             IdNv = hd.IdNv,
+             IdKh = hd.IdKh,
+             IdVouCher = hd.IdVouCher,
+             MaHoaDon = hd.MaHoaDon,
+             NgayTao = hd.NgayTao,
+             NgayCapNhat = hd.NgayCapNhat,
+             NgayXacNhan = hd.NgayXacNhan,
+             NgayChoGiaoHang = hd.NgayChoGiaoHang,
+             NgayGiaoHang = hd.NgayGiaoHang,
+             DonViGiaoHang = hd.DonViGiaoHang,
+             TenNguoiGiao = hd.TenNguoiGiao,
+             SdtnguoiGiao = hd.SdtnguoiGiao,
+             TienGiaoHang = hd.TienGiaoHang,
+             NgayNhanHang = hd.NgayNhanHang,
+             TenNguoiNhan = hd.TenNguoiNhan,
+             SdtnguoiNhan = hd.SdtnguoiNhan,
+             EmailNguoiNhan = hd.EmailNguoiNhan,
+             DiaChiNhanHang = hd.DiaChiNhanHang,
+             NgayThanhToan = hd.NgayThanhToan,
+             NgayHuy = hd.NgayHuy,
+             GiaTriGiam = hd.GiaTriGiam,
+             TienKhachTra = hd.TienKhachTra,
+             TienThua = hd.TienThua,
+             ThanhTien = hd.ThanhTien,
+             GhiChu = hd.GhiChu,
+             LoaiHoaDon = hd.LoaiHoaDon,
+             TrangThai = hd.TrangThai,
+             IdKhNavigation = hd.IdKhNavigation == null ? null : new KhachHang
+             {
+                 HoVaTenKh = hd.IdKhNavigation.HoVaTenKh // Only select the HoVaTenKh
+             },
+             IdNvNavigation = hd.IdNvNavigation == null ? null : new NhanVien
+             {
+                 HoVaTenNv = hd.IdNvNavigation.HoVaTenNv // Only select the HoVaTenNv
+             },
+             IdVouCherNavigation = hd.IdVouCherNavigation
+         })
+         .ToListAsync();
         }
 
-        public async Task<HoaDon> GetByHoaDon(Guid id)
+        public async Task<object> GetByHoaDon(Guid id)
         {
-            return await _context.HoaDons.FindAsync(id);
+
+            var result = await _context.HoaDons
+                .Where(hd => hd.Id == id)
+                .Select(hd => new
+                {
+                    hd.Id,
+                    hd.MaHoaDon,
+                    hd.NgayTao,
+                    KhachHang = hd.IdKhNavigation == null ? null : new
+                    {
+                        hd.IdKhNavigation.Id,
+                        hd.IdKhNavigation.HoVaTenKh,
+                        hd.IdKhNavigation.SoDienThoai,
+                        hd.IdKhNavigation.Email,
+                        hd.IdKhNavigation.DiaChis
+                    },  // Thông tin khách hàng
+                    NhanVien = hd.IdNvNavigation == null ? null : new
+                    {
+                        hd.IdNvNavigation.Id,
+                        hd.IdNvNavigation.HoVaTenNv,
+                        hd.IdNvNavigation.SoDienThoai,
+                        hd.IdNvNavigation.Email
+                    },  // Thông tin nhân viên
+                    HoaDonChiTiets = hd.HoaDonChiTiets
+                        .Where(hdct => hdct.IdHd == hd.Id)
+                        .Select(hdct => new
+                        {
+                            hdct.Id,
+                            hdct.IdSpct,
+                            SanPham = hdct.IdSpctNavigation == null ? null : new
+                            {
+                                hdct.IdSpctNavigation.Id,
+                                TenSanPham = hdct.IdSpctNavigation.IdSpNavigation != null
+                                    ? hdct.IdSpctNavigation.IdSpNavigation.TenSp
+                                    : null,  // Tên sản phẩm
+                                GiaBan = hdct.IdSpctNavigation.IdSpNavigation != null
+                                    ? hdct.IdSpctNavigation.IdSpNavigation.GiaBan
+                                    : 0  // Giá bán
+                            },  // Thông tin sản phẩm trong chi tiết hóa đơn
+                            hdct.SoLuong,
+                            hdct.DonGia,
+                            ThanhTien = hdct.SoLuong * hdct.DonGia  // Thành tiền của sản phẩm
+                        })
+                        .ToList(),
+                    TongTien = hd.HoaDonChiTiets.Sum(hdct => hdct.SoLuong * hdct.DonGia),  // Tổng tiền của hóa đơn
+                    TinhTrangThanhToan = hd.TrangThai // Trạng thái thanh toán của hóa đơn
+                })
+                .FirstOrDefaultAsync();
+
+            return result;
         }
 
         public async Task<int> CountHdByMaHoaDonPrefix(string prefix)
