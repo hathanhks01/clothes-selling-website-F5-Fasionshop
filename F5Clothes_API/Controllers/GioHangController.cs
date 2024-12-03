@@ -54,7 +54,7 @@ public class GioHangController : ControllerBase
         catch (Exception ex)
         {
             // Log the error and return a bad request response
-            
+
             return StatusCode(500, new { Message = "Đã xảy ra lỗi khi lấy thông tin giỏ hàng.", Error = ex.Message });
         }
     }
@@ -114,14 +114,19 @@ public class GioHangController : ControllerBase
     [HttpPut("UpdateGioHang")]
     public async Task<IActionResult> UpdateGioHang([FromBody] GioHangUpdate updateDto)
     {
+        if (updateDto == null || updateDto.id == Guid.Empty)
+        {
+            return BadRequest("Invalid input data.");
+        }
+
         try
         {
             await _gioHangServices.UpdateGioHangAsync(updateDto);
-            return Ok(new { message = "Cart item updated successfully." }); // 200 OK
+            return Ok(new { Message = "Cập nhật số lượng thành công!" });
         }
         catch (Exception ex)
         {
-            return NotFound(new { message = ex.Message });
+            return NotFound(new { Message = ex.Message });
         }
     }
 
@@ -160,11 +165,12 @@ public class GioHangController : ControllerBase
         }
         catch (Exception ex)
         {
-            
+
 
             return BadRequest(new
             {
-                Message = $"Đặt hàng thất bại.", idKh,
+                Message = $"Đặt hàng thất bại.",
+                idKh,
                 Error = ex.Message,
                 InnerException = ex.InnerException?.Message // Ghi lại chi tiết về lỗi (nếu có)
             });

@@ -10,6 +10,7 @@ namespace F5Clothes_DAL.IReponsitories
     {
         Task<List<GiohangDtos>> GetAllGioHangAsync(Guid idKh);
         Task<GioHang> GetByGioHang(Guid idKh);
+        Task<GioHangChiTiet> GetGioHangById(Guid id);
         Task<GiohangDtos> GetGioHangByIdAsync(Guid id);
         Task<decimal> GetProductPriceAsync(Guid idSpct);
         Task<GioHangChiTiet> GetCartItemByIdsAsync(Guid idGh, Guid idSpct);
