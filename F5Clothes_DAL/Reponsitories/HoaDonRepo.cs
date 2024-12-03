@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace F5Clothes_DAL.Reponsitories
 {
-    public class HoaDonRepo: IHoaDonRepo
+    public class HoaDonRepo : IHoaDonRepo
     {
         private readonly DbduAnTnContext _context;
         public HoaDonRepo(DbduAnTnContext context)
@@ -166,6 +166,12 @@ namespace F5Clothes_DAL.Reponsitories
             string randomPart = new Random().Next(1000, 9999).ToString();
 
             return await Task.FromResult($"{prefix}{datePart}{randomPart}");
+        }
+
+        public async Task AddHdgioHang(HoaDon Hd)
+        {
+            _context.Add(Hd);
+            await _context.SaveChangesAsync();
         }
     }
 }
