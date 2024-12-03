@@ -13,7 +13,8 @@ namespace F5Clothes_DAL.IReponsitories
         Task<List<HoaDon>> GetAllHoaDon();
         Task<object> GetByHoaDon(Guid id);
         Task<HoaDon> AddHd(HoaDon Hd);
-        Task<bool> UpdateHd(HoaDon Hd);
+        Task AddHdgioHang(HoaDon Hd);
+        Task UpdateHd(HoaDon Hd);
         Task DeleteHd(Guid Id);
         Task<string> GenerateMaHoaDon();
     }

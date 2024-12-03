@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace F5Clothes_DAL.Reponsitories
 {
-    public class HoaDonRepo: IHoaDonRepo
+    public class HoaDonRepo : IHoaDonRepo
     {
         private readonly DbduAnTnContext _context;
         public HoaDonRepo(DbduAnTnContext context)
@@ -252,6 +252,11 @@ namespace F5Clothes_DAL.Reponsitories
 
             return await Task.FromResult($"{prefix}{datePart}{randomPart}");
         }
+        public async Task AddHdgioHang(HoaDon Hd)
+        {
+            _context.Add(Hd);
+            await _context.SaveChangesAsync();
+        }
         public async Task<bool> UpdateHd(HoaDon Hd)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -267,26 +272,12 @@ namespace F5Clothes_DAL.Reponsitories
                 {
                     throw new Exception("Hóa đơn không tồn tại");
                 }
-
-                // Update basic invoice information
                 UpdateInvoiceBasicInfo(existingHoaDon, Hd);
-
-                // Update delivery information
                 UpdateDeliveryInfo(existingHoaDon, Hd);
-
-                // Update financial information
                 UpdateFinancialInfo(existingHoaDon, Hd);
-
-                // Update invoice details
                 await UpdateHoaDonChiTiets(existingHoaDon, Hd);
-
-                // Track status changes
                 TrackStatusChanges(existingHoaDon, Hd);
-
-                // Update last modified date
                 existingHoaDon.NgayCapNhat = DateTime.Now;
-
-                // Save changes
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
