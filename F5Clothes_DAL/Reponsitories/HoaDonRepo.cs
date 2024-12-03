@@ -46,51 +46,77 @@ namespace F5Clothes_DAL.Reponsitories
         public async Task<List<HoaDon>> GetAllHoaDon()
         {
             return await _context.HoaDons
-         .Include(hd => hd.IdNvNavigation) // Include the NhanVien navigation
-         .Include(hd => hd.IdKhNavigation) // Include the KhachHang navigation
-         .Include(hd => hd.IdVouCherNavigation) // Include VouCher
-         .Select(hd => new HoaDon
-         {
-             Id = hd.Id,
-             IdNv = hd.IdNv,
-             IdKh = hd.IdKh,
-             IdVouCher = hd.IdVouCher,
-             MaHoaDon = hd.MaHoaDon,
-             NgayTao = hd.NgayTao,
-             NgayCapNhat = hd.NgayCapNhat,
-             NgayXacNhan = hd.NgayXacNhan,
-             NgayChoGiaoHang = hd.NgayChoGiaoHang,
-             NgayGiaoHang = hd.NgayGiaoHang,
-             DonViGiaoHang = hd.DonViGiaoHang,
-             TenNguoiGiao = hd.TenNguoiGiao,
-             SdtnguoiGiao = hd.SdtnguoiGiao,
-             TienGiaoHang = hd.TienGiaoHang,
-             NgayNhanHang = hd.NgayNhanHang,
-             TenNguoiNhan = hd.TenNguoiNhan,
-             SdtnguoiNhan = hd.SdtnguoiNhan,
-             EmailNguoiNhan = hd.EmailNguoiNhan,
-             DiaChiNhanHang = hd.DiaChiNhanHang,
-             NgayThanhToan = hd.NgayThanhToan,
-             NgayHuy = hd.NgayHuy,
-             GiaTriGiam = hd.GiaTriGiam,
-             TienKhachTra = hd.TienKhachTra,
-             TienThua = hd.TienThua,
-             ThanhTien = hd.ThanhTien,
-             GhiChu = hd.GhiChu,
-             LoaiHoaDon = hd.LoaiHoaDon,
-             TrangThai = hd.TrangThai,
-             IdKhNavigation = hd.IdKhNavigation == null ? null : new KhachHang
-             {
-                 HoVaTenKh = hd.IdKhNavigation.HoVaTenKh // Only select the HoVaTenKh
-             },
-             IdNvNavigation = hd.IdNvNavigation == null ? null : new NhanVien
-             {
-                 HoVaTenNv = hd.IdNvNavigation.HoVaTenNv // Only select the HoVaTenNv
-             },
-             IdVouCherNavigation = hd.IdVouCherNavigation
-         })
-         .ToListAsync();
-        }
+       .Include(hd => hd.IdNvNavigation)
+       .Include(hd => hd.IdKhNavigation)
+       .Include(hd => hd.IdVouCherNavigation)
+       .Include(hd => hd.HinhThucThanhToans)
+       .Include(hd => hd.LichSuHoaDons)
+       .Include(hd => hd.HoaDonChiTiets)
+           .ThenInclude(hdt => hdt.IdSpctNavigation)
+               .ThenInclude(spct => spct.IdSpNavigation) // Ensure product name is included
+       .Select(hd => new HoaDon
+       {
+           Id = hd.Id,
+           IdNv = hd.IdNv,
+           IdKh = hd.IdKh,
+           IdVouCher = hd.IdVouCher,
+           MaHoaDon = hd.MaHoaDon,
+           NgayTao = hd.NgayTao,
+           NgayCapNhat = hd.NgayCapNhat,
+           NgayXacNhan = hd.NgayXacNhan,
+           NgayChoGiaoHang = hd.NgayChoGiaoHang,
+           NgayGiaoHang = hd.NgayGiaoHang,
+           DonViGiaoHang = hd.DonViGiaoHang,
+           TenNguoiGiao = hd.TenNguoiGiao,
+           SdtnguoiGiao = hd.SdtnguoiGiao,
+           TienGiaoHang = hd.TienGiaoHang,
+           NgayNhanHang = hd.NgayNhanHang,
+           TenNguoiNhan = hd.TenNguoiNhan,
+           SdtnguoiNhan = hd.SdtnguoiNhan,
+           EmailNguoiNhan = hd.EmailNguoiNhan,
+           DiaChiNhanHang = hd.DiaChiNhanHang,
+           NgayThanhToan = hd.NgayThanhToan,
+           NgayHuy = hd.NgayHuy,
+           GiaTriGiam = hd.GiaTriGiam,
+           TienKhachTra = hd.TienKhachTra,
+           TienThua = hd.TienThua,
+           ThanhTien = hd.ThanhTien,
+           GhiChu = hd.GhiChu,
+           LoaiHoaDon = hd.LoaiHoaDon,
+           TrangThai = hd.TrangThai,
+           IdKhNavigation = hd.IdKhNavigation == null ? null : new KhachHang
+           {
+               Id = hd.IdKhNavigation.Id,
+               HoVaTenKh = hd.IdKhNavigation.HoVaTenKh
+           },
+           IdNvNavigation = hd.IdNvNavigation == null ? null : new NhanVien
+           {
+               Id = hd.IdNvNavigation.Id,
+               HoVaTenNv = hd.IdNvNavigation.HoVaTenNv
+           },
+           HoaDonChiTiets = hd.HoaDonChiTiets.Select(hdt => new HoaDonChiTiet
+           {
+               Id = hdt.Id,
+               IdHdNavigation = hdt.IdHdNavigation,
+               IdSpct = hdt.IdSpct,
+               SoLuong = hdt.SoLuong,
+               DonGia = hdt.DonGia,
+               IdSpctNavigation = hdt.IdSpctNavigation == null ? null : new SanPhamChiTiet
+               {
+                   Id = hdt.IdSpctNavigation.Id,
+                   IdSp = hdt.IdSpctNavigation.IdSp,
+                   MoTa = hdt.IdSpctNavigation.MoTa,
+                   IdSpNavigation = hdt.IdSpctNavigation.IdSpNavigation == null ? null : new SanPham
+                   {
+                       Id = hdt.IdSpctNavigation.IdSpNavigation.Id,
+                       ImageDefaul=hdt.IdSpctNavigation.IdSpNavigation.ImageDefaul,
+                   }
+               }
+           }).ToList(),
+           IdVouCherNavigation = hd.IdVouCherNavigation
+       })
+       .ToListAsync();     
+    }
 
         public async Task<object> GetByHoaDon(Guid id)
         {
