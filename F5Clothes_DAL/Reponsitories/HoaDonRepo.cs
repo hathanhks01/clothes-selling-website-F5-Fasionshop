@@ -46,9 +46,9 @@ namespace F5Clothes_DAL.Reponsitories
         public async Task<List<HoaDon>> GetAllHoaDon()
         {
             return await _context.HoaDons
-         .Include(hd => hd.IdNvNavigation) // Include the NhanVien navigation
-         .Include(hd => hd.IdKhNavigation) // Include the KhachHang navigation
-         .Include(hd => hd.IdVouCherNavigation) // Include VouCher
+         .Include(hd => hd.IdNvNavigation)
+         .Include(hd => hd.IdKhNavigation)
+         .Include(hd => hd.IdVouCherNavigation)
          .Select(hd => new HoaDon
          {
              Id = hd.Id,
@@ -94,7 +94,6 @@ namespace F5Clothes_DAL.Reponsitories
 
         public async Task<object> GetByHoaDon(Guid id)
         {
-
             var result = await _context.HoaDons
                 .Where(hd => hd.Id == id)
                 .Select(hd => new
@@ -109,14 +108,14 @@ namespace F5Clothes_DAL.Reponsitories
                         hd.IdKhNavigation.SoDienThoai,
                         hd.IdKhNavigation.Email,
                         hd.IdKhNavigation.DiaChis
-                    },  // Thông tin khách hàng
+                    },
                     NhanVien = hd.IdNvNavigation == null ? null : new
                     {
                         hd.IdNvNavigation.Id,
                         hd.IdNvNavigation.HoVaTenNv,
                         hd.IdNvNavigation.SoDienThoai,
                         hd.IdNvNavigation.Email
-                    },  // Thông tin nhân viên
+                    },
                     HoaDonChiTiets = hd.HoaDonChiTiets
                         .Where(hdct => hdct.IdHd == hd.Id)
                         .Select(hdct => new
@@ -128,18 +127,18 @@ namespace F5Clothes_DAL.Reponsitories
                                 hdct.IdSpctNavigation.Id,
                                 TenSanPham = hdct.IdSpctNavigation.IdSpNavigation != null
                                     ? hdct.IdSpctNavigation.IdSpNavigation.TenSp
-                                    : null,  // Tên sản phẩm
+                                    : null,
                                 GiaBan = hdct.IdSpctNavigation.IdSpNavigation != null
                                     ? hdct.IdSpctNavigation.IdSpNavigation.GiaBan
-                                    : 0  // Giá bán
-                            },  // Thông tin sản phẩm trong chi tiết hóa đơn
+                                    : 0 
+                            }, 
                             hdct.SoLuong,
                             hdct.DonGia,
-                            ThanhTien = hdct.SoLuong * hdct.DonGia  // Thành tiền của sản phẩm
+                            ThanhTien = hdct.SoLuong * hdct.DonGia
                         })
                         .ToList(),
-                    TongTien = hd.HoaDonChiTiets.Sum(hdct => hdct.SoLuong * hdct.DonGia),  // Tổng tiền của hóa đơn
-                    TinhTrangThanhToan = hd.TrangThai // Trạng thái thanh toán của hóa đơn
+                    TongTien = hd.HoaDonChiTiets.Sum(hdct => hdct.SoLuong * hdct.DonGia),
+                    TinhTrangThanhToan = hd.TrangThai
                 })
                 .FirstOrDefaultAsync();
 
@@ -158,7 +157,7 @@ namespace F5Clothes_DAL.Reponsitories
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Thiết lập các giá trị mặc định cho hóa đơn mới
+              
                 hoaDon.Id = Guid.NewGuid();
                 hoaDon.MaHoaDon = await GenerateMaHoaDon();
                 hoaDon.NgayTao = DateTime.Now;
@@ -166,9 +165,9 @@ namespace F5Clothes_DAL.Reponsitories
                 hoaDon.NgayXacNhan = hoaDon.LoaiHoaDon == 1 ? DateTime.Now : null;
                 hoaDon.TrangThai = hoaDon.TrangThai;
 
-                // Tạo danh sách chi tiết hóa đơn mới
+               
                 var chiTietList = hoaDon.HoaDonChiTiets.ToList();
-                hoaDon.HoaDonChiTiets = null; // Tách chi tiết ra khỏi hóa đơn
+                hoaDon.HoaDonChiTiets = null;
 
 
                 await _context.HoaDons.AddAsync(hoaDon);
@@ -176,13 +175,11 @@ namespace F5Clothes_DAL.Reponsitories
 
                 decimal tongTien = 0;
 
-                // Kiểm tra chi tiết hóa đơn
                 if (chiTietList == null || !chiTietList.Any())
                 {
                     throw new Exception("Chi tiết hóa đơn là bắt buộc");
                 }
 
-                // Xử lý từng chi tiết hóa đơn
                 foreach (var chiTiet in chiTietList)
                 {
                     var sanPhamChiTiet = await _context.SanPhamChiTiets
@@ -195,10 +192,8 @@ namespace F5Clothes_DAL.Reponsitories
                     if (sanPhamChiTiet.SoLuongTon < chiTiet.SoLuong)
                         throw new Exception($"Sản phẩm {sanPhamChiTiet.Id} không đủ số lượng");
 
-                    // Cập nhật số lượng tồn
                     sanPhamChiTiet.SoLuongTon -= chiTiet.SoLuong;
 
-                    // Tạo chi tiết hóa đơn mới
                     var newChiTiet = new HoaDonChiTiet
                     {
                         Id = Guid.NewGuid(),
@@ -213,12 +208,10 @@ namespace F5Clothes_DAL.Reponsitories
 
                     await _context.HoaDonChiTiets.AddAsync(newChiTiet);
 
-                    // Tính tổng tiền
                     decimal giaBan = newChiTiet.DonGiaKhiGiam ?? newChiTiet.DonGia ?? 0;
                     tongTien += giaBan * (decimal)newChiTiet.SoLuong;
                 }
 
-                // Xử lý voucher
                 if (hoaDon.IdVouCher.HasValue)
                 {
                     var voucher = await _context.VouChers
@@ -262,7 +255,6 @@ namespace F5Clothes_DAL.Reponsitories
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Find the existing invoice
                 var existingHoaDon = await _context.HoaDons
                     .Include(h => h.HoaDonChiTiets)
                     .Include(h => h.LichSuHoaDons)
@@ -297,7 +289,6 @@ namespace F5Clothes_DAL.Reponsitories
             existingHoaDon.IdKh = hoaDon.IdKh ?? existingHoaDon.IdKh;
             existingHoaDon.IdVouCher = hoaDon.IdVouCher ?? existingHoaDon.IdVouCher;
 
-            // Update time-related fields
             existingHoaDon.NgayXacNhan = hoaDon.NgayXacNhan ?? existingHoaDon.NgayXacNhan;
             existingHoaDon.NgayChoGiaoHang = hoaDon.NgayChoGiaoHang ?? existingHoaDon.NgayChoGiaoHang;
             existingHoaDon.NgayGiaoHang = hoaDon.NgayGiaoHang ?? existingHoaDon.NgayGiaoHang;
