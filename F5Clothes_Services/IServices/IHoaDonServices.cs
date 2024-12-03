@@ -11,9 +11,9 @@ namespace F5Clothes_Services.IServices
     public interface IHoaDonServices
     {
         Task<List<HoaDon>> GetAll();
-        Task<HoaDon> GetById(Guid id);
+        Task<object> GetById(Guid id);
         Task<HoaDon> Create(HoaDon hoaDon);
-        Task Update(HoaDon hoaDon);
+        Task<bool> UpdateHoaDonAsync(HoaDon hoaDon);
         Task Delete(Guid id);
     }
 }

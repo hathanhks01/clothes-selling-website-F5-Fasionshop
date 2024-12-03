@@ -1,0 +1,15 @@
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\bin\Debug\net8.0\F5Clothes_DAL.deps.json
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\bin\Debug\net8.0\F5Clothes_DAL.runtimeconfig.json
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\bin\Debug\net8.0\F5Clothes_DAL.dll
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\bin\Debug\net8.0\F5Clothes_DAL.pdb
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\obj\Debug\net8.0\F5Clothes_DAL.csproj.AssemblyReference.cache
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\obj\Debug\net8.0\F5Clothes_DAL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\obj\Debug\net8.0\F5Clothes_DAL.AssemblyInfoInputs.cache
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\obj\Debug\net8.0\F5Clothes_DAL.AssemblyInfo.cs
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\obj\Debug\net8.0\F5Clothes_DAL.csproj.CoreCompileInputs.cache
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\obj\Debug\net8.0\F5Clothes_DAL.sourcelink.json
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\obj\Debug\net8.0\F5Clothes_DAL.dll
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\obj\Debug\net8.0\refint\F5Clothes_DAL.dll
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\obj\Debug\net8.0\F5Clothes_DAL.pdb
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\obj\Debug\net8.0\F5Clothes_DAL.genruntimeconfig.cache
+C:\Users\Ha Thanh Thanh\Desktop\clothes-selling-website-F5-Fasionshop\F5Clothes_DAL\obj\Debug\net8.0\ref\F5Clothes_DAL.dll
