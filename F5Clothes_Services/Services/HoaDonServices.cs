@@ -50,5 +50,10 @@ namespace F5Clothes_Services.Services
         {
             return await _hoaDonRepo.UpdateHd(hoaDon);
         }
+
+        public async Task updateStatusAsync(HoaDon Hd)
+        {
+            await _hoaDonRepo.updateStatus(Hd);
+        }
     }
 }

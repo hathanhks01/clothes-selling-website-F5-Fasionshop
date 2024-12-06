@@ -14,6 +14,7 @@ namespace F5Clothes_Services.IServices
         Task<object> GetById(Guid id);
         Task<HoaDon> Create(HoaDon hoaDon);
         Task<bool> UpdateHoaDonAsync(HoaDon hoaDon);
+        Task updateStatusAsync(HoaDon Hd);
         Task Delete(Guid id);
     }
 }

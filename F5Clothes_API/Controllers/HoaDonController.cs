@@ -74,6 +74,29 @@ namespace F5Clothes_API.Controllers
                 return StatusCode(500, "Có lỗi xảy ra khi cập nhật");
             }
         }
+        [HttpPut("updateStatus")]
+        public async Task<IActionResult> UpdateStatus(HoaDon Hd)
+        {
+            if (Hd == null || Hd.Id == Guid.Empty)
+            {
+                return BadRequest("Invalid invoice data.");
+            }
+
+            try
+            {
+                await _HoaDonSV.updateStatusAsync(Hd);
+                return Ok();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log the error (ex) here
+                return StatusCode(500, "Có lỗi xảy ra khi cập nhật");
+            }
+        }
 
         [HttpDelete("{id}")]
         public async Task Delete(Guid id)
