@@ -8,13 +8,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using F5Clothes_DAL.Reponsitories;
+using Microsoft.EntityFrameworkCore;
 
 namespace F5Clothes_Services.Services
 {
     public class GioHangServices : IGioHangServices
     {
         private readonly IGioHangRepo _gioHangRepo;
-        
+
         private readonly IMapper _mapper;
         private readonly ISPCTRepo _sPCTRepo;
         private readonly IHoaDonRepo _hoaDonRepo;
@@ -23,9 +24,9 @@ namespace F5Clothes_Services.Services
         private readonly IDiaChiRepo _diaChiRepo;
         private readonly ISanPhamRepo _sanPhamRepo;
 
-        public GioHangServices(IGioHangRepo gioHangRepo, 
-            IMapper mapper, ISPCTRepo sPCTRepo,IHoaDonRepo hoaDonRepo,
-            IHDCTRepo hDCTRepo,IVoucherRepo voucherRepo, IDiaChiRepo diaChiRepo,
+        public GioHangServices(IGioHangRepo gioHangRepo,
+            IMapper mapper, ISPCTRepo sPCTRepo, IHoaDonRepo hoaDonRepo,
+            IHDCTRepo hDCTRepo, IVoucherRepo voucherRepo, IDiaChiRepo diaChiRepo,
             ISanPhamRepo sanPhamRepo)
         {
             _gioHangRepo = gioHangRepo;
@@ -34,7 +35,7 @@ namespace F5Clothes_Services.Services
             _hoaDonRepo = hoaDonRepo;
             _hDCTRepo = hDCTRepo;
             _voucherRepo = voucherRepo;
-           _diaChiRepo = diaChiRepo;
+            _diaChiRepo = diaChiRepo;
             _sanPhamRepo = sanPhamRepo;
         }
 
@@ -43,7 +44,7 @@ namespace F5Clothes_Services.Services
         {
 
             var gioHangChiTiets = await _gioHangRepo.GetAllGioHangAsync(idKh);
-           
+
             return _mapper.Map<List<GiohangDtos>>(gioHangChiTiets);
         }
 
@@ -175,7 +176,7 @@ namespace F5Clothes_Services.Services
 
             };
 
-            await _hoaDonRepo.AddHd(hoaDon);
+            await _hoaDonRepo.AddHdgioHang(hoaDon);
 
             foreach (var item in cartItems)
             {
@@ -192,17 +193,17 @@ namespace F5Clothes_Services.Services
                     IdSpct = item.IdSpct,
                     SoLuong = item.SoLuong,
                     DonGia = item.DonGia,
-                
+
                     NgayTao = DateTime.Now,
                     DonGiaKhiGiam = item.DonGiaKhiGiam
                 };
-                await _hDCTRepo.Create(hoaDonChiTiet);
+                await _hDCTRepo.CreateDatHang(hoaDonChiTiet);
 
                 await _gioHangRepo.DeleteGioHangAsync(item.Id);
             }
         }
 
-       
+
 
 
 
@@ -268,18 +269,24 @@ namespace F5Clothes_Services.Services
         // Update an existing cart item
         public async Task UpdateGioHangAsync(GioHangUpdate updateDto)
         {
-            /*  var existingCartItem = await _gioHangRepo.GetGioHangByIdAsync(updateDto.id);
-             if (existingCartItem == null) throw new Exception("Cart item not found.");
+            // Fetch the existing cart item from the repository ()
+            var existingCartItem = await _gioHangRepo.GetGioHangById(updateDto.id);
 
-             // Use AutoMapper to map the updateDto to the existing entity
-             _mapper.Map(updateDto, existingCartItem);  // This will update all properties from the DTO
+            if (existingCartItem == null)
+                throw new Exception("Cart item not found.");
 
-             // Ensure that other fields like SoLuong are set explicitly if needed
-             existingCartItem.SoLuong = updateDto.SoLuong;
+            // Map DTO fields to the entity manually
+            existingCartItem.SoLuong = updateDto.SoLuong;
+            // Set other fields if needed
+            // Example: existingCartItem.IdSpct = updateDto.IdSpct;
 
-             // Update the cart item in the repository
-             await _gioHangRepo.UpdateGioHangAsync(existingCartItem);*/
+            // Update the cart item in the repository
+            await _gioHangRepo.UpdateGioHangAsync(existingCartItem);
         }
+
+
+
+
 
 
         // Delete a cart item

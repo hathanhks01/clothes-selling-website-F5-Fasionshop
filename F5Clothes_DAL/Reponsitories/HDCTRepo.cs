@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace F5Clothes_DAL.Reponsitories
 {
-    public class HDCTRepo: IHDCTRepo
+    public class HDCTRepo : IHDCTRepo
     {
         private readonly DbduAnTnContext _context;
         public HDCTRepo(DbduAnTnContext context)
@@ -20,6 +20,12 @@ namespace F5Clothes_DAL.Reponsitories
         public async Task Create(HoaDonChiTiet hoaDonChiTiet)
         {
             await _context.HoaDonChiTiets.AddAsync(hoaDonChiTiet);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task CreateDatHang(HoaDonChiTiet hoaDonChiTiet)
+        {
+            _context.Add(hoaDonChiTiet);
             await _context.SaveChangesAsync();
         }
 
