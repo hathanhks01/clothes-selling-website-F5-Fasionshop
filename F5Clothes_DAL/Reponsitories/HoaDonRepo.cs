@@ -412,5 +412,27 @@ namespace F5Clothes_DAL.Reponsitories
                 existingHoaDon.LichSuHoaDons.Add(lichSuHoaDon);
             }
         }
+
+        public async Task updateStatus(HoaDon Hd)
+        {
+            var invoiceStatus = await _context.HoaDons.FindAsync(Hd.Id);
+            if (invoiceStatus != null)
+            {
+                try
+                {
+                    invoiceStatus.TrangThai = Hd.TrangThai;
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException ex)
+                {
+                    // Log the error (ex) here
+                    throw new Exception("An error occurred while updating the invoice status.", ex);
+                }
+            }
+            else
+            {
+                throw new KeyNotFoundException("Invoice not found.");
+            }
+        }
     }
 }
