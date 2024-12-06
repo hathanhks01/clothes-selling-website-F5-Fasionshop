@@ -7,19 +7,19 @@ public partial class GioHangChiTiet
 {
     public Guid Id { get; set; }
 
-    public Guid? IdGh { get; set; }
+    public Guid IdGh { get; set; }
 
-    public Guid? IdSpct { get; set; }
+    public Guid IdSpct { get; set; }
 
-    public int? SoLuong { get; set; }
+    public int SoLuong { get; set; }
 
-    public decimal? DonGia { get; set; }
+    public decimal DonGia { get; set; }
 
     public decimal? DonGiaKhiGiam { get; set; }
 
     public decimal? SoTienGiam { get; set; }
 
-    public DateTime? NgayTao { get; set; }
+    public DateTime NgayTao { get; set; }
 
     public DateTime? NgayCapNhat { get; set; }
 

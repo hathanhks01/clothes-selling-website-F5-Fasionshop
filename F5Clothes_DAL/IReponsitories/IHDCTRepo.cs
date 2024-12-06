@@ -10,10 +10,11 @@ namespace F5Clothes_DAL.IReponsitories
 {
     public interface IHDCTRepo
     {
-        Task<List<HoaDonChiTiet>> GetAllHoaDonChiTiet();
-        Task<HoaDonChiTiet> GetByHoaDonChiTiet(Guid id);
-        Task AddHDCT(HoaDonChiTiet HDCT);
-        Task UpdateHDCT(HoaDonChiTiet HDCT);
-        Task DeleteHDCT(Guid Id);
+        public Task Create(HoaDonChiTiet hoaDonChiTiet);
+        public Task CreateDatHang(HoaDonChiTiet hoaDonChiTiet);
+        public Task Delete(Guid id);
+        public Task<List<HoaDonChiTiet>> GetAll();
+        public Task<HoaDonChiTiet> GetById(Guid id);
+        public Task Update(HoaDonChiTiet hoaDonChiTiet);
     }
 }

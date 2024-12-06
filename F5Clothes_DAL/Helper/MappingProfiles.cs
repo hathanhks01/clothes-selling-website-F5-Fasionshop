@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace F5Clothes_DAL.Helper
 {
-    public class MappingProfiles:Profile
+    public class MappingProfiles : Profile
     {
         public MappingProfiles()
         {
@@ -21,11 +21,22 @@ namespace F5Clothes_DAL.Helper
             CreateMap<DanhMuc, DanhMucDtos>();
             CreateMap<DiaChi, DiaChiDtos>();
             CreateMap<GiamGium, GiamGiaDtos>();
-            CreateMap<GioHang, GiohangDtos>();
-            CreateMap<GioHangChiTiet, GioHangChiTietDtos>();
+            CreateMap<GioHangChiTiet, GiohangDtos>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.TenSp, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.TenSp))
+                    .ForMember(dest => dest.HinhAnh, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.ImageDefaul))
+                    .ForMember(dest => dest.DonGia, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.GiaBan))
+                     .ForMember(dest => dest.DonGia, src => src.MapFrom(c => c.IdSpctNavigation.IdMsNavigation.TenMauSac))
+                       .ForMember(dest => dest.DonGia, src => src.MapFrom(c => c.IdSpctNavigation.IdSizeNavigation.TenSize))
+                    .ForMember(dest => dest.TongTien, src => src.MapFrom(c => c.IdSpctNavigation.IdSpNavigation.GiaBan * c.SoLuong));
+            CreateMap<AddGioHangDtos, GioHangChiTiet>();
+            CreateMap<GioHangUpdate, GioHangChiTiet>();
+            CreateMap<SanPhamChiTietDtos, SanPhamChiTiet>();
+            CreateMap<GiohangDtos, GioHangChiTiet>();
             CreateMap<HoaDon, HoaDonDtos>();
-            CreateMap<HoaDonChiTiet,HoaDonChiTietDtos>();
+            CreateMap<HoaDonChiTiet, HoaDonChiTietDtos>();
             CreateMap<KhachHang, KhachHangDtos>();
+            CreateMap<KhachHangDtos, KhachHang>();
             CreateMap<Image, ImageDtos>();
             CreateMap<LichSuHoaDon, LichSuHoaDonDtos>();
             CreateMap<MauSac, MauSacDtos>();

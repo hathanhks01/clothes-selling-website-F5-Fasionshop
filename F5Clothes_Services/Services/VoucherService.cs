@@ -39,6 +39,11 @@ namespace F5Clothes_Services.Services
             return await _voucherRepo.GetByVouCher(id);
         }
 
+        public async Task<VouCher> GetMaVouCher(string Ma)
+        {
+            return await _voucherRepo.GetMaVouCher(Ma);
+        }
+
         public async Task<VouCher> UpdateVc(VouCher Vc)
         {
             await _voucherRepo.UpdateVc(Vc);

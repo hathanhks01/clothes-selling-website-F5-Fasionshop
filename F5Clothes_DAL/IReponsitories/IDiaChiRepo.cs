@@ -12,7 +12,7 @@ namespace F5Clothes_DAL.IReponsitories
     public interface IDiaChiRepo
     {
         Task<List<DiaChi>> GetAllDiaChi();
-        Task<DiaChi> GetByDiaChi(Guid id);
+        Task<List<DiaChi>> GetByDiaChi(Guid idKH);
         Task<DiaChi> Adddc(DiaChiDtos dc);
         Task Updatedc(DiaChi dc);
         Task Deletedc(Guid Id);

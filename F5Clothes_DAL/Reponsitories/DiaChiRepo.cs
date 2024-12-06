@@ -1,6 +1,8 @@
 ﻿using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
+using F5Clothes_DAL.Models.system;
+
 using Microsoft.EntityFrameworkCore;
 
 using System;
@@ -32,10 +34,10 @@ namespace F5Clothes_DAL.Reponsitories
                     DiaChiChiTiet = dc.DiaChiChiTiet,
                     GhiChu = dc.GhiChu,
                     QuanHuyen = dc.QuanHuyen,
-                    NgayTao = dc.NgayTao,
+                    NgayTao = DateTime.Now,
                     PhuongXa = dc.PhuongXa,
-                    QuocGia = dc.QuocGia,
-                    TrangThai = dc.TrangThai,
+                    QuocGia = "Việt Nam",
+                    TrangThai = 1,
                 };
 
                 _context.DiaChis.Add(diaChis);
@@ -48,10 +50,10 @@ namespace F5Clothes_DAL.Reponsitories
                 diaChi.DiaChiChiTiet = dc.DiaChiChiTiet;
                 diaChi.GhiChu = dc.GhiChu;
                 diaChi.QuanHuyen = dc.QuanHuyen;
-                diaChi.NgayTao = dc.NgayTao;
+                diaChi.NgayTao = DateTime.Now;
                 diaChi.PhuongXa = dc.PhuongXa;
-                diaChi.QuocGia = dc.QuocGia;
-                diaChi.TrangThai = dc.TrangThai;
+                diaChi.QuocGia = "Việt Nam";
+                diaChi.TrangThai = 1;
 
                 await _context.SaveChangesAsync();
                 return diaChi;
@@ -71,10 +73,14 @@ namespace F5Clothes_DAL.Reponsitories
             return await _context.DiaChis.ToListAsync();
         }
 
-        public async Task<DiaChi> GetByDiaChi(Guid id)
+        public async Task<List<DiaChi>> GetByDiaChi(Guid idKH)
         {
-            return await _context.DiaChis.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.DiaChis
+                                 .Where(x => x.IdKh == idKH)
+                                 .ToListAsync(); 
         }
+
+
 
         public async Task Updatedc(DiaChi dc)
         {

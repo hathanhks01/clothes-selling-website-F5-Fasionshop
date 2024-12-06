@@ -1,3 +1,4 @@
+
 ﻿using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
@@ -26,10 +27,6 @@ namespace F5Clothes_DAL.Reponsitories
             _context.Remove(Kh);
             await _context.SaveChangesAsync();
         }
-        public async Task<KhachHang> GetByMaKhachHang(string maKH)
-        {
-            return await _context.KhachHangs.FirstOrDefaultAsync(kh => kh.MaKh == maKH);
-        }
 
         public async Task<List<KhachHang>> GetAllKhachHang()
         {
@@ -40,6 +37,12 @@ namespace F5Clothes_DAL.Reponsitories
         {
             return await _context.KhachHangs.FirstOrDefaultAsync(x => x.Id == id);
         }
+        public async Task<KhachHang> GetByMaKhachHang(string maKH)
+        {
+            return await _context.KhachHangs.FirstOrDefaultAsync(kh => kh.MaKh == maKH);
+        }
+
+       
         public async Task<List<KhachHangDtos>> GetKhachHang(ListKhachHangModel valid)
         {
             var query = _context.KhachHangs.AsQueryable();
@@ -76,6 +79,82 @@ namespace F5Clothes_DAL.Reponsitories
         {
             _context.Entry(Kh).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+        }
+        public async Task<bool> UpdateProfile(Guid id, KhachHangProfileUpdateDto profileUpdateDto)
+        {
+            var khachHang = await _context.KhachHangs.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (khachHang == null)
+            {
+                return false; // Customer not found
+            }
+
+            // Update only non-null fields from the DTO
+            if (!string.IsNullOrEmpty(profileUpdateDto.HoVaTenKh))
+            {
+                khachHang.HoVaTenKh = profileUpdateDto.HoVaTenKh;
+            }
+
+            if (profileUpdateDto.GioiTinh.HasValue)
+            {
+                khachHang.GioiTinh = profileUpdateDto.GioiTinh.Value;
+            }
+
+            if (profileUpdateDto.NgaySinh.HasValue)
+            {
+                khachHang.NgaySinh = profileUpdateDto.NgaySinh.Value;
+            }
+
+            if (!string.IsNullOrEmpty(profileUpdateDto.SoDienThoai))
+            {
+                khachHang.SoDienThoai = profileUpdateDto.SoDienThoai;
+            }
+
+            if (!string.IsNullOrEmpty(profileUpdateDto.Email))
+            {
+                khachHang.Email = profileUpdateDto.Email;
+            }
+
+            if (!string.IsNullOrEmpty(profileUpdateDto.Image))
+            {
+                khachHang.Image = profileUpdateDto.Image;
+            }
+
+            // Set the entity state as modified and save changes
+            _context.Entry(khachHang).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return true; // Profile updated successfully
+        }
+
+        public async Task<bool> ChangePassword(Guid id, string oldPassword, string newPassword)
+        {
+            var khachHang = await _context.KhachHangs.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (khachHang == null)
+            {
+                return false; // Không tìm thấy khách hàng
+            }
+
+            // Kiểm tra mật khẩu cũ
+            if (!BCrypt.Net.BCrypt.Verify(oldPassword, khachHang.MatKhau)) // So sánh mật khẩu đã mã hóa
+            {
+                return false; // Mật khẩu cũ không đúng
+            }
+
+            // Mã hóa mật khẩu mới
+            khachHang.MatKhau = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            // Đặt trạng thái cho đối tượng và lưu thay đổi
+            _context.Entry(khachHang).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return true; // Đổi mật khẩu thành công
+        }
+
+        public async Task<KhachHang> GetByTK(string username)
+        {
+            return await _context.KhachHangs.FirstOrDefaultAsync(x => x.TaiKhoan == username);
         }
     }
 }
