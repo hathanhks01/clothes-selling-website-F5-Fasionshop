@@ -162,7 +162,7 @@ namespace F5Clothes_Services.Services
                 MaHoaDon = maHoaDon,
                 IdKh = customerId,
                 NgayTao = DateTime.Now,
-                TrangThai = 0,
+                TrangThai = 1,
                 LoaiHoaDon = 2,
                 DiaChiNhanHang = diaChiNhanHang, // Gán địa chỉ nhận hàng
                 TenNguoiNhan = orderInfo.TenNguoiNhan,
