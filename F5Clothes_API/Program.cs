@@ -65,6 +65,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuthenticationRepo, AuthenticationRepo>();
 builder.Services.AddScoped<IAuthenticationServices, AuthenticationServices>();
 builder.Services.AddScoped<IChatLieuRepo, ChatLieuRepo>();
@@ -101,6 +102,7 @@ builder.Services.AddScoped<IXuatXuService, XuatXuService>();
 builder.Services.AddScoped<IHinhThucThanhToanRepo, HinhThucThanhToanRepo>();
 builder.Services.AddScoped<IVoucherService, VoucherService>();
 builder.Services.AddScoped<IGioHangServices, GioHangServices>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 
 var app = builder.Build();
