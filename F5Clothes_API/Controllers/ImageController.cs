@@ -2,7 +2,6 @@
 using F5Clothes_DAL.DTOs;
 using F5Clothes_DAL.IReponsitories;
 using F5Clothes_DAL.Models;
-
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,45 +25,40 @@ namespace F5Clothes_API.Controllers
         {
             var ImageList = await _ImageRepo.GetAllImage();
             var mappeIm = _mapper.Map<List<ImageDtos>>(ImageList);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             return Ok(mappeIm);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetBySp(Guid id)
-        {
-
-
-            var mappedImage = _mapper.Map<ImageDtos>(await _ImageRepo.GetByImage(id));
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-
-            }
-            return Ok(mappedImage);
-        }
-
         [HttpPost]
-        public async Task GetAll(Image Image)
+        public async Task<ActionResult> AddImage(Image image)
         {
-            await _ImageRepo.AddImage(Image);
+            await _ImageRepo.AddImage(image);
+            return Ok();
         }
 
-        [HttpPut]
-        public async Task Update(Image Image)
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateImage(Guid id, Image image)
         {
-            await _ImageRepo.UpdateImage(Image);
+            var existingImage = await _ImageRepo.GetByImage(id);
+            if (existingImage == null)
+            {
+                return NotFound();
+            }
+
+            await _ImageRepo.UpdateImage(image);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task Delete(Guid id)
+        public async Task<ActionResult> DeleteImage(Guid id)
         {
+            var image = await _ImageRepo.GetByImage(id);
+            if (image == null)
+            {
+                return NotFound();
+            }
+
             await _ImageRepo.DeleteImage(id);
+            return NoContent();
         }
     }
 }
