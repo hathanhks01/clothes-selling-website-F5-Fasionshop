@@ -109,14 +109,14 @@ namespace F5Clothes_DAL.Reponsitories
                    IdSpNavigation = hdt.IdSpctNavigation.IdSpNavigation == null ? null : new SanPham
                    {
                        Id = hdt.IdSpctNavigation.IdSpNavigation.Id,
-                       ImageDefaul=hdt.IdSpctNavigation.IdSpNavigation.ImageDefaul,
+                       ImageDefaul = hdt.IdSpctNavigation.IdSpNavigation.ImageDefaul,
                    }
                }
            }).ToList(),
            IdVouCherNavigation = hd.IdVouCherNavigation
        })
-       .ToListAsync();     
-    }
+       .ToListAsync();
+        }
 
 
         public async Task<object> GetByHoaDon(Guid id)
@@ -157,8 +157,8 @@ namespace F5Clothes_DAL.Reponsitories
                                     : null,
                                 GiaBan = hdct.IdSpctNavigation.IdSpNavigation != null
                                     ? hdct.IdSpctNavigation.IdSpNavigation.GiaBan
-                                    : 0 
-                            }, 
+                                    : 0
+                            },
                             hdct.SoLuong,
                             hdct.DonGia,
                             ThanhTien = hdct.SoLuong * hdct.DonGia
@@ -184,7 +184,7 @@ namespace F5Clothes_DAL.Reponsitories
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-              
+
                 hoaDon.Id = Guid.NewGuid();
                 hoaDon.MaHoaDon = await GenerateMaHoaDon();
                 hoaDon.NgayTao = DateTime.Now;
@@ -192,7 +192,7 @@ namespace F5Clothes_DAL.Reponsitories
                 hoaDon.NgayXacNhan = hoaDon.LoaiHoaDon == 1 ? DateTime.Now : null;
                 hoaDon.TrangThai = hoaDon.TrangThai;
 
-               
+
                 var chiTietList = hoaDon.HoaDonChiTiets.ToList();
                 hoaDon.HoaDonChiTiets = null;
 
@@ -415,23 +415,77 @@ namespace F5Clothes_DAL.Reponsitories
 
         public async Task updateStatus(HoaDon Hd)
         {
-            var invoiceStatus = await _context.HoaDons.FindAsync(Hd.Id);
-            if (invoiceStatus != null)
             {
-                try
+                var invoiceStatus = await _context.HoaDons.FindAsync(Hd.Id);
+                if (invoiceStatus != null)
                 {
-                    invoiceStatus.TrangThai = Hd.TrangThai;
-                    await _context.SaveChangesAsync();
+                    try
+                    {
+                        if (Hd.TrangThai == 6)
+                        {
+                            if (invoiceStatus.TrangThai == 5)
+                            {
+                                throw new InvalidOperationException("Không thể chuyển trạng thái hóa đơn từ 3, 4, hoặc 5 sang 6.");
+                            }
+                            else if (invoiceStatus.TrangThai == 1)
+                            {
+                                invoiceStatus.TrangThai = invoiceStatus.TrangThai;
+                            }
+                            else if (invoiceStatus.TrangThai >= 2 && invoiceStatus.TrangThai <= 4)
+                            {
+                                foreach (var chiTiet in Hd.HoaDonChiTiets)
+                                {
+                                    var product = await _context.SanPhamChiTiets.FindAsync(chiTiet.IdSpct);
+                                    if (product != null)
+                                    {
+                                        product.SoLuongTon += chiTiet.SoLuong;
+                                    }
+                                }
+                            }
+
+                            invoiceStatus.TrangThai = 6;
+                        }
+                        else if (invoiceStatus.TrangThai == 5|| invoiceStatus.TrangThai==6)
+                        {
+                            throw new InvalidOperationException("Không thể sửa đổi trạng thái hóa đơn đã được đặt thành 5 hoặc 6.");
+                        }
+                        else if (invoiceStatus.TrangThai == 1)
+                        {
+                            if (invoiceStatus.TrangThai==1&& Hd.TrangThai == 6)
+                            {
+                                invoiceStatus.TrangThai = invoiceStatus.TrangThai;
+                            }
+                            invoiceStatus.TrangThai = Hd.TrangThai;
+                            foreach (var chiTiet in Hd.HoaDonChiTiets)
+                            {
+                                var product = await _context.SanPhamChiTiets.FindAsync(chiTiet.IdSpct);
+                                if (product != null)
+                                {
+                                    product.SoLuongTon -= chiTiet.SoLuong;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (Hd.TrangThai != invoiceStatus.TrangThai + 1)
+                            {
+                                throw new InvalidOperationException("Trạng thái chỉ có thể tăng tiến từ 1 đến 6.");
+                            }
+                            invoiceStatus.TrangThai = Hd.TrangThai;
+                        }
+
+                        // Lưu thay đổi
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        throw new Exception("An error occurred while updating the invoice status.", ex);
+                    }
                 }
-                catch (DbUpdateException ex)
+                else
                 {
-                    // Log the error (ex) here
-                    throw new Exception("An error occurred while updating the invoice status.", ex);
+                    throw new KeyNotFoundException("Invoice not found.");
                 }
-            }
-            else
-            {
-                throw new KeyNotFoundException("Invoice not found.");
             }
         }
     }
