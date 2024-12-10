@@ -66,7 +66,6 @@ namespace F5Clothes_DAL.Reponsitories
 
         public async Task<(KhachHang, string)> Register(Customer customer)
         {
-
             var KhachHangExist = _context.KhachHangs.FirstOrDefault(x => x.MaKh == customer.MaKh);
             KhachHang user;
             if (KhachHangExist == null)
@@ -83,12 +82,6 @@ namespace F5Clothes_DAL.Reponsitories
                     MatKhau = BCrypt.Net.BCrypt.HashPassword(customer.MatKhau), // Mã hóa mật khẩu
                     SoDienThoai = customer.SoDienThoai
                 };
-                //if (await _context.KhachHangs.AnyAsync(u => u.HoVaTenKh == customer.HoVaTenKh))
-                //    throw new Exception("Username already exists");
-                //if (await _context.KhachHangs.AnyAsync(u => u.Email == customer.Email))
-                //    throw new Exception("Email already exists");
-                //if (await _context.KhachHangs.AnyAsync(u => u.SoDienThoai == customer.SoDienThoai))
-                //    throw new Exception("Phone number already exists");
                 _context.KhachHangs.Add(user);
             }
             else
@@ -164,8 +157,6 @@ namespace F5Clothes_DAL.Reponsitories
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>();
-
-            // Kiểm tra nếu user là NhanVien
             if (user is NhanVien nhanVien)
             {
                 claims.AddRange(new[]
@@ -180,7 +171,6 @@ namespace F5Clothes_DAL.Reponsitories
 
                 });
             }
-            // Kiểm tra nếu user là KhachHang
             else if (user is KhachHang khachHang)
             {
                 claims.AddRange(new[]
@@ -213,14 +203,14 @@ namespace F5Clothes_DAL.Reponsitories
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        // Hàm lấy mã khách hàng mới
         public async Task<string> GetNewCustomerCode()
         {
             var lastCustomerCode = await _context.KhachHangs
-                                                 .OrderByDescending(kh => kh.MaKh)
-                                                 .Select(kh => kh.MaKh)
-                                                 .FirstOrDefaultAsync();
-
+                                         .Where(kh => kh.MaKh.StartsWith("KH"))
+                                         .Select(kh => kh.MaKh)
+                                         .OrderByDescending(kh => kh.Length)
+                                         .ThenByDescending(kh => kh)  
+                                         .FirstOrDefaultAsync();
             if (lastCustomerCode == null)
             {
                 return "KH01";
@@ -239,7 +229,6 @@ namespace F5Clothes_DAL.Reponsitories
             }
         }
 
-        // Hàm lấy mã nhân viên mới
         public async Task<string> GetNewNhanVienCode()
         {
             var lastEmployeeCode = await _context.NhanViens
