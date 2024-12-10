@@ -184,7 +184,6 @@ namespace F5Clothes_Services.Services
                 if (product.SoLuongTon < item.SoLuong)
                     throw new Exception($"Không đủ số lượng sản phẩm {product.IdSpNavigation.TenSp} trong kho.");
 
-                product.SoLuongTon -= item.SoLuong;
                 await _sPCTRepo.UpdateSanPhamChiTiet(_mapper.Map<SanPhamChiTietDtos>(product));
 
                 var hoaDonChiTiet = new HoaDonChiTiet

@@ -434,5 +434,45 @@ namespace F5Clothes_DAL.Reponsitories
                 throw new KeyNotFoundException("Invoice not found.");
             }
         }
+        public async Task<object> GetByMaKh(Guid id)
+        {
+            var result = await _context.HoaDons
+                .Where(hd => hd.IdKh == id)
+                .OrderByDescending(hd => hd.NgayTao)
+                .Select(hd => new
+                {
+                    hd.Id,
+                    hd.MaHoaDon,
+                    hd.NgayTao,
+                    hd.TenNguoiNhan,
+                    hd.DiaChiNhanHang,
+                    HoaDonChiTiets = hd.HoaDonChiTiets
+                        .Where(hdct => hdct.IdHd == hd.Id)
+                        .Select(hdct => new
+                        {
+                            hdct.Id,
+                            hdct.IdSpct,
+                            SanPham = hdct.IdSpctNavigation == null ? null : new
+                            {
+                                hdct.IdSpctNavigation.Id,
+                                TenSanPham = hdct.IdSpctNavigation.IdSpNavigation != null
+                                    ? hdct.IdSpctNavigation.IdSpNavigation.TenSp
+                                    : null,
+                                Anh = hdct.IdSpctNavigation.IdSpNavigation != null
+                                    ? hdct.IdSpctNavigation.IdSpNavigation.ImageDefaul
+                                    : null
+                            },
+                            hdct.SoLuong,
+                            hdct.DonGia,
+                            ThanhTien = hdct.SoLuong * hdct.DonGia
+                        })
+                        .ToList(),
+                    TongTien = hd.HoaDonChiTiets.Sum(hdct => hdct.SoLuong * hdct.DonGia),
+                    TinhTrangThanhToan = hd.TrangThai
+                })
+                .ToListAsync();
+
+            return result;
+        }
     }
 }

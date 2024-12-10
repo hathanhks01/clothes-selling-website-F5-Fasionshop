@@ -28,7 +28,10 @@ namespace F5Clothes_Services.Services
 
             return await _hoaDonRepo.AddHd(hoaDon);
         }
-
+        public async Task<object> GetByMaKh(Guid idKh)
+        {
+            return await _hoaDonRepo.GetByMaKh(idKh);
+        }
         public async Task Delete(Guid id)
         {
           await _hoaDonRepo.DeleteHd(id);

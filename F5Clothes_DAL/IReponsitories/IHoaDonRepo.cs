@@ -17,6 +17,7 @@ namespace F5Clothes_DAL.IReponsitories
         Task<bool> UpdateHd(HoaDon Hd);
         Task updateStatus(HoaDon Hd);
         Task DeleteHd(Guid Id);
+        Task<object> GetByMaKh(Guid idKh);
         Task<string> GenerateMaHoaDon();
     }
 }

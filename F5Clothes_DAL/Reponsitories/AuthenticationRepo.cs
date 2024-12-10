@@ -203,14 +203,14 @@ namespace F5Clothes_DAL.Reponsitories
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        // Hàm lấy mã khách hàng mới
         public async Task<string> GetNewCustomerCode()
         {
             var lastCustomerCode = await _context.KhachHangs
-                                                 .OrderByDescending(kh => kh.MaKh)
-                                                 .Select(kh => kh.MaKh)
-                                                 .FirstOrDefaultAsync();
-
+                                         .Where(kh => kh.MaKh.StartsWith("KH"))
+                                         .Select(kh => kh.MaKh)
+                                         .OrderByDescending(kh => kh.Length)
+                                         .ThenByDescending(kh => kh)  
+                                         .FirstOrDefaultAsync();
             if (lastCustomerCode == null)
             {
                 return "KH01";
