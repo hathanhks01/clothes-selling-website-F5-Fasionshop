@@ -103,5 +103,15 @@ namespace F5Clothes_API.Controllers
         {
             await _HoaDonSV.Delete(id);
         }
+        [HttpGet("by-makh/{idKh}")]
+        public async Task<IActionResult> GetMaKh(Guid idKh)
+        {
+            var hd = await _HoaDonSV.GetByMaKh(idKh);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(hd);
+        }
     }
 }
