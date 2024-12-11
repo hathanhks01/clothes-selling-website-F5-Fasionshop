@@ -102,6 +102,8 @@ builder.Services.AddScoped<IXuatXuService, XuatXuService>();
 builder.Services.AddScoped<IHinhThucThanhToanRepo, HinhThucThanhToanRepo>();
 builder.Services.AddScoped<IVoucherService, VoucherService>();
 builder.Services.AddScoped<IGioHangServices, GioHangServices>();
+builder.Services.AddScoped<IStatisticsRepository, StatisticsRepository>();
+builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 
