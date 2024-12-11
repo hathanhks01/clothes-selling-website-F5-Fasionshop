@@ -11,7 +11,7 @@
         "projectName": "F5Clothes_API",
         "projectPath": "C:\\Users\\Admin\\Source\\Repos\\clothes-selling-website-F5-Fasionshop11\\F5Clothes_API\\F5Clothes_API.csproj",
         "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Admin\\source\\repos\\clothes-selling-website-F5-Fasionshop11\\F5Clothes_API\\obj\\",
+        "outputPath": "C:\\Users\\Admin\\Source\\Repos\\clothes-selling-website-F5-Fasionshop11\\F5Clothes_API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -192,7 +192,7 @@
         "projectName": "F5Clothes_Services",
         "projectPath": "C:\\Users\\Admin\\Source\\Repos\\clothes-selling-website-F5-Fasionshop11\\F5Clothes_Services\\F5Clothes_Services.csproj",
         "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Admin\\source\\repos\\clothes-selling-website-F5-Fasionshop11\\F5Clothes_Services\\obj\\",
+        "outputPath": "C:\\Users\\Admin\\Source\\Repos\\clothes-selling-website-F5-Fasionshop11\\F5Clothes_Services\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
