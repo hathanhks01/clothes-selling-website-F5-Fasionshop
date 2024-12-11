@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
                       {
                           policy.AllowAnyOrigin()
                           .AllowAnyMethod()    // Cho phép tất cả các phương thức HTTP (GET, POST, PUT, DELETE,...)
-                                .AllowAnyHeader();   // Cho phép tất cả các tiêu đề, bao gồm Content-Type
+                          .AllowAnyHeader();   // Cho phép tất cả các tiêu đề, bao gồm Content-Type
                       });
 });
 
@@ -115,7 +115,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseCors(
-	//"AllowAllOrigins");
 	options => options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
 app.UseHttpsRedirection();
 app.UseAuthentication();
