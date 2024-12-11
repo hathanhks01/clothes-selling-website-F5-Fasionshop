@@ -247,6 +247,12 @@ namespace F5Clothes_Services.Services
                 throw new Exception("Không tìm thấy sản phẩm.");
             }
 
+            // Kiểm tra số lượng tồn kho
+            if (productDetail.SoLuongTon < addDto.SoLuong)
+            {
+                throw new Exception($"Không đủ số lượng sản phẩm {product.TenSp} trong kho.");
+            }
+
             // Lấy giá khi giảm
             decimal? donGiaKhiGiam = product.DonGiaKhiGiam ?? productPrice;
 
@@ -265,16 +271,31 @@ namespace F5Clothes_Services.Services
 
 
 
+
         // Update an existing cart item
         public async Task UpdateGioHangAsync(GioHangUpdate updateDto)
         {
-            // Fetch the existing cart item from the repository ()
+            // Fetch the existing cart item from the repository
             var existingCartItem = await _gioHangRepo.GetGioHangById(updateDto.id);
 
             if (existingCartItem == null)
                 throw new Exception("Cart item not found.");
 
-            // Map DTO fields to the entity manually
+            // Lấy sản phẩm chi tiết để kiểm tra số lượng tồn kho
+            var productDetail = await _sPCTRepo.GetByIdSanPhamChiTiet(existingCartItem.IdSpct);
+            if (productDetail == null)
+            {
+                throw new Exception("Không tìm thấy thông tin sản phẩm.");
+            }
+
+            // Kiểm tra số lượng tồn kho
+            if (productDetail.SoLuongTon < updateDto.SoLuong)
+            {
+                var product = await _sanPhamRepo.GetByIdSanPham(productDetail.IdSp.Value);
+                throw new Exception($"Không đủ số lượng sản phẩm {product.TenSp} trong kho.");
+            }
+
+            // Map DTO fields to the existing cart item
             existingCartItem.SoLuong = updateDto.SoLuong;
             // Set other fields if needed
             // Example: existingCartItem.IdSpct = updateDto.IdSpct;
@@ -282,11 +303,6 @@ namespace F5Clothes_Services.Services
             // Update the cart item in the repository
             await _gioHangRepo.UpdateGioHangAsync(existingCartItem);
         }
-
-
-
-
-
 
         // Delete a cart item
         public async Task DeleteGioHangAsync(Guid id)

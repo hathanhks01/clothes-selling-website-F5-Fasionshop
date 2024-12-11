@@ -256,6 +256,7 @@ namespace F5Clothes_DAL.Reponsitories
                             SizeId = ct.IdSizeNavigation.Id,
                             SizeTen = ct.IdSizeNavigation.TenSize,
                             SoLuongTon = ct.SoLuongTon
+
                         })
                         .Where(ct => ct.SizeId != null)
                         .Distinct()
