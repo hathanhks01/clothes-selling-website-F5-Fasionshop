@@ -27,71 +27,85 @@ namespace F5Clothes_API.Controllers
         [HttpPost("vnpay-payment")]
         public async Task<IActionResult> VNPayPayment(Guid customerId, OrderInfoDto orderInfo)
         {
-            string diaChiNhanHang;
-            const string DiaChiCuaHang = "Số 123 Đường ABC, Quận 1, TP. Hồ Chí Minh";
-
-            // Xác định địa chỉ nhận hàng
-            if (orderInfo.IdDiaChi == null)
+            try
             {
-                diaChiNhanHang = DiaChiCuaHang;
+                string diaChiNhanHang;
+                const string DiaChiCuaHang = "Số 123 Đường ABC, Quận 1, TP. Hồ Chí Minh";
+
+                // Xác định địa chỉ nhận hàng
+                if (orderInfo.IdDiaChi == null)
+                {
+                    diaChiNhanHang = DiaChiCuaHang;
+                }
+                else
+                {
+                    var diaChiList = await _diaChiRepo.GetByDiaChi(customerId);
+                    if (diaChiList == null || !diaChiList.Any())
+                        throw new Exception("Không tìm thấy địa chỉ nào cho khách hàng.");
+
+                    var diaChi = diaChiList.FirstOrDefault(x => x.Id == orderInfo.IdDiaChi)
+                                 ?? diaChiList.FirstOrDefault();
+
+                    if (diaChi == null || string.IsNullOrEmpty(diaChi.DiaChiChiTiet))
+                        throw new Exception("Không có địa chỉ nhận hàng hợp lệ.");
+
+                    diaChiNhanHang = $"{diaChi.DiaChiChiTiet}, {diaChi.PhuongXa}, {diaChi.QuanHuyen}, {diaChi.TinhThanh}";
+                }
+                // Kiểm tra giỏ hàng
+                var cartItems = await _gioHangRepo.GetAllGioHangAsync(customerId);
+                if (cartItems == null || !cartItems.Any())
+                    return BadRequest("Giỏ hàng trống, không thể đặt hàng.");
+
+                // Tính tổng tiền
+                decimal tongTien = cartItems.Sum(item =>
+                    item.SoLuong * (item.DonGiaKhiGiam.HasValue && item.DonGiaKhiGiam > 0
+                        ? item.DonGiaKhiGiam.Value
+                        : item.DonGia)
+                );
+
+                // Áp dụng voucher
+                decimal? giaTriGiam = await ApplyVoucherAsync(orderInfo, tongTien);
+                tongTien -= giaTriGiam ?? 0;
+
+                // Tạo hóa đơn
+                var maHoaDon = await _hoaDonRepo.GenerateMaHoaDon();
+                var hoaDon = new HoaDon
+                {
+                    MaHoaDon = maHoaDon,
+                    IdKh = customerId,
+                    NgayTao = DateTime.Now,
+                    TrangThai = 1,
+                    LoaiHoaDon = 2,
+                    DiaChiNhanHang = diaChiNhanHang,
+                    TenNguoiNhan = orderInfo.TenNguoiNhan,
+                    SdtnguoiNhan = orderInfo.SdtNguoiNhan,
+                    NgayNhanHang = orderInfo.NgayNhanHang,
+                    IdVouCher = orderInfo.VoucherId,
+                    ThanhTien = tongTien,
+                    GiaTriGiam = giaTriGiam,
+                    GhiChu = orderInfo.GhiChu
+                };
+
+                await _hoaDonRepo.AddHdgioHang(hoaDon);
+
+                // Tạo URL thanh toán
+                var vnPayModel = new PaymentInformationModel
+                {
+                    Amount = (double)tongTien*100,
+                    OrderDescription = $"Thanh toán đơn hàng {maHoaDon}",
+                    FullName = orderInfo.TenNguoiNhan,
+                    OrderType = Guid.NewGuid().ToString(), // Sử dụng GUID thay cho Random
+                };
+
+                var paymentUrl = _vnPayService.CreatePaymentUrl(vnPayModel, HttpContext);
+                return Ok(new { paymentUrl });
             }
-            else
+            catch (Exception ex)
             {
-                var diaChiList = await _diaChiRepo.GetByDiaChi(customerId);
-                if (diaChiList == null || !diaChiList.Any())
-                    throw new Exception("Không tìm thấy địa chỉ nào cho khách hàng.");
-
-                var diaChi = diaChiList.FirstOrDefault(x => x.Id == orderInfo.IdDiaChi)
-                             ?? diaChiList.FirstOrDefault();
-
-                if (diaChi == null || string.IsNullOrEmpty(diaChi.DiaChiChiTiet))
-                    throw new Exception("Không có địa chỉ nhận hàng hợp lệ.");
-
-                diaChiNhanHang = $"{diaChi.DiaChiChiTiet}, {diaChi.PhuongXa}, {diaChi.QuanHuyen}, {diaChi.TinhThanh}";
+                return StatusCode(500, $"Đã xảy ra lỗi: {ex.Message}");
             }
-
-            var cartItems = await _gioHangRepo.GetAllGioHangAsync(customerId);
-            if (cartItems == null || !cartItems.Any())
-                throw new Exception("Giỏ hàng trống, không thể đặt hàng.");
-
-            decimal tongTien = cartItems.Sum(item =>
-                item.SoLuong * (item.DonGiaKhiGiam.HasValue && item.DonGiaKhiGiam > 0
-                    ? item.DonGiaKhiGiam.Value
-                    : item.DonGia)
-            );
-
-            decimal? giaTriGiam = await ApplyVoucherAsync(orderInfo, tongTien);
-            tongTien -= giaTriGiam ?? 0;
-            var maHoaDon = await _hoaDonRepo.GenerateMaHoaDon();
-            var hoaDon = new HoaDon
-            {
-                MaHoaDon = maHoaDon,
-                IdKh = customerId,
-                NgayTao = DateTime.Now,
-                TrangThai = 0,
-                LoaiHoaDon = 2,
-                DiaChiNhanHang = diaChiNhanHang,
-                TenNguoiNhan = orderInfo.TenNguoiNhan,
-                SdtnguoiNhan = orderInfo.SdtNguoiNhan,
-                NgayNhanHang = orderInfo.NgayNhanHang,
-                IdVouCher = orderInfo.VoucherId,
-                ThanhTien = tongTien,
-                GiaTriGiam = giaTriGiam,
-                GhiChu = orderInfo.GhiChu
-            };
-
-            await _hoaDonRepo.AddHdgioHang(hoaDon);
-
-            var vnPayModel = new PaymentInformationModel
-            {
-                Amount = (double)tongTien,
-                OrderDescription = $"Thanh toán đơn hàng {maHoaDon}",
-                FullName = orderInfo.TenNguoiNhan,
-                OrderType = new Random().Next(1000, 100000).ToString(),
-            };
-            var paymentUrl = _vnPayService.CreatePaymentUrl(vnPayModel, HttpContext);
-            return Ok(new { paymentUrl });
         }
+
 
         private async Task<decimal?> ApplyVoucherAsync(OrderInfoDto orderInfo, decimal tongTien)
         {

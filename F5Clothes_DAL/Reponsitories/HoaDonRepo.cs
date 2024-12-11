@@ -23,8 +23,8 @@ namespace F5Clothes_DAL.Reponsitories
         public async Task DeleteHd(Guid Id)
         {
             var Hd = await _context.HoaDons
-                .Include(h => h.HoaDonChiTiets)  // Đảm bảo các bản ghi HoaDonChiTiets được tải
-                .Include(h => h.HinhThucThanhToans)  // Đảm bảo các bản ghi HinhThucThanhToans được tải
+                .Include(h => h.HoaDonChiTiets) 
+                .Include(h => h.HinhThucThanhToans) 
                 .Include(h => h.LichSuHoaDons)
                 .FirstOrDefaultAsync(h => h.Id == Id);
 
@@ -34,8 +34,8 @@ namespace F5Clothes_DAL.Reponsitories
             }
             _context.LichSuHoaDons.RemoveRange(Hd.LichSuHoaDons);
             // Xóa các bản ghi phụ thuộc trước
-            _context.HoaDonChiTiets.RemoveRange(Hd.HoaDonChiTiets);  // Xóa bản ghi HoaDonChiTiet
-            _context.HinhThucThanhToans.RemoveRange(Hd.HinhThucThanhToans);  // Xóa bản ghi HinhThucThanhToan
+            _context.HoaDonChiTiets.RemoveRange(Hd.HoaDonChiTiets);
+            _context.HinhThucThanhToans.RemoveRange(Hd.HinhThucThanhToans);
 
             // Xóa bản ghi HoaDon
             _context.HoaDons.Remove(Hd);
@@ -460,7 +460,11 @@ namespace F5Clothes_DAL.Reponsitories
                                     : null,
                                 Anh = hdct.IdSpctNavigation.IdSpNavigation != null
                                     ? hdct.IdSpctNavigation.IdSpNavigation.ImageDefaul
-                                    : null
+                                    : null,
+                                Size = hdct.IdSpctNavigation.IdSizeNavigation != null ?
+                                    hdct.IdSpctNavigation.IdSizeNavigation.TenSize : null,
+                                MauSac = hdct.IdSpctNavigation.IdMsNavigation != null ?
+                                    hdct.IdSpctNavigation.IdMsNavigation.TenMauSac : null
                             },
                             hdct.SoLuong,
                             hdct.DonGia,
