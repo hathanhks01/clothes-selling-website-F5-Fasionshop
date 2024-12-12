@@ -36,6 +36,7 @@ namespace F5Clothes_DAL.Reponsitories
                     QuanHuyen = dc.QuanHuyen,
                     NgayTao = DateTime.Now,
                     PhuongXa = dc.PhuongXa,
+                    TinhThanh = dc.TinhThanh,
                     QuocGia = "Việt Nam",
                     TrangThai = 1,
                 };
