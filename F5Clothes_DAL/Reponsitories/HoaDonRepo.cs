@@ -226,11 +226,13 @@ namespace F5Clothes_DAL.Reponsitories
 
                     if (sanPhamChiTiet == null)
                         throw new Exception($"Sản phẩm chi tiết {chiTiet.IdSpct} không tồn tại");
+                    if (hoaDon.TrangThai != 1)
+                    {
+                        if (sanPhamChiTiet.SoLuongTon < chiTiet.SoLuong)
+                            throw new Exception($"Sản phẩm {sanPhamChiTiet.Id} không đủ số lượng");
 
-                    if (sanPhamChiTiet.SoLuongTon < chiTiet.SoLuong)
-                        throw new Exception($"Sản phẩm {sanPhamChiTiet.Id} không đủ số lượng");
-
-                    sanPhamChiTiet.SoLuongTon -= chiTiet.SoLuong;
+                        sanPhamChiTiet.SoLuongTon -= chiTiet.SoLuong;
+                    }
 
                     var newChiTiet = new HoaDonChiTiet
                     {
