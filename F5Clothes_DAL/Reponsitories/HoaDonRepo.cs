@@ -45,77 +45,88 @@ namespace F5Clothes_DAL.Reponsitories
         }
         public async Task<List<HoaDon>> GetAllHoaDon()
         {
-            return await _context.HoaDons
-       .Include(hd => hd.IdNvNavigation)
-       .Include(hd => hd.IdKhNavigation)
-       .Include(hd => hd.IdVouCherNavigation)
-       .Include(hd => hd.HinhThucThanhToans)
-       .Include(hd => hd.LichSuHoaDons)
-       .Include(hd => hd.HoaDonChiTiets)
-           .ThenInclude(hdt => hdt.IdSpctNavigation)
-               .ThenInclude(spct => spct.IdSpNavigation) // Ensure product name is included
-       .Select(hd => new HoaDon
-       {
-           Id = hd.Id,
-           IdNv = hd.IdNv,
-           IdKh = hd.IdKh,
-           IdVouCher = hd.IdVouCher,
-           MaHoaDon = hd.MaHoaDon,
-           NgayTao = hd.NgayTao,
-           NgayCapNhat = hd.NgayCapNhat,
-           NgayXacNhan = hd.NgayXacNhan,
-           NgayChoGiaoHang = hd.NgayChoGiaoHang,
-           NgayGiaoHang = hd.NgayGiaoHang,
-           DonViGiaoHang = hd.DonViGiaoHang,
-           TenNguoiGiao = hd.TenNguoiGiao,
-           SdtnguoiGiao = hd.SdtnguoiGiao,
-           TienGiaoHang = hd.TienGiaoHang,
-           NgayNhanHang = hd.NgayNhanHang,
-           TenNguoiNhan = hd.TenNguoiNhan,
-           SdtnguoiNhan = hd.SdtnguoiNhan,
-           EmailNguoiNhan = hd.EmailNguoiNhan,
-           DiaChiNhanHang = hd.DiaChiNhanHang,
-           NgayThanhToan = hd.NgayThanhToan,
-           NgayHuy = hd.NgayHuy,
-           GiaTriGiam = hd.GiaTriGiam,
-           TienKhachTra = hd.TienKhachTra,
-           TienThua = hd.TienThua,
-           ThanhTien = hd.ThanhTien,
-           GhiChu = hd.GhiChu,
-           LoaiHoaDon = hd.LoaiHoaDon,
-           TrangThai = hd.TrangThai,
-           IdKhNavigation = hd.IdKhNavigation == null ? null : new KhachHang
-           {
-               Id = hd.IdKhNavigation.Id,
-               HoVaTenKh = hd.IdKhNavigation.HoVaTenKh
-           },
-           IdNvNavigation = hd.IdNvNavigation == null ? null : new NhanVien
-           {
-               Id = hd.IdNvNavigation.Id,
-               HoVaTenNv = hd.IdNvNavigation.HoVaTenNv
-           },
-           HoaDonChiTiets = hd.HoaDonChiTiets.Select(hdt => new HoaDonChiTiet
-           {
-               Id = hdt.Id,
-               IdHdNavigation = hdt.IdHdNavigation,
-               IdSpct = hdt.IdSpct,
-               SoLuong = hdt.SoLuong,
-               DonGia = hdt.DonGia,
-               IdSpctNavigation = hdt.IdSpctNavigation == null ? null : new SanPhamChiTiet
-               {
-                   Id = hdt.IdSpctNavigation.Id,
-                   IdSp = hdt.IdSpctNavigation.IdSp,
-                   MoTa = hdt.IdSpctNavigation.MoTa,
-                   IdSpNavigation = hdt.IdSpctNavigation.IdSpNavigation == null ? null : new SanPham
-                   {
-                       Id = hdt.IdSpctNavigation.IdSpNavigation.Id,
-                       ImageDefaul = hdt.IdSpctNavigation.IdSpNavigation.ImageDefaul,
-                   }
-               }
-           }).ToList(),
-           IdVouCherNavigation = hd.IdVouCherNavigation
-       })
-       .ToListAsync();
+            var result = await _context.HoaDons
+        .Include(hd => hd.IdNvNavigation)
+        .Include(hd => hd.IdKhNavigation)
+        .Include(hd => hd.IdVouCherNavigation)
+        .Include(hd => hd.HinhThucThanhToans)
+        .Include(hd => hd.LichSuHoaDons)
+        .Include(hd => hd.HoaDonChiTiets)
+            .ThenInclude(hdt => hdt.IdSpctNavigation)
+            .ThenInclude(spct => spct.IdSpNavigation)
+        .Select(hd => new HoaDon
+        {
+            Id = hd.Id,
+            IdNv = hd.IdNv,
+            IdKh = hd.IdKh,
+            IdVouCher = hd.IdVouCher,
+            MaHoaDon = hd.MaHoaDon,
+            NgayTao = hd.NgayTao,
+            NgayCapNhat = hd.NgayCapNhat,
+            NgayXacNhan = hd.NgayXacNhan,
+            NgayChoGiaoHang = hd.NgayChoGiaoHang,
+            NgayGiaoHang = hd.NgayGiaoHang,
+            DonViGiaoHang = hd.DonViGiaoHang,
+            TenNguoiGiao = hd.TenNguoiGiao,
+            SdtnguoiGiao = hd.SdtnguoiGiao,
+            TienGiaoHang = hd.TienGiaoHang,
+            NgayNhanHang = hd.NgayNhanHang,
+            TenNguoiNhan = hd.TenNguoiNhan,
+            SdtnguoiNhan = hd.SdtnguoiNhan,
+            EmailNguoiNhan = hd.EmailNguoiNhan,
+            DiaChiNhanHang = hd.DiaChiNhanHang,
+            NgayThanhToan = hd.NgayThanhToan,
+            NgayHuy = hd.NgayHuy,
+            GiaTriGiam = hd.GiaTriGiam,
+            TienKhachTra = hd.TienKhachTra,
+            TienThua = hd.TienThua,
+            ThanhTien = hd.ThanhTien,
+            GhiChu = hd.GhiChu,
+            LoaiHoaDon = hd.LoaiHoaDon,
+            TrangThai = hd.TrangThai,
+
+            IdKhNavigation = hd.IdKhNavigation == null ? null : new KhachHang
+            {
+                Id = hd.IdKhNavigation.Id,
+                HoVaTenKh = hd.IdKhNavigation.HoVaTenKh
+            },
+
+            IdNvNavigation = hd.IdNvNavigation == null ? null : new NhanVien
+            {
+                Id = hd.IdNvNavigation.Id,
+                HoVaTenNv = hd.IdNvNavigation.HoVaTenNv
+            },
+
+            HoaDonChiTiets = hd.HoaDonChiTiets.Select(hdt => new HoaDonChiTiet
+            {
+                Id = hdt.Id,
+                IdHdNavigation = hdt.IdHdNavigation,
+                IdSpct = hdt.IdSpct,
+                SoLuong = hdt.SoLuong,
+                DonGia = hdt.DonGia,
+
+                IdSpctNavigation = hdt.IdSpctNavigation == null ? null : new SanPhamChiTiet
+                {
+                    Id = hdt.IdSpctNavigation.Id,
+                    IdSp = hdt.IdSpctNavigation.IdSp,
+                    MoTa = hdt.IdSpctNavigation.MoTa,
+
+                    IdSpNavigation = hdt.IdSpctNavigation.IdSpNavigation == null ? null : new SanPham
+                    {
+                        Id = hdt.IdSpctNavigation.IdSpNavigation.Id,
+                        ImageDefaul = hdt.IdSpctNavigation.IdSpNavigation.ImageDefaul,
+                    }
+                }
+            }).ToList(),
+
+            IdVouCherNavigation = hd.IdVouCherNavigation == null ? null : new VouCher
+            {
+                Id = hd.IdVouCherNavigation.Id,
+                TenVouCher = hd.IdVouCherNavigation.TenVouCher
+            }
+        })
+        .ToListAsync();
+            return result;
         }
 
 
@@ -128,6 +139,9 @@ namespace F5Clothes_DAL.Reponsitories
                     hd.Id,
                     hd.MaHoaDon,
                     hd.NgayTao,
+                    hd.TenNguoiNhan,
+                    hd.SdtnguoiNhan,
+                    hd.DiaChiNhanHang,
                     KhachHang = hd.IdKhNavigation == null ? null : new
                     {
                         hd.IdKhNavigation.Id,
@@ -191,7 +205,9 @@ namespace F5Clothes_DAL.Reponsitories
                 hoaDon.NgayCapNhat = DateTime.Now;
                 hoaDon.NgayXacNhan = hoaDon.LoaiHoaDon == 1 ? DateTime.Now : null;
                 hoaDon.TrangThai = hoaDon.TrangThai;
-
+                hoaDon.TenNguoiNhan = hoaDon.TenNguoiNhan;
+                hoaDon.SdtnguoiNhan = hoaDon.SdtnguoiNhan;
+                hoaDon.DiaChiNhanHang=hoaDon.DiaChiNhanHang;
 
                 var chiTietList = hoaDon.HoaDonChiTiets.ToList();
                 hoaDon.HoaDonChiTiets = null;
@@ -215,11 +231,13 @@ namespace F5Clothes_DAL.Reponsitories
 
                     if (sanPhamChiTiet == null)
                         throw new Exception($"Sản phẩm chi tiết {chiTiet.IdSpct} không tồn tại");
+                    if (hoaDon.TrangThai != 1)
+                    {
+                        if (sanPhamChiTiet.SoLuongTon < chiTiet.SoLuong)
+                            throw new Exception($"Sản phẩm {sanPhamChiTiet.Id} không đủ số lượng");
 
-                    if (sanPhamChiTiet.SoLuongTon < chiTiet.SoLuong)
-                        throw new Exception($"Sản phẩm {sanPhamChiTiet.Id} không đủ số lượng");
-
-                    sanPhamChiTiet.SoLuongTon -= chiTiet.SoLuong;
+                        sanPhamChiTiet.SoLuongTon -= chiTiet.SoLuong;
+                    }
 
                     var newChiTiet = new HoaDonChiTiet
                     {

@@ -134,7 +134,7 @@ namespace F5Clothes_DAL.Reponsitories
 
             var monthlyRevenue = await _context.HoaDons
                 .Where(hd => hd.TrangThai.HasValue && (OrderStatus)hd.TrangThai.Value == OrderStatus.Delivered)
-                .GroupBy(hd => hd.NgayThanhToan.Value.Month)
+                .GroupBy(hd => hd.NgayTao.Value.Month)
                 .Select(g => new MonthlyRevenueDto
                 {
                     Month = g.Key,
