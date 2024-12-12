@@ -139,6 +139,7 @@ namespace F5Clothes_DAL.Reponsitories
                     hd.Id,
                     hd.MaHoaDon,
                     hd.NgayTao,
+                    hd.DiaChiNhanHang,
                     KhachHang = hd.IdKhNavigation == null ? null : new
                     {
                         hd.IdKhNavigation.Id,
@@ -202,7 +203,7 @@ namespace F5Clothes_DAL.Reponsitories
                 hoaDon.NgayCapNhat = DateTime.Now;
                 hoaDon.NgayXacNhan = hoaDon.LoaiHoaDon == 1 ? DateTime.Now : null;
                 hoaDon.TrangThai = hoaDon.TrangThai;
-
+                hoaDon.DiaChiNhanHang=hoaDon.DiaChiNhanHang;
 
                 var chiTietList = hoaDon.HoaDonChiTiets.ToList();
                 hoaDon.HoaDonChiTiets = null;
