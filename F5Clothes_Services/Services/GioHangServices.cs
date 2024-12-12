@@ -210,22 +210,6 @@ namespace F5Clothes_Services.Services
         {
             // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
             var existingCartItem = await _gioHangRepo.GetCartItemByIdsAsync(addDto.IdGh, addDto.IdSpct);
-            if (existingCartItem != null)
-            {
-                throw new Exception("Sản phẩm đã có trong giỏ hàng.");
-            }
-
-            // Map DTO to entity
-            var newCartItem = _mapper.Map<GioHangChiTiet>(addDto);
-
-            // Generate a new ID if not provided
-            if (addDto.Id == Guid.Empty)
-            {
-                addDto.Id = Guid.NewGuid(); // Update the DTO
-            }
-
-            // Update the entity with the ID
-            newCartItem.Id = addDto.Id;
 
             // Lấy giá sản phẩm chi tiết (DonGia)
             var productPrice = await _gioHangRepo.GetProductPriceAsync(addDto.IdSpct);
@@ -247,34 +231,80 @@ namespace F5Clothes_Services.Services
                 throw new Exception("Không tìm thấy sản phẩm.");
             }
 
+            // Kiểm tra số lượng tồn kho
+            if (productDetail.SoLuongTon < addDto.SoLuong + (existingCartItem?.SoLuong ?? 0))
+            {
+                throw new Exception($"Không đủ số lượng sản phẩm {product.TenSp} trong kho.");
+            }
+
             // Lấy giá khi giảm
             decimal? donGiaKhiGiam = product.DonGiaKhiGiam ?? productPrice;
 
-            // Set các thuộc tính cho giỏ hàng mới
-            newCartItem.IdGh = addDto.IdGh;
-            newCartItem.IdSpct = addDto.IdSpct;
-            newCartItem.SoLuong = addDto.SoLuong;
-            newCartItem.DonGia = productPrice;
-            newCartItem.DonGiaKhiGiam = donGiaKhiGiam;
-            newCartItem.NgayTao = DateTime.Now;
-            newCartItem.TrangThai = 0; // Giỏ hàng hoạt động
+            if (existingCartItem != null)
+            {
+                // Nếu sản phẩm đã tồn tại, cộng dồn số lượng và cập nhật giá trị
+                existingCartItem.SoLuong += addDto.SoLuong;
+                existingCartItem.DonGia = productPrice;
+                existingCartItem.DonGiaKhiGiam = donGiaKhiGiam;
+                existingCartItem.NgayCapNhat = DateTime.Now;
 
-            // Thêm giỏ hàng vào repository
-            await _gioHangRepo.AddGioHangAsync(newCartItem);
+                // Cập nhật giỏ hàng trong repository
+                await _gioHangRepo.UpdateGioHangAsync(existingCartItem);
+            }
+            else
+            {
+                // Nếu sản phẩm chưa tồn tại, thêm mới
+                var newCartItem = _mapper.Map<GioHangChiTiet>(addDto);
+
+                // Generate a new ID if not provided
+                if (addDto.Id == Guid.Empty)
+                {
+                    addDto.Id = Guid.NewGuid(); // Update the DTO
+                }
+
+                // Set các thuộc tính cho giỏ hàng mới
+                newCartItem.Id = addDto.Id;
+                newCartItem.IdGh = addDto.IdGh;
+                newCartItem.IdSpct = addDto.IdSpct;
+                newCartItem.SoLuong = addDto.SoLuong;
+                newCartItem.DonGia = productPrice;
+                newCartItem.DonGiaKhiGiam = donGiaKhiGiam;
+                newCartItem.NgayTao = DateTime.Now;
+                newCartItem.TrangThai = 0; // Giỏ hàng hoạt động
+
+                // Thêm giỏ hàng vào repository
+                await _gioHangRepo.AddGioHangAsync(newCartItem);
+            }
         }
+
+
 
 
 
         // Update an existing cart item
         public async Task UpdateGioHangAsync(GioHangUpdate updateDto)
         {
-            // Fetch the existing cart item from the repository ()
+            // Fetch the existing cart item from the repository
             var existingCartItem = await _gioHangRepo.GetGioHangById(updateDto.id);
 
             if (existingCartItem == null)
                 throw new Exception("Cart item not found.");
 
-            // Map DTO fields to the entity manually
+            // Lấy sản phẩm chi tiết để kiểm tra số lượng tồn kho
+            var productDetail = await _sPCTRepo.GetByIdSanPhamChiTiet(existingCartItem.IdSpct);
+            if (productDetail == null)
+            {
+                throw new Exception("Không tìm thấy thông tin sản phẩm.");
+            }
+
+            // Kiểm tra số lượng tồn kho
+            if (productDetail.SoLuongTon < updateDto.SoLuong)
+            {
+                var product = await _sanPhamRepo.GetByIdSanPham(productDetail.IdSp.Value);
+                throw new Exception($"Không đủ số lượng sản phẩm {product.TenSp} trong kho.");
+            }
+
+            // Map DTO fields to the existing cart item
             existingCartItem.SoLuong = updateDto.SoLuong;
             // Set other fields if needed
             // Example: existingCartItem.IdSpct = updateDto.IdSpct;
@@ -282,11 +312,6 @@ namespace F5Clothes_Services.Services
             // Update the cart item in the repository
             await _gioHangRepo.UpdateGioHangAsync(existingCartItem);
         }
-
-
-
-
-
 
         // Delete a cart item
         public async Task DeleteGioHangAsync(Guid id)
