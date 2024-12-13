@@ -75,6 +75,8 @@ namespace F5Clothes_DAL.DTOs
         public string SdtNguoiNhan { get; set; }
         public DateTime? NgayNhanHang { get; set; }
         public string? GhiChu { get; set; }
+        public string? NhaGiaoHang{ get; set; }
+        public decimal? TienShip { get; set; }
 
 
     }
