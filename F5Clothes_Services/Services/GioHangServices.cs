@@ -23,11 +23,12 @@ namespace F5Clothes_Services.Services
         private readonly IVoucherRepo _voucherRepo;
         private readonly IDiaChiRepo _diaChiRepo;
         private readonly ISanPhamRepo _sanPhamRepo;
+        private readonly IHinhThucThanhToanRepo _hinhThucThanhToanRepo;
 
         public GioHangServices(IGioHangRepo gioHangRepo,
             IMapper mapper, ISPCTRepo sPCTRepo, IHoaDonRepo hoaDonRepo,
             IHDCTRepo hDCTRepo, IVoucherRepo voucherRepo, IDiaChiRepo diaChiRepo,
-            ISanPhamRepo sanPhamRepo)
+            ISanPhamRepo sanPhamRepo,IHinhThucThanhToanRepo hinhThucThanhToanRepo)
         {
             _gioHangRepo = gioHangRepo;
             _mapper = mapper;
@@ -37,6 +38,7 @@ namespace F5Clothes_Services.Services
             _voucherRepo = voucherRepo;
             _diaChiRepo = diaChiRepo;
             _sanPhamRepo = sanPhamRepo;
+            _hinhThucThanhToanRepo = hinhThucThanhToanRepo;
         }
 
         // Retrieve all cart items for a customer by ID
@@ -177,6 +179,17 @@ namespace F5Clothes_Services.Services
             };
 
             await _hoaDonRepo.AddHdgioHang(hoaDon);
+            var hinhThucThanhToan = new HinhThucThanhToan
+            {
+                IdHd = hoaDon.Id,
+                IdKh = customerId,
+                HinhThucThanhToan1 = 1, // Assuming 1 represents "COD"
+                TrangThai = 0,  // Assuming 0 means "Not Paid"
+                NgayTao = DateTime.Now,
+                MaGiaoDich = null,  // Generate a unique transaction code if needed
+                GhiChu = "Thanh toán khi nhận hàng"
+            };
+            await _hinhThucThanhToanRepo.AddHTt(hinhThucThanhToan);
 
             foreach (var item in cartItems)
             {
@@ -199,6 +212,8 @@ namespace F5Clothes_Services.Services
                 await _hDCTRepo.CreateDatHang(hoaDonChiTiet);
 
                 await _gioHangRepo.DeleteGioHangAsync(item.Id);
+
+
             }
         }
 
