@@ -77,7 +77,7 @@ namespace F5Clothes_API.Controllers
                 // Áp dụng mã giảm giá
                 decimal? giaTriGiam = await ApplyVoucherAsync(orderInfo, tongTien);
                 tongTien -= giaTriGiam ?? 0;
-
+                decimal? ThanhTien = tongTien + orderInfo.TienShip;
                 // Tạo hóa đơn
                 var maHoaDon = await _hoaDonRepo.GenerateMaHoaDon();
                 var hoaDon = new HoaDon
@@ -85,14 +85,16 @@ namespace F5Clothes_API.Controllers
                     MaHoaDon = maHoaDon,
                     IdKh = customerId,
                     NgayTao = DateTime.Now,
-                    TrangThai = 1, // Assuming 1 means "Not Paid"
-                    LoaiHoaDon = 2,
+                    TrangThai = 2, // Da xac nhan 
+                    LoaiHoaDon = 2, // Mua online
                     DiaChiNhanHang = diaChiNhanHang,
                     TenNguoiNhan = orderInfo.TenNguoiNhan,
                     SdtnguoiNhan = orderInfo.SdtNguoiNhan,
                     NgayNhanHang = orderInfo.NgayNhanHang,
                     IdVouCher = orderInfo.VoucherId,
-                    ThanhTien = tongTien,
+                    ThanhTien = tongTien + orderInfo.TienShip,
+                    DonViGiaoHang = "GHN",
+                    TienGiaoHang = orderInfo.TienShip,
                     GiaTriGiam = giaTriGiam,
                     GhiChu = orderInfo.GhiChu
                 };
@@ -101,7 +103,7 @@ namespace F5Clothes_API.Controllers
                 // Create VNPay model for payment
                 var vnPayModel = new PaymentInformationModel
                 {
-                    Amount = (double)tongTien,
+                    Amount = (double)ThanhTien,
                     OrderDescription = $"Thanh toán đơn hàng {maHoaDon}",
                     FullName = orderInfo.TenNguoiNhan,
                     OrderType = Guid.NewGuid().ToString() // Generate a unique transaction code

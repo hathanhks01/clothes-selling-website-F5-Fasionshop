@@ -171,7 +171,9 @@ namespace F5Clothes_Services.Services
                 SdtnguoiNhan = orderInfo.SdtNguoiNhan,
                 NgayNhanHang = orderInfo.NgayNhanHang,
                 IdVouCher = orderInfo.VoucherId,
-                ThanhTien = tongTien,
+                ThanhTien = tongTien+ orderInfo.TienShip,
+                DonViGiaoHang = "GHN",
+                TienGiaoHang = orderInfo.TienShip,
                 GiaTriGiam = giaTriGiam,
                 GhiChu = orderInfo.GhiChu
 
