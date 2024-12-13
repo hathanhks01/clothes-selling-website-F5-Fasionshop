@@ -46,4 +46,12 @@ public class StatisticsController : ControllerBase
         var monthlyRevenue = await _statisticsService.GetMonthlyRevenueAsync(year);
         return Ok(monthlyRevenue);
     }
+
+    [HttpGet("total-customers")]
+    public async Task<IActionResult> GetTotalCustomers()
+    {
+        var totalCustomers = await _statisticsService.GetTotalCustomersAsync();
+        return Ok(totalCustomers);
+    }
+
 }

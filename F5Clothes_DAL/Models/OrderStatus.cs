@@ -13,5 +13,6 @@ namespace F5Clothes_DAL.Models
         Shipping = 3,     // Đang giao
         Delivered = 5,    // Đã giao 
         Cancelled = 6     // Đã hủy 
+
     }
 }

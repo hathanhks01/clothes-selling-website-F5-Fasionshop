@@ -9,19 +9,22 @@ namespace F5Clothes_DAL.DTOs
 {
     public class StaticPageDtos
     {
-        // DTO cho doanh thu theo tháng
+        public int TotalProductsSold { get; set; } // Add this property to fix the error
+
         public class MonthlyRevenueDto
         {
             public int Month { get; set; }
             public decimal Revenue { get; set; }
         }
-
-        // DTO cho số lượng đơn hàng theo trạng thái
         public class OrderStatusCountDto
         {
             public OrderStatus Status { get; set; }
             public int Count { get; set; }
         }
-
+        public class DailyRevenueDto
+        {
+            public DateTime Date { get; set; }
+            public decimal Revenue { get; set; }
+        }
     }
 }
