@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using static F5Clothes_DAL.DTOs.StaticPageDtos;
 
@@ -72,35 +71,25 @@ namespace F5Clothes_DAL.Reponsitories
             return totalOrders;
         }
 
-        // Phương thức tính tổng số lượng sản phẩm đã bán trong khoảng thời gian
-        public async Task<int> GetTotalProductsSoldAsync(DateTime startDate, DateTime endDate)
+        // Phương thức tính tổng số lượng sản phẩm đã bán trong khoảng thời gian dựa vào trạng thái đơn hàng nếu trạng thái là đã giao hàng
+        public async Task<StaticPageDtos> GetTotalProductsSoldAsync(DateTime startDate, DateTime endDate)
         {
+            
             _logger.LogInformation($"Original StartDate: {startDate}, EndDate: {endDate}");
-
             // Lấy ngày lớn nhất và nhỏ nhất trong cơ sở dữ liệu
-            var minDate = await _context.HoaDonChiTiets
-                .Where(hdct => hdct.IdHdNavigation != null && hdct.IdHdNavigation.NgayThanhToan.HasValue)
-                .MinAsync(hdct => hdct.IdHdNavigation.NgayThanhToan);
-            var maxDate = await _context.HoaDonChiTiets
-                .Where(hdct => hdct.IdHdNavigation != null && hdct.IdHdNavigation.NgayThanhToan.HasValue)
-                .MaxAsync(hdct => hdct.IdHdNavigation.NgayThanhToan);
-
+            var minDate = await _context.HoaDons.MinAsync(hd => hd.NgayTao);
+            var maxDate = await _context.HoaDons.MaxAsync(hd => hd.NgayTao);
             // Điều chỉnh startDate và endDate nếu cần
             if (startDate < minDate) startDate = minDate ?? startDate;
             if (endDate > maxDate) endDate = maxDate ?? endDate;
-
             _logger.LogInformation($"Adjusted StartDate: {startDate}, EndDate: {endDate}");
-
-            var totalProductsSold = await _context.HoaDonChiTiets
-                .Where(hdct => hdct.IdHdNavigation != null
-                               && hdct.IdHdNavigation.TrangThai.HasValue
-                               && (OrderStatus)hdct.IdHdNavigation.TrangThai.Value == OrderStatus.Delivered
-                               && hdct.IdHdNavigation.NgayThanhToan >= startDate
-                               && hdct.IdHdNavigation.NgayThanhToan <= endDate)
-                .SumAsync(hdct => hdct.SoLuong ?? 0);
-
+            var totalProductsSold = await _context.HoaDons
+                .Where(hd => hd.NgayTao >= startDate && hd.NgayTao <= endDate && hd.TrangThai.HasValue && (OrderStatus)hd.TrangThai.Value == OrderStatus.Delivered)
+                .SelectMany(hd => hd.HoaDonChiTiets)
+                .SumAsync(cthd => cthd.SoLuong);
             _logger.LogInformation($"Total Products Sold: {totalProductsSold}");
-            return totalProductsSold;
+            return new StaticPageDtos { TotalProductsSold = totalProductsSold ?? 0 };
+
         }
 
         // Phương thức đếm số lượng đơn hàng theo trạng thái trong khoảng thời gian
@@ -133,7 +122,7 @@ namespace F5Clothes_DAL.Reponsitories
             _logger.LogInformation($"Year: {year}");
 
             var monthlyRevenue = await _context.HoaDons
-                .Where(hd => hd.TrangThai.HasValue && (OrderStatus)hd.TrangThai.Value == OrderStatus.Delivered)
+                .Where(hd => hd.TrangThai.HasValue && (OrderStatus)hd.TrangThai.Value == OrderStatus.Delivered) 
                 .GroupBy(hd => hd.NgayTao.Value.Month)
                 .Select(g => new MonthlyRevenueDto
                 {
@@ -146,17 +135,49 @@ namespace F5Clothes_DAL.Reponsitories
             return monthlyRevenue;
         }
 
-        //// Phương thức lấy tất cả các đơn hàng
-        //public async Task<List<HoaDon>> GetAllOrdersAsync()
-        //{
-        //    return await _context.HoaDons.ToListAsync();
-        //}
+        // Tìm kiếm đơn hàng theo khoảng thời gian
+        public async Task<List<HoaDon>> GetOrdersByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            _logger.LogInformation($"Searching Orders between: {startDate} and {endDate}");
 
-        //// Phương thức lấy tất cả các chi tiết đơn hàng
-        //public async Task<List<HoaDonChiTiet>> GetAllOrderDetailsAsync()
-        //{
-        //    return await _context.HoaDonChiTiets.ToListAsync();
-        //}
+            // Điều chỉnh thời gian nếu cần
+            var minDate = await _context.HoaDons.MinAsync(hd => hd.NgayTao);
+            var maxDate = await _context.HoaDons.MaxAsync(hd => hd.NgayTao);
 
+            if (startDate < minDate) startDate = minDate ?? startDate;
+            if (endDate > maxDate) endDate = maxDate ?? endDate;
+
+            _logger.LogInformation($"Adjusted Search DateRange: {startDate} to {endDate}");
+
+            var orders = await _context.HoaDons
+                .Where(hd => hd.NgayTao >= startDate && hd.NgayTao <= endDate)
+                .ToListAsync();
+
+            return orders;
+        }
+
+        // Tìm kiếm doanh thu theo ngày
+        public async Task<List<DailyRevenueDto>> GetDailyRevenueAsync(DateTime startDate, DateTime endDate)
+        {
+            _logger.LogInformation($"Getting daily revenue between: {startDate} and {endDate}");
+
+            var dailyRevenue = await _context.HoaDons
+                .Where(hd => hd.NgayTao >= startDate && hd.NgayTao <= endDate && hd.TrangThai.HasValue && (OrderStatus)hd.TrangThai.Value == OrderStatus.Delivered)
+                .GroupBy(hd => hd.NgayTao.Value.Date)
+                .Select(g => new DailyRevenueDto
+                {
+                    Date = g.Key,
+                    Revenue = g.Sum(hd => hd.ThanhTien ?? 0)
+                })
+                .ToListAsync();
+
+            return dailyRevenue;
+        }
+
+        public async Task<int> GetTotalCustomersAsync()
+        {
+            var totalCustomers = await _context.KhachHangs.CountAsync();
+            return totalCustomers;
+        }
     }
 }

@@ -30,7 +30,7 @@ namespace F5Clothes_Services.Services
             return await _statisticsRepository.GetTotalOrdersAsync(startDate, endDate);
         }
 
-        public async Task<int> CalculateTotalProductsSoldAsync(DateTime startDate, DateTime endDate)
+        public async Task<StaticPageDtos> CalculateTotalProductsSoldAsync(DateTime startDate, DateTime endDate)
         {
             return await _statisticsRepository.GetTotalProductsSoldAsync(startDate, endDate);
         }
@@ -43,6 +43,11 @@ namespace F5Clothes_Services.Services
         public async Task<List<MonthlyRevenueDto>> GetMonthlyRevenueAsync(int year)
         {
             return await _statisticsRepository.GetMonthlyRevenueAsync(year);
+        }
+
+        public async Task<int> GetTotalCustomersAsync()
+        {
+            return await _statisticsRepository.GetTotalCustomersAsync();
         }
 
         //// Phương thức lấy tất cả các đơn hàng
