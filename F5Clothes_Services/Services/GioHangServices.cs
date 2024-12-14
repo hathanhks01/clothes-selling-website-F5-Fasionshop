@@ -57,76 +57,22 @@ namespace F5Clothes_Services.Services
             if (gioHangChiTiet == null) throw new Exception("Không có sản phẩm nào trong giỏ hàng.");
             return _mapper.Map<GiohangDtos>(gioHangChiTiet);
         }
-        public async Task<decimal?> ApplyVoucherAsync(OrderInfoDto orderInfo, decimal tongTien)
-        {
-            if (!orderInfo.VoucherId.HasValue)
-                return 0;
-
-            var voucher = await _voucherRepo.GetByVouCher(orderInfo.VoucherId.Value);
-            if (voucher == null || voucher.TrangThai == 2)
-                throw new Exception("Voucher không hợp lệ hoặc đã hết hiệu lực.");
-
-            var now = DateTime.UtcNow; // Or DateTime.Now based on your time zone choice
-            if (DateTime.Compare(voucher.NgayBatDau.Value, now) > 0 || DateTime.Compare(voucher.NgayKetThuc.Value, now) < 0)
-            {
-                throw new Exception("Voucher không còn hiệu lực.");
-            }
-
-            // Check if the voucher has enough available quantity
-            if (voucher.SoLuongMa > 0)
-            {
-                // Decrease the available quantity and increase the used quantity
-                voucher.SoLuongMa--;
-                voucher.SoLuongDung++;
-                await _voucherRepo.UpdateVc(voucher);  // Update voucher in the database
-            }
-            else
-            {
-                throw new Exception("Voucher đã hết số lượng sử dụng.");
-            }
-
-            if (tongTien < (voucher.DieuKienToiThieuHoaDon ?? 0))
-                throw new Exception($"Hóa đơn không đạt điều kiện tối thiểu để sử dụng mã giảm giá. Yêu cầu tối thiểu: {voucher.DieuKienToiThieuHoaDon}.");
-
-            decimal? giaTriGiam = 0;
-            if (voucher.HinhThucGiam == 1) // Giảm theo phần trăm
-            {
-                var discountPercent = (voucher.GiaTriGiam ?? 0) / 100m;
-                giaTriGiam = tongTien * discountPercent;
-
-                if (giaTriGiam > tongTien)
-                    giaTriGiam = tongTien;
-            }
-            else if (voucher.HinhThucGiam == 2) // Giảm số tiền cố định
-            {
-                giaTriGiam = voucher.GiaTriGiam;
-
-                if (giaTriGiam > tongTien)
-                    giaTriGiam = tongTien;
-            }
-
-            return giaTriGiam;
-        }
-
         public async Task PlaceOrderAsync(Guid customerId, OrderInfoDto orderInfo)
         {
             string diaChiNhanHang;
             const string DiaChiCuaHang = "Số 123 Đường ABC, Quận 1, TP. Hồ Chí Minh";
 
-            // Nếu IdDiaChi là GUID mặc định thì sử dụng địa chỉ cố định
+            // Lấy địa chỉ nhận hàng
             if (orderInfo.IdDiaChi == null)
             {
                 diaChiNhanHang = DiaChiCuaHang;
             }
             else
             {
-                // Lấy danh sách địa chỉ của khách hàng
                 var diaChiList = await _diaChiRepo.GetByDiaChi(customerId);
-
                 if (diaChiList == null || !diaChiList.Any())
                     throw new Exception("Không tìm thấy địa chỉ nào cho khách hàng.");
 
-                // Tìm địa chỉ theo IdDiaChi trong orderInfo, nếu không tìm thấy thì lấy địa chỉ đầu tiên
                 var diaChi = diaChiList.FirstOrDefault(x => x.Id == orderInfo.IdDiaChi)
                              ?? diaChiList.FirstOrDefault();
 
@@ -136,29 +82,20 @@ namespace F5Clothes_Services.Services
                 diaChiNhanHang = $"{diaChi.DiaChiChiTiet ?? ""}, {diaChi.PhuongXa ?? ""}, {diaChi.QuanHuyen ?? ""}, {diaChi.TinhThanh ?? ""}";
             }
 
-
+            // Lấy giỏ hàng
             var cartItems = await _gioHangRepo.GetAllGioHangAsync(customerId);
-
             if (cartItems == null || !cartItems.Any())
                 throw new Exception("Giỏ hàng trống, không thể đặt hàng.");
 
-            decimal tongTien;
-            if (cartItems.Any(item => item.DonGiaKhiGiam.HasValue && item.DonGiaKhiGiam.Value > 0))
-            {
-                tongTien = cartItems.Sum(item => item.SoLuong * (item.DonGiaKhiGiam ?? 0)); // Sử dụng DonGiaKhiGiam nếu có, nếu không thì dùng 0.0m
-            }
-            else
-            {
-                tongTien = cartItems.Sum(item => item.SoLuong * (item.DonGia)); // Sử dụng DonGia nếu có, nếu không thì dùng 0.0m
-            }
+            // Tính tổng tiền
+            decimal tongTien = cartItems.Sum(item => item.SoLuong * (item.DonGiaKhiGiam ?? item.DonGia));
 
             // Áp dụng mã giảm giá
             decimal? giaTriGiam = await ApplyVoucherAsync(orderInfo, tongTien);
             tongTien -= giaTriGiam ?? 0;
 
-            // Generate MaHoaDon
+            // Tạo hóa đơn
             var maHoaDon = await _hoaDonRepo.GenerateMaHoaDon();
-
             var hoaDon = new HoaDon
             {
                 MaHoaDon = maHoaDon,
@@ -166,39 +103,49 @@ namespace F5Clothes_Services.Services
                 NgayTao = DateTime.Now,
                 TrangThai = 1,
                 LoaiHoaDon = 2,
-                DiaChiNhanHang = diaChiNhanHang, // Gán địa chỉ nhận hàng
+                DiaChiNhanHang = diaChiNhanHang,
                 TenNguoiNhan = orderInfo.TenNguoiNhan,
                 SdtnguoiNhan = orderInfo.SdtNguoiNhan,
                 NgayNhanHang = orderInfo.NgayNhanHang,
                 IdVouCher = orderInfo.VoucherId,
-                ThanhTien = tongTien+ orderInfo.TienShip,
+                ThanhTien = tongTien + orderInfo.TienShip,
                 DonViGiaoHang = "GHN",
                 TienGiaoHang = orderInfo.TienShip,
                 GiaTriGiam = giaTriGiam,
                 GhiChu = orderInfo.GhiChu
-
-
             };
 
             await _hoaDonRepo.AddHdgioHang(hoaDon);
+
+            // Cập nhật voucher sau khi tạo hóa đơn thành công
+            if (orderInfo.VoucherId.HasValue)
+            {
+                var voucher = await _voucherRepo.GetByVouCher(orderInfo.VoucherId.Value);
+                voucher.SoLuongMa--;
+                voucher.SoLuongDung++;
+                await _voucherRepo.UpdateVc(voucher);
+            }
+
+            // Tạo phương thức thanh toán
             var hinhThucThanhToan = new HinhThucThanhToan
             {
                 IdHd = hoaDon.Id,
                 IdKh = customerId,
-                HinhThucThanhToan1 = 1, // Assuming 1 represents "COD"
-                TrangThai = 0,  // Assuming 0 means "Not Paid"
+                HinhThucThanhToan1 = 1,
+                TrangThai = 0,
                 NgayTao = DateTime.Now,
-                MaGiaoDich = null,  // Generate a unique transaction code if needed
                 GhiChu = "Thanh toán khi nhận hàng"
             };
             await _hinhThucThanhToanRepo.AddHTt(hinhThucThanhToan);
 
+            // Xử lý từng sản phẩm trong giỏ hàng
             foreach (var item in cartItems)
             {
                 var product = await _sPCTRepo.GetByIdSanPhamChiTiet(item.IdSpct);
                 if (product.SoLuongTon < item.SoLuong)
                     throw new Exception($"Không đủ số lượng sản phẩm {product.IdSpNavigation.TenSp} trong kho.");
 
+                product.SoLuongTon -= item.SoLuong;
                 await _sPCTRepo.UpdateSanPhamChiTiet(_mapper.Map<SanPhamChiTietDtos>(product));
 
                 var hoaDonChiTiet = new HoaDonChiTiet
@@ -207,19 +154,53 @@ namespace F5Clothes_Services.Services
                     IdSpct = item.IdSpct,
                     SoLuong = item.SoLuong,
                     DonGia = item.DonGia,
-
                     NgayTao = DateTime.Now,
                     DonGiaKhiGiam = item.DonGiaKhiGiam
                 };
                 await _hDCTRepo.CreateDatHang(hoaDonChiTiet);
 
                 await _gioHangRepo.DeleteGioHangAsync(item.Id);
-
-
             }
         }
 
 
+
+        public async Task<decimal?> ApplyVoucherAsync(OrderInfoDto orderInfo, decimal tongTien)
+        {
+            if (!orderInfo.VoucherId.HasValue)
+                return 0;
+
+            var voucher = await _voucherRepo.GetByVouCher(orderInfo.VoucherId.Value);
+            if (voucher == null || voucher.TrangThai == 2)
+                throw new Exception("Voucher không hợp lệ hoặc đã hết hiệu lực.");
+
+            var now = DateTime.UtcNow;
+            if (DateTime.Compare(voucher.NgayBatDau.Value, now) > 0 || DateTime.Compare(voucher.NgayKetThuc.Value, now) < 0)
+                throw new Exception("Voucher không còn hiệu lực.");
+
+            if (voucher.SoLuongMa <= 0)
+                throw new Exception("Voucher đã hết số lượng sử dụng.");
+
+            if (tongTien < (voucher.DieuKienToiThieuHoaDon ?? 0))
+                throw new Exception($"Hóa đơn không đạt điều kiện tối thiểu để sử dụng mã giảm giá. Yêu cầu tối thiểu: {voucher.DieuKienToiThieuHoaDon}.");
+
+            decimal? giaTriGiam = 0;
+            if (voucher.HinhThucGiam == 1) // Giảm theo phần trăm
+            {
+                var discountPercent = (voucher.GiaTriGiam ?? 0) / 100m;
+                giaTriGiam = tongTien * discountPercent;
+                if (giaTriGiam > tongTien)
+                    giaTriGiam = tongTien;
+            }
+            else if (voucher.HinhThucGiam == 2) // Giảm số tiền cố định
+            {
+                giaTriGiam = voucher.GiaTriGiam;
+                if (giaTriGiam > tongTien)
+                    giaTriGiam = tongTien;
+            }
+
+            return giaTriGiam;
+        }
 
 
 

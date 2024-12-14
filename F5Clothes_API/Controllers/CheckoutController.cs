@@ -11,6 +11,7 @@ namespace F5Clothes_API.Controllers
 {
     public class CheckoutController : Controller
     {
+        private readonly IVoucherRepo _voucherRepo;
         private readonly IDiaChiRepo _diaChiRepo;
         private readonly IHDCTRepo _hDCTRepo;
         private readonly IGioHangRepo _gioHangRepo;
@@ -19,8 +20,9 @@ namespace F5Clothes_API.Controllers
         private readonly IMapper _mapper;
         private readonly ISPCTRepo _sPCTRepo;
         private readonly IHinhThucThanhToanRepo _hinhThucThanhToanRepo;
-        public CheckoutController(IDiaChiRepo diaChiRepo, IHDCTRepo hDCTRepo, IGioHangRepo gioHangRepo, IHoaDonRepo hoaDonRepo, IVnPayService vnPayService, ISPCTRepo sPCTRepo, IMapper mapper, IHinhThucThanhToanRepo hinhThucThanhToanRepo)
+        public CheckoutController(IVoucherRepo voucherRepo,IDiaChiRepo diaChiRepo, IHDCTRepo hDCTRepo, IGioHangRepo gioHangRepo, IHoaDonRepo hoaDonRepo, IVnPayService vnPayService, ISPCTRepo sPCTRepo, IMapper mapper, IHinhThucThanhToanRepo hinhThucThanhToanRepo)
         {
+            _voucherRepo = voucherRepo;
             _diaChiRepo = diaChiRepo;
             _hDCTRepo = hDCTRepo;
             _gioHangRepo = gioHangRepo;
@@ -64,20 +66,15 @@ namespace F5Clothes_API.Controllers
                 if (cartItems == null || !cartItems.Any())
                     throw new Exception("Giỏ hàng trống, không thể đặt hàng.");
 
-                decimal tongTien;
-                if (cartItems.Any(item => item.DonGiaKhiGiam.HasValue && item.DonGiaKhiGiam.Value > 0))
-                {
-                    tongTien = cartItems.Sum(item => item.SoLuong * (item.DonGiaKhiGiam ?? 0)); // Sử dụng DonGiaKhiGiam nếu có, nếu không thì dùng 0.0m
-                }
-                else
-                {
-                    tongTien = cartItems.Sum(item => item.SoLuong * (item.DonGia)); // Sử dụng DonGia nếu có, nếu không thì dùng 0.0m
-                }
+                // Tính tổng tiền (sử dụng DonGiaKhiGiam nếu có, nếu không thì dùng DonGia)
+                decimal tongTien = cartItems.Sum(item => item.SoLuong * (item.DonGiaKhiGiam ?? item.DonGia));
 
                 // Áp dụng mã giảm giá
                 decimal? giaTriGiam = await ApplyVoucherAsync(orderInfo, tongTien);
                 tongTien -= giaTriGiam ?? 0;
+
                 decimal? ThanhTien = tongTien + orderInfo.TienShip;
+
                 // Tạo hóa đơn
                 var maHoaDon = await _hoaDonRepo.GenerateMaHoaDon();
                 var hoaDon = new HoaDon
@@ -85,20 +82,29 @@ namespace F5Clothes_API.Controllers
                     MaHoaDon = maHoaDon,
                     IdKh = customerId,
                     NgayTao = DateTime.Now,
-                    TrangThai = 2, // Da xac nhan 
+                    TrangThai = 2, // Da xac nhan
                     LoaiHoaDon = 2, // Mua online
                     DiaChiNhanHang = diaChiNhanHang,
                     TenNguoiNhan = orderInfo.TenNguoiNhan,
                     SdtnguoiNhan = orderInfo.SdtNguoiNhan,
                     NgayNhanHang = orderInfo.NgayNhanHang,
                     IdVouCher = orderInfo.VoucherId,
-                    ThanhTien = tongTien + orderInfo.TienShip,
+                    ThanhTien = ThanhTien,
                     DonViGiaoHang = "GHN",
                     TienGiaoHang = orderInfo.TienShip,
                     GiaTriGiam = giaTriGiam,
                     GhiChu = orderInfo.GhiChu
                 };
                 await _hoaDonRepo.AddHdgioHang(hoaDon);
+
+                // Cập nhật voucher sau khi tạo hóa đơn thành công
+                if (orderInfo.VoucherId.HasValue)
+                {
+                    var voucher = await _voucherRepo.GetByVouCher(orderInfo.VoucherId.Value);
+                    voucher.SoLuongMa--;
+                    voucher.SoLuongDung++;
+                    await _voucherRepo.UpdateVc(voucher);
+                }
 
                 // Create VNPay model for payment
                 var vnPayModel = new PaymentInformationModel
@@ -126,6 +132,7 @@ namespace F5Clothes_API.Controllers
                 };
                 await _hinhThucThanhToanRepo.AddHTt(hinhThucThanhToan);
 
+                // Xử lý từng sản phẩm trong giỏ hàng
                 foreach (var item in cartItems)
                 {
                     var product = await _sPCTRepo.GetByIdSanPhamChiTiet(item.IdSpct);
@@ -158,9 +165,42 @@ namespace F5Clothes_API.Controllers
 
 
 
+
         private async Task<decimal?> ApplyVoucherAsync(OrderInfoDto orderInfo, decimal tongTien)
         {
-            return await Task.FromResult<decimal?>(0);
+            if (!orderInfo.VoucherId.HasValue)
+                return 0;
+
+            var voucher = await _voucherRepo.GetByVouCher(orderInfo.VoucherId.Value);
+            if (voucher == null || voucher.TrangThai == 2)
+                throw new Exception("Voucher không hợp lệ hoặc đã hết hiệu lực.");
+
+            var now = DateTime.UtcNow;
+            if (DateTime.Compare(voucher.NgayBatDau.Value, now) > 0 || DateTime.Compare(voucher.NgayKetThuc.Value, now) < 0)
+                throw new Exception("Voucher không còn hiệu lực.");
+
+            if (voucher.SoLuongMa <= 0)
+                throw new Exception("Voucher đã hết số lượng sử dụng.");
+
+            if (tongTien < (voucher.DieuKienToiThieuHoaDon ?? 0))
+                throw new Exception($"Hóa đơn không đạt điều kiện tối thiểu để sử dụng mã giảm giá. Yêu cầu tối thiểu: {voucher.DieuKienToiThieuHoaDon}.");
+
+            decimal? giaTriGiam = 0;
+            if (voucher.HinhThucGiam == 1) // Giảm theo phần trăm
+            {
+                var discountPercent = (voucher.GiaTriGiam ?? 0) / 100m;
+                giaTriGiam = tongTien * discountPercent;
+                if (giaTriGiam > tongTien)
+                    giaTriGiam = tongTien;
+            }
+            else if (voucher.HinhThucGiam == 2) // Giảm số tiền cố định
+            {
+                giaTriGiam = voucher.GiaTriGiam;
+                if (giaTriGiam > tongTien)
+                    giaTriGiam = tongTien;
+            }
+
+            return giaTriGiam;
         }
 
         public IActionResult PaymentCallBack()
