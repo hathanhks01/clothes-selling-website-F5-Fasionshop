@@ -120,13 +120,13 @@ namespace F5Clothes_API.Controllers
                 NgayCapNhat = createdVoucher.NgayCapNhat,
                 NgayKetThuc = createdVoucher.NgayKetThuc,
                 SoLuongMa = createdVoucher.SoLuongMa,
-                SoLuongDung = createdVoucher.SoLuongDung,
+                SoLuongDung = 0,
                 GiaTriGiam = createdVoucher.GiaTriGiam,
                 DieuKienToiThieuHoaDon = createdVoucher.DieuKienToiThieuHoaDon,
                 HinhThucGiam = createdVoucher.HinhThucGiam,
                 LoaiVouCher = createdVoucher.LoaiVouCher,
                 GhiChu = createdVoucher.GhiChu,
-                TrangThai = createdVoucher.TrangThai
+                TrangThai = 1
             };
 
             return CreatedAtAction(nameof(GetByVouCher), new { id = createdVoucher.Id }, createdVoucherDto);

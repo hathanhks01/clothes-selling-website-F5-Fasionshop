@@ -23,8 +23,8 @@ namespace F5Clothes_DAL.Reponsitories
         public async Task DeleteHd(Guid Id)
         {
             var Hd = await _context.HoaDons
-                .Include(h => h.HoaDonChiTiets) 
-                .Include(h => h.HinhThucThanhToans) 
+                .Include(h => h.HoaDonChiTiets)
+                .Include(h => h.HinhThucThanhToans)
                 .Include(h => h.LichSuHoaDons)
                 .FirstOrDefaultAsync(h => h.Id == Id);
 
@@ -207,7 +207,7 @@ namespace F5Clothes_DAL.Reponsitories
                 hoaDon.TrangThai = hoaDon.TrangThai;
                 hoaDon.TenNguoiNhan = hoaDon.TenNguoiNhan;
                 hoaDon.SdtnguoiNhan = hoaDon.SdtnguoiNhan;
-                hoaDon.DiaChiNhanHang=hoaDon.DiaChiNhanHang;
+                hoaDon.DiaChiNhanHang = hoaDon.DiaChiNhanHang;
 
                 var chiTietList = hoaDon.HoaDonChiTiets.ToList();
                 hoaDon.HoaDonChiTiets = null;
@@ -463,13 +463,13 @@ namespace F5Clothes_DAL.Reponsitories
 
                             invoiceStatus.TrangThai = 6;
                         }
-                        else if (invoiceStatus.TrangThai == 5|| invoiceStatus.TrangThai==6)
+                        else if (invoiceStatus.TrangThai == 5 || invoiceStatus.TrangThai == 6)
                         {
                             throw new InvalidOperationException("Không thể sửa đổi trạng thái hóa đơn đã được đặt thành 5 hoặc 6.");
                         }
                         else if (invoiceStatus.TrangThai == 1)
                         {
-                            if (invoiceStatus.TrangThai==1&& Hd.TrangThai == 6)
+                            if (invoiceStatus.TrangThai == 1 && Hd.TrangThai == 6)
                             {
                                 invoiceStatus.TrangThai = invoiceStatus.TrangThai;
                             }
@@ -540,10 +540,11 @@ namespace F5Clothes_DAL.Reponsitories
                             },
                             hdct.SoLuong,
                             hdct.DonGia,
-                            ThanhTien = hdct.SoLuong * hdct.DonGia
+                            Tongtien = hdct.SoLuong * hdct.DonGia
                         })
                         .ToList(),
-                    TongTien = hd.HoaDonChiTiets.Sum(hdct => hdct.SoLuong * hdct.DonGia),
+                    hd.GiaTriGiam,
+                    hd.ThanhTien,
                     TinhTrangThanhToan = hd.TrangThai
                 })
                 .ToListAsync();
