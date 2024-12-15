@@ -92,6 +92,7 @@ namespace F5Clothes_API.Controllers
                     ThanhTien = ThanhTien,
                     DonViGiaoHang = "GHN",
                     TienGiaoHang = orderInfo.TienShip,
+                    NgayThanhToan = DateTime.Now,
                     GiaTriGiam = giaTriGiam,
                     GhiChu = orderInfo.GhiChu
                 };
