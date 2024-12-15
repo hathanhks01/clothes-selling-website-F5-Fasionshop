@@ -42,7 +42,11 @@ namespace F5Clothes_API.Controllers
         {
             return await _sanPhamRepo.GetAllSanPhamsWithDetailsAsync();
         }
-
+        [HttpGet("Image")]
+        public async Task<IEnumerable<object>> GetAllImageBySanPham()
+        {
+            return await _sanPhamRepo.GetAllImageBySanPham();
+        }
         [HttpGet("details/{id}")]
         public async Task<object> GetSanPhamDetailsByIdAsync(Guid id)
         {

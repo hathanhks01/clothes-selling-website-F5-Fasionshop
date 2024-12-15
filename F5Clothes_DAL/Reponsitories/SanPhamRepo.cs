@@ -379,5 +379,27 @@ namespace F5Clothes_DAL.Reponsitories
         {
             return await _context.SanPhamChiTiets.FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<IEnumerable<object>> GetAllImageBySanPham()
+        {
+            var result = await _context.SanPhams
+                .Include(sp => sp.Images) // Bao gồm thương hiệu
+                .Select(sp => new
+                {
+                    sp.Id,
+                    sp.TenSp,
+                    sp.MaSp,
+                    sp.ImageDefaul,
+                    sp.TrangThai,
+                    Images = sp.Images
+                        .Where(image => image.IdSp == sp.Id)
+                        .Select(image => new { image.Id, image.TenImage })
+                        .Distinct()
+                   .ToList()
+                })
+                .ToListAsync();
+
+            return result;
+        }
     }
 }
