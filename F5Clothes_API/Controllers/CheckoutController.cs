@@ -92,6 +92,7 @@ namespace F5Clothes_API.Controllers
                     ThanhTien = ThanhTien,
                     DonViGiaoHang = "GHN",
                     TienGiaoHang = orderInfo.TienShip,
+                    NgayThanhToan = DateTime.Now,
                     GiaTriGiam = giaTriGiam,
                     GhiChu = orderInfo.GhiChu
                 };
@@ -125,7 +126,7 @@ namespace F5Clothes_API.Controllers
                     IdKh = customerId,
                     HinhThucThanhToan1 = 2, // Assuming 1 represents "VNPAY"
                     TrangThai = 1,  // Assuming 0 means "Not Paid"
-                    NgayTao = DateTime.Now,
+                    
                     MaGiaoDich = vnPayModel.OrderType,  // VNPay order type (transaction code)
                     SoTienTra = (decimal)vnPayModel.Amount,
                     GhiChu = "Thanh toán VNPAY"
