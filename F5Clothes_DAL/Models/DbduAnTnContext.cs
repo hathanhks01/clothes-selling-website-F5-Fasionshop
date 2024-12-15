@@ -60,9 +60,7 @@ public partial class DbduAnTnContext : DbContext
     public virtual DbSet<XuatXu> XuatXus { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-
         => optionsBuilder.UseSqlServer("Server=DESKTOP-IJA3FLB;Database=DBDuAnTN;TrustServerCertificate=True;Trusted_Connection=True;");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ChatLieu>(entity =>

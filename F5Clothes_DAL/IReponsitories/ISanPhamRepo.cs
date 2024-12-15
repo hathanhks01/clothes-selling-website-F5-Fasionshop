@@ -23,6 +23,8 @@ namespace F5Clothes_DAL.IReponsitories
         Task<SanPhamChiTiet> AddOrUpdateSanPhamChiTiet(SanPhamChiTietDtos chiTietDtos);
         Task UpdateSanPhamChiTiet(Guid sanPhamId, IEnumerable<SanPhamChiTietDtos> chiTietDtos);
         Task<IEnumerable<SanPhamChiTiet>> GetSanPhamChiTietBySanPhamId(Guid sanPhamId);
-        
+        Task<IEnumerable<object>> GetAllImageBySanPham();
+
+        Task<Image> AddOrUpdateHinhAnhChiTiet(ImageDtos chiTietDtos);
     }
 }
