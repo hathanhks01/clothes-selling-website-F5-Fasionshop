@@ -401,5 +401,37 @@ namespace F5Clothes_DAL.Reponsitories
 
             return result;
         }
+
+        public async Task<Image> AddOrUpdateHinhAnhChiTiet(ImageDtos chiTietDtos)
+        {
+
+            if (chiTietDtos == null)
+                throw new ArgumentNullException(nameof(chiTietDtos), "SanPhamDto cannot be null.");
+
+            var existingSanPham = chiTietDtos.Id != Guid.Empty
+            ? await _context.Images.FirstOrDefaultAsync(sp => sp.Id == chiTietDtos.Id) : null;
+
+            if (existingSanPham != null)
+            {
+                existingSanPham.TenImage = chiTietDtos.TenImage;
+            }
+            else
+            {
+                existingSanPham = new Image
+                {
+                    Id = Guid.NewGuid(),
+                    IdSp = chiTietDtos.IdSp,
+                   TenImage = chiTietDtos.TenImage,
+                    TrangThai = chiTietDtos.TrangThai,
+                    MoTa = chiTietDtos.MoTa,
+                    
+                };
+
+                await _context.Images.AddAsync(existingSanPham);
+            }
+
+            await _context.SaveChangesAsync();
+            return existingSanPham;
+        }
     }
 }
