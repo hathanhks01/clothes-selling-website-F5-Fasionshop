@@ -126,7 +126,7 @@ namespace F5Clothes_API.Controllers
                     IdKh = customerId,
                     HinhThucThanhToan1 = 2, // Assuming 1 represents "VNPAY"
                     TrangThai = 1,  // Assuming 0 means "Not Paid"
-                    NgayTao = DateTime.Now,
+                    
                     MaGiaoDich = vnPayModel.OrderType,  // VNPay order type (transaction code)
                     SoTienTra = (decimal)vnPayModel.Amount,
                     GhiChu = "Thanh toán VNPAY"
@@ -204,20 +204,49 @@ namespace F5Clothes_API.Controllers
             return giaTriGiam;
         }
 
-        public IActionResult PaymentCallBack()
+        [HttpGet]
+        [Route("checkout/callback")]
+        public IActionResult PaymentCallback()
         {
-            var response = _vnPayService.PaymentExecute(Request.Query);
-            if (response == null || response.VnPayResponseCode != "00")
+            // In ra các tham số trong callback (chỉ dùng trong môi trường phát triển)
+            var queryParameters = Request.Query;
+            Console.WriteLine("Received callback parameters:");
+            foreach (var param in queryParameters)
             {
-                TempData["Message"] = response == null
-                    ? "Không nhận được phản hồi từ VNPay."
-                    : $"Lỗi thanh toán VN Pay: {response.VnPayResponseCode}";
-                return RedirectToAction("PaymentFail");
+                Console.WriteLine($"{param.Key}: {param.Value}");
             }
 
+            // Gọi PaymentExecute để xử lý các tham số trả về từ VNPay
+            var response = _vnPayService.PaymentExecute(Request.Query);
 
-            TempData["Message"] = $"Thanh toán VNPay thành công";
-            return RedirectToAction("PaymentSuccess");
+            // Kiểm tra nếu phản hồi từ VNPay không hợp lệ
+            if (response == null)
+            {
+                return BadRequest(new
+                {
+                    message = "Không nhận được phản hồi từ VNPay."
+                });
+            }
+
+            // Kiểm tra mã phản hồi VNPay
+            if (response.VnPayResponseCode != "00")
+            {
+                return BadRequest(new
+                {
+                    message = $"Lỗi thanh toán VNPay: {response.VnPayResponseCode}",
+                    orderId = response.OrderId,
+                    transactionId = response.TransactionId
+                });
+            }
+
+            // Nếu thành công, trả về thông báo thành công và mã giao dịch
+            return Ok(new
+            {
+                message = "Thanh toán VNPay thành công",
+                transactionId = response.TransactionId,
+                orderId = response.OrderId
+            });
         }
+
     }
 }

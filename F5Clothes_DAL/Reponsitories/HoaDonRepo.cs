@@ -541,11 +541,16 @@ namespace F5Clothes_DAL.Reponsitories
                             hdct.SoLuong,
                             hdct.DonGia,
                             Tongtien = hdct.SoLuong * hdct.DonGia
+
                         })
                         .ToList(),
                     hd.GiaTriGiam,
                     hd.ThanhTien,
                     TinhTrangThanhToan = hd.TrangThai
+                    ,
+                    TrangThaiThanhToan = hd.HinhThucThanhToans
+                .Select(httt => httt.TrangThai)
+                .FirstOrDefault()
                 })
                 .ToListAsync();
 

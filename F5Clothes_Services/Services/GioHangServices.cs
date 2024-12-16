@@ -302,16 +302,13 @@ namespace F5Clothes_Services.Services
                 throw new Exception($"Không đủ số lượng sản phẩm {product.TenSp} trong kho.");
             }
 
-            // Map DTO fields to the existing cart item
+           
             existingCartItem.SoLuong = updateDto.SoLuong;
-            // Set other fields if needed
-            // Example: existingCartItem.IdSpct = updateDto.IdSpct;
-
-            // Update the cart item in the repository
+           
             await _gioHangRepo.UpdateGioHangAsync(existingCartItem);
         }
 
-        // Delete a cart item
+        
         public async Task DeleteGioHangAsync(Guid id)
         {
             var existingCartItem = await _gioHangRepo.GetGioHangByIdAsync(id);
@@ -324,6 +321,6 @@ namespace F5Clothes_Services.Services
         public async Task<GioHang> GetByGioHang(Guid idKh)
         {
             return await _gioHangRepo.GetByGioHang(idKh);
-        }
+        }   
     }
 }
