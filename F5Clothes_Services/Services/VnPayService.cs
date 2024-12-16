@@ -48,6 +48,8 @@ namespace F5Clothes_Services.Services
         public PaymentResponseModel PaymentExecute(IQueryCollection collections)
         {
             var vnpay = new VnPayLibrary();
+
+            // Lấy tất cả các tham số bắt đầu với "vnp_"
             foreach (var (key, value) in collections)
             {
                 if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
@@ -56,32 +58,47 @@ namespace F5Clothes_Services.Services
                 }
             }
 
-            var vnp_orderId = Convert.ToInt64(vnpay.GetResponseData("vnp_TxnRef"));
-            var vnp_TransactionId = Convert.ToInt64(vnpay.GetResponseData("vnp_TransactionNo"));
+            // Lấy các giá trị quan trọng
+            var vnp_orderId = vnpay.GetResponseData("vnp_TxnRef");
+            var vnp_TransactionId = vnpay.GetResponseData("vnp_TransactionNo");
             var vnp_SecureHash = collections.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value;
             var vnp_ResponseCode = vnpay.GetResponseData("vnp_ResponseCode");
             var vnp_OrderInfo = vnpay.GetResponseData("vnp_OrderInfo");
 
+            // Kiểm tra nếu các tham số quan trọng không có giá trị hợp lệ
+            if (string.IsNullOrEmpty(vnp_orderId) || string.IsNullOrEmpty(vnp_TransactionId) || string.IsNullOrEmpty(vnp_SecureHash))
+            {
+                return new PaymentResponseModel
+                {
+                    Success = false,
+                    Message = "Dữ liệu phản hồi từ VNPay không đầy đủ."
+                };
+            }
+
+            // Kiểm tra chữ ký
             bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, _configuration["VnPay:HashSecret"]);
             if (!checkSignature)
             {
                 return new PaymentResponseModel
                 {
-                    Success = false
+                    Success = false,
+                    Message = "Chữ ký không hợp lệ."
                 };
             }
 
+            // Trả về kết quả thanh toán
             return new PaymentResponseModel
             {
                 Success = true,
                 PaymentMethod = "VnPay",
                 OrderDescription = vnp_OrderInfo,
-                OrderId = vnp_orderId.ToString(),
-                TransactionId = vnp_TransactionId.ToString(),
+                OrderId = vnp_orderId,
+                TransactionId = vnp_TransactionId,
                 Token = vnp_SecureHash,
                 VnPayResponseCode = vnp_ResponseCode
             };
         }
+
 
     }
 }

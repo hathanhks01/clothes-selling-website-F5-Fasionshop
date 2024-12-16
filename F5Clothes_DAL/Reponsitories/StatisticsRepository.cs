@@ -77,14 +77,13 @@ namespace F5Clothes_DAL.Reponsitories
             
             _logger.LogInformation($"Original StartDate: {startDate}, EndDate: {endDate}");
             // Lấy ngày lớn nhất và nhỏ nhất trong cơ sở dữ liệu
-            var minDate = await _context.HoaDons.MinAsync(hd => hd.NgayTao);
-            var maxDate = await _context.HoaDons.MaxAsync(hd => hd.NgayTao);
-            // Điều chỉnh startDate và endDate nếu cần
+            var minDate = await _context.HoaDons.MinAsync(hd => hd.NgayThanhToan);
+            var maxDate = await _context.HoaDons.MaxAsync(hd => hd.NgayThanhToan);
             if (startDate < minDate) startDate = minDate ?? startDate;
             if (endDate > maxDate) endDate = maxDate ?? endDate;
             _logger.LogInformation($"Adjusted StartDate: {startDate}, EndDate: {endDate}");
             var totalProductsSold = await _context.HoaDons
-                .Where(hd => hd.NgayTao >= startDate && hd.NgayTao <= endDate && hd.TrangThai.HasValue && (OrderStatus)hd.TrangThai.Value == OrderStatus.Delivered)
+                .Where(hd => hd.NgayThanhToan >= startDate && hd.NgayThanhToan <= endDate && hd.TrangThai.HasValue && (OrderStatus)hd.TrangThai.Value == OrderStatus.Delivered)
                 .SelectMany(hd => hd.HoaDonChiTiets)
                 .SumAsync(cthd => cthd.SoLuong);
             _logger.LogInformation($"Total Products Sold: {totalProductsSold}");

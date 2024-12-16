@@ -37,12 +37,18 @@ namespace F5Clothes_API.Controllers
         {
             return await _sanPhamRepo.GetByIdSanPhamChiTiet(id);
         }
+
+        
         [HttpGet("store")]
         public async Task<IEnumerable<object>> GetAllSanPhamsAsync()
         {
             return await _sanPhamRepo.GetAllSanPhamsWithDetailsAsync();
         }
-
+        [HttpGet("Image")]
+        public async Task<IEnumerable<object>> GetAllImageBySanPham()
+        {
+            return await _sanPhamRepo.GetAllImageBySanPham();
+        }
         [HttpGet("details/{id}")]
         public async Task<object> GetSanPhamDetailsByIdAsync(Guid id)
         {
@@ -124,6 +130,13 @@ namespace F5Clothes_API.Controllers
             {
                 return StatusCode(500, $"Đã xảy ra lỗi: {ex.Message}");
             }
+        }
+        [HttpPost]
+        [Route("AddOrUpdateImage")]
+        public async Task<IActionResult> AddOrUpdateHinhAnhChiTiet([FromBody] ImageDtos chiTietDtos)
+        {
+            await _sanPhamRepo.AddOrUpdateHinhAnhChiTiet(chiTietDtos);
+            return CreatedAtAction(nameof(GetById), new { id = chiTietDtos.Id }, chiTietDtos);
         }
     } 
 
