@@ -404,34 +404,34 @@ namespace F5Clothes_DAL.Reponsitories
 
         public async Task<Image> AddOrUpdateHinhAnhChiTiet(ImageDtos chiTietDtos)
         {
-
             if (chiTietDtos == null)
-                throw new ArgumentNullException(nameof(chiTietDtos), "SanPhamDto cannot be null.");
+                throw new ArgumentNullException(nameof(chiTietDtos), "Image details cannot be null.");
+            var existingImage = chiTietDtos.Id != Guid.Empty
+                ? await _context.Images.FirstOrDefaultAsync(img => img.Id == chiTietDtos.Id)
+                : null;
 
-            var existingSanPham = chiTietDtos.Id != Guid.Empty
-            ? await _context.Images.FirstOrDefaultAsync(sp => sp.Id == chiTietDtos.Id) : null;
-
-            if (existingSanPham != null)
+            if (existingImage != null)
             {
-                existingSanPham.TenImage = chiTietDtos.TenImage;
+                existingImage.TenImage = chiTietDtos.TenImage;
+                existingImage.MoTa = chiTietDtos.MoTa;
+                existingImage.TrangThai = chiTietDtos.TrangThai;
             }
             else
             {
-                existingSanPham = new Image
+                existingImage = new Image
                 {
-                    Id = Guid.NewGuid(),
+                    Id = chiTietDtos.Id == Guid.Empty ? Guid.NewGuid() : chiTietDtos.Id,
                     IdSp = chiTietDtos.IdSp,
-                   TenImage = chiTietDtos.TenImage,
-                    TrangThai = chiTietDtos.TrangThai,
+                    TenImage = chiTietDtos.TenImage,
                     MoTa = chiTietDtos.MoTa,
-                    
+                    TrangThai = chiTietDtos.TrangThai
                 };
 
-                await _context.Images.AddAsync(existingSanPham);
+                await _context.Images.AddAsync(existingImage);
             }
-
             await _context.SaveChangesAsync();
-            return existingSanPham;
+            return existingImage;
         }
+
     }
 }
