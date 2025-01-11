@@ -256,6 +256,7 @@ namespace F5Clothes_DAL.Reponsitories
                             SizeId = ct.IdSizeNavigation.Id,
                             SizeTen = ct.IdSizeNavigation.TenSize,
                             SoLuongTon = ct.SoLuongTon
+
                         })
                         .Where(ct => ct.SizeId != null)
                         .Distinct()
@@ -378,5 +379,59 @@ namespace F5Clothes_DAL.Reponsitories
         {
             return await _context.SanPhamChiTiets.FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<IEnumerable<object>> GetAllImageBySanPham()
+        {
+            var result = await _context.SanPhams
+                .Include(sp => sp.Images) // Bao gồm thương hiệu
+                .Select(sp => new
+                {
+                    sp.Id,
+                    sp.TenSp,
+                    sp.MaSp,
+                    sp.ImageDefaul,
+                    sp.TrangThai,
+                    Images = sp.Images
+                        .Where(image => image.IdSp == sp.Id)
+                        .Select(image => new { image.Id, image.TenImage })
+                        .Distinct()
+                   .ToList()
+                })
+                .ToListAsync();
+
+            return result;
+        }
+
+        public async Task<Image> AddOrUpdateHinhAnhChiTiet(ImageDtos chiTietDtos)
+        {
+            if (chiTietDtos == null)
+                throw new ArgumentNullException(nameof(chiTietDtos), "Image details cannot be null.");
+            var existingImage = chiTietDtos.Id != Guid.Empty
+                ? await _context.Images.FirstOrDefaultAsync(img => img.Id == chiTietDtos.Id)
+                : null;
+
+            if (existingImage != null)
+            {
+                existingImage.TenImage = chiTietDtos.TenImage;
+                existingImage.MoTa = chiTietDtos.MoTa;
+                existingImage.TrangThai = chiTietDtos.TrangThai;
+            }
+            else
+            {
+                existingImage = new Image
+                {
+                    Id = chiTietDtos.Id == Guid.Empty ? Guid.NewGuid() : chiTietDtos.Id,
+                    IdSp = chiTietDtos.IdSp,
+                    TenImage = chiTietDtos.TenImage,
+                    MoTa = chiTietDtos.MoTa,
+                    TrangThai = chiTietDtos.TrangThai
+                };
+
+                await _context.Images.AddAsync(existingImage);
+            }
+            await _context.SaveChangesAsync();
+            return existingImage;
+        }
+
     }
 }

@@ -46,8 +46,18 @@ namespace F5Clothes_DAL.Reponsitories
         }
         public async Task UpdateVc(VouCher Vc)
         {
-            _context.Entry(Vc).State = EntityState.Modified;
+            // Kiểm tra object có tồn tại trong database
+            var existingVoucher = await _context.VouChers.FindAsync(Vc.Id);
+            if (existingVoucher == null)
+                throw new Exception("Voucher not found.");
+
+            // Cập nhật các trường cần thay đổi
+            existingVoucher.SoLuongMa = Vc.SoLuongMa;
+            existingVoucher.SoLuongDung = Vc.SoLuongDung;
+
+            // Lưu thay đổi
             await _context.SaveChangesAsync();
         }
+
     }
 }

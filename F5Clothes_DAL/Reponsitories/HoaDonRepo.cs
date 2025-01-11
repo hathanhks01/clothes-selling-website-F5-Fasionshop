@@ -23,8 +23,8 @@ namespace F5Clothes_DAL.Reponsitories
         public async Task DeleteHd(Guid Id)
         {
             var Hd = await _context.HoaDons
-                .Include(h => h.HoaDonChiTiets)  // Đảm bảo các bản ghi HoaDonChiTiets được tải
-                .Include(h => h.HinhThucThanhToans)  // Đảm bảo các bản ghi HinhThucThanhToans được tải
+                .Include(h => h.HoaDonChiTiets)
+                .Include(h => h.HinhThucThanhToans)
                 .Include(h => h.LichSuHoaDons)
                 .FirstOrDefaultAsync(h => h.Id == Id);
 
@@ -34,8 +34,8 @@ namespace F5Clothes_DAL.Reponsitories
             }
             _context.LichSuHoaDons.RemoveRange(Hd.LichSuHoaDons);
             // Xóa các bản ghi phụ thuộc trước
-            _context.HoaDonChiTiets.RemoveRange(Hd.HoaDonChiTiets);  // Xóa bản ghi HoaDonChiTiet
-            _context.HinhThucThanhToans.RemoveRange(Hd.HinhThucThanhToans);  // Xóa bản ghi HinhThucThanhToan
+            _context.HoaDonChiTiets.RemoveRange(Hd.HoaDonChiTiets);
+            _context.HinhThucThanhToans.RemoveRange(Hd.HinhThucThanhToans);
 
             // Xóa bản ghi HoaDon
             _context.HoaDons.Remove(Hd);
@@ -45,78 +45,89 @@ namespace F5Clothes_DAL.Reponsitories
         }
         public async Task<List<HoaDon>> GetAllHoaDon()
         {
-            return await _context.HoaDons
-       .Include(hd => hd.IdNvNavigation)
-       .Include(hd => hd.IdKhNavigation)
-       .Include(hd => hd.IdVouCherNavigation)
-       .Include(hd => hd.HinhThucThanhToans)
-       .Include(hd => hd.LichSuHoaDons)
-       .Include(hd => hd.HoaDonChiTiets)
-           .ThenInclude(hdt => hdt.IdSpctNavigation)
-               .ThenInclude(spct => spct.IdSpNavigation) // Ensure product name is included
-       .Select(hd => new HoaDon
-       {
-           Id = hd.Id,
-           IdNv = hd.IdNv,
-           IdKh = hd.IdKh,
-           IdVouCher = hd.IdVouCher,
-           MaHoaDon = hd.MaHoaDon,
-           NgayTao = hd.NgayTao,
-           NgayCapNhat = hd.NgayCapNhat,
-           NgayXacNhan = hd.NgayXacNhan,
-           NgayChoGiaoHang = hd.NgayChoGiaoHang,
-           NgayGiaoHang = hd.NgayGiaoHang,
-           DonViGiaoHang = hd.DonViGiaoHang,
-           TenNguoiGiao = hd.TenNguoiGiao,
-           SdtnguoiGiao = hd.SdtnguoiGiao,
-           TienGiaoHang = hd.TienGiaoHang,
-           NgayNhanHang = hd.NgayNhanHang,
-           TenNguoiNhan = hd.TenNguoiNhan,
-           SdtnguoiNhan = hd.SdtnguoiNhan,
-           EmailNguoiNhan = hd.EmailNguoiNhan,
-           DiaChiNhanHang = hd.DiaChiNhanHang,
-           NgayThanhToan = hd.NgayThanhToan,
-           NgayHuy = hd.NgayHuy,
-           GiaTriGiam = hd.GiaTriGiam,
-           TienKhachTra = hd.TienKhachTra,
-           TienThua = hd.TienThua,
-           ThanhTien = hd.ThanhTien,
-           GhiChu = hd.GhiChu,
-           LoaiHoaDon = hd.LoaiHoaDon,
-           TrangThai = hd.TrangThai,
-           IdKhNavigation = hd.IdKhNavigation == null ? null : new KhachHang
-           {
-               Id = hd.IdKhNavigation.Id,
-               HoVaTenKh = hd.IdKhNavigation.HoVaTenKh
-           },
-           IdNvNavigation = hd.IdNvNavigation == null ? null : new NhanVien
-           {
-               Id = hd.IdNvNavigation.Id,
-               HoVaTenNv = hd.IdNvNavigation.HoVaTenNv
-           },
-           HoaDonChiTiets = hd.HoaDonChiTiets.Select(hdt => new HoaDonChiTiet
-           {
-               Id = hdt.Id,
-               IdHdNavigation = hdt.IdHdNavigation,
-               IdSpct = hdt.IdSpct,
-               SoLuong = hdt.SoLuong,
-               DonGia = hdt.DonGia,
-               IdSpctNavigation = hdt.IdSpctNavigation == null ? null : new SanPhamChiTiet
-               {
-                   Id = hdt.IdSpctNavigation.Id,
-                   IdSp = hdt.IdSpctNavigation.IdSp,
-                   MoTa = hdt.IdSpctNavigation.MoTa,
-                   IdSpNavigation = hdt.IdSpctNavigation.IdSpNavigation == null ? null : new SanPham
-                   {
-                       Id = hdt.IdSpctNavigation.IdSpNavigation.Id,
-                       ImageDefaul=hdt.IdSpctNavigation.IdSpNavigation.ImageDefaul,
-                   }
-               }
-           }).ToList(),
-           IdVouCherNavigation = hd.IdVouCherNavigation
-       })
-       .ToListAsync();     
-    }
+            var result = await _context.HoaDons
+        .Include(hd => hd.IdNvNavigation)
+        .Include(hd => hd.IdKhNavigation)
+        .Include(hd => hd.IdVouCherNavigation)
+        .Include(hd => hd.HinhThucThanhToans)
+        .Include(hd => hd.LichSuHoaDons)
+        .Include(hd => hd.HoaDonChiTiets)
+            .ThenInclude(hdt => hdt.IdSpctNavigation)
+            .ThenInclude(spct => spct.IdSpNavigation)
+        .Select(hd => new HoaDon
+        {
+            Id = hd.Id,
+            IdNv = hd.IdNv,
+            IdKh = hd.IdKh,
+            IdVouCher = hd.IdVouCher,
+            MaHoaDon = hd.MaHoaDon,
+            NgayTao = hd.NgayTao,
+            NgayCapNhat = hd.NgayCapNhat,
+            NgayXacNhan = hd.NgayXacNhan,
+            NgayChoGiaoHang = hd.NgayChoGiaoHang,
+            NgayGiaoHang = hd.NgayGiaoHang,
+            DonViGiaoHang = hd.DonViGiaoHang,
+            TenNguoiGiao = hd.TenNguoiGiao,
+            SdtnguoiGiao = hd.SdtnguoiGiao,
+            TienGiaoHang = hd.TienGiaoHang,
+            NgayNhanHang = hd.NgayNhanHang,
+            TenNguoiNhan = hd.TenNguoiNhan,
+            SdtnguoiNhan = hd.SdtnguoiNhan,
+            EmailNguoiNhan = hd.EmailNguoiNhan,
+            DiaChiNhanHang = hd.DiaChiNhanHang,
+            NgayThanhToan = hd.NgayThanhToan,
+            NgayHuy = hd.NgayHuy,
+            GiaTriGiam = hd.GiaTriGiam,
+            TienKhachTra = hd.TienKhachTra,
+            TienThua = hd.TienThua,
+            ThanhTien = hd.ThanhTien,
+            GhiChu = hd.GhiChu,
+            LoaiHoaDon = hd.LoaiHoaDon,
+            TrangThai = hd.TrangThai,
+
+            IdKhNavigation = hd.IdKhNavigation == null ? null : new KhachHang
+            {
+                Id = hd.IdKhNavigation.Id,
+                HoVaTenKh = hd.IdKhNavigation.HoVaTenKh
+            },
+
+            IdNvNavigation = hd.IdNvNavigation == null ? null : new NhanVien
+            {
+                Id = hd.IdNvNavigation.Id,
+                HoVaTenNv = hd.IdNvNavigation.HoVaTenNv
+            },
+
+            HoaDonChiTiets = hd.HoaDonChiTiets.Select(hdt => new HoaDonChiTiet
+            {
+                Id = hdt.Id,
+                IdHdNavigation = hdt.IdHdNavigation,
+                IdSpct = hdt.IdSpct,
+                SoLuong = hdt.SoLuong,
+                DonGia = hdt.DonGia,
+
+                IdSpctNavigation = hdt.IdSpctNavigation == null ? null : new SanPhamChiTiet
+                {
+                    Id = hdt.IdSpctNavigation.Id,
+                    IdSp = hdt.IdSpctNavigation.IdSp,
+                    MoTa = hdt.IdSpctNavigation.MoTa,
+
+                    IdSpNavigation = hdt.IdSpctNavigation.IdSpNavigation == null ? null : new SanPham
+                    {
+                        Id = hdt.IdSpctNavigation.IdSpNavigation.Id,
+                        ImageDefaul = hdt.IdSpctNavigation.IdSpNavigation.ImageDefaul,
+                    }
+                }
+            }).ToList(),
+
+            IdVouCherNavigation = hd.IdVouCherNavigation == null ? null : new VouCher
+            {
+                Id = hd.IdVouCherNavigation.Id,
+                TenVouCher = hd.IdVouCherNavigation.TenVouCher
+            }
+        })
+        .ToListAsync();
+            return result;
+        }
 
 
         public async Task<object> GetByHoaDon(Guid id)
@@ -128,6 +139,9 @@ namespace F5Clothes_DAL.Reponsitories
                     hd.Id,
                     hd.MaHoaDon,
                     hd.NgayTao,
+                    hd.TenNguoiNhan,
+                    hd.SdtnguoiNhan,
+                    hd.DiaChiNhanHang,
                     KhachHang = hd.IdKhNavigation == null ? null : new
                     {
                         hd.IdKhNavigation.Id,
@@ -157,8 +171,8 @@ namespace F5Clothes_DAL.Reponsitories
                                     : null,
                                 GiaBan = hdct.IdSpctNavigation.IdSpNavigation != null
                                     ? hdct.IdSpctNavigation.IdSpNavigation.GiaBan
-                                    : 0 
-                            }, 
+                                    : 0
+                            },
                             hdct.SoLuong,
                             hdct.DonGia,
                             ThanhTien = hdct.SoLuong * hdct.DonGia
@@ -184,15 +198,17 @@ namespace F5Clothes_DAL.Reponsitories
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-              
+
                 hoaDon.Id = Guid.NewGuid();
                 hoaDon.MaHoaDon = await GenerateMaHoaDon();
                 hoaDon.NgayTao = DateTime.Now;
                 hoaDon.NgayCapNhat = DateTime.Now;
                 hoaDon.NgayXacNhan = hoaDon.LoaiHoaDon == 1 ? DateTime.Now : null;
                 hoaDon.TrangThai = hoaDon.TrangThai;
+                hoaDon.TenNguoiNhan = hoaDon.TenNguoiNhan;
+                hoaDon.SdtnguoiNhan = hoaDon.SdtnguoiNhan;
+                hoaDon.DiaChiNhanHang = hoaDon.DiaChiNhanHang;
 
-               
                 var chiTietList = hoaDon.HoaDonChiTiets.ToList();
                 hoaDon.HoaDonChiTiets = null;
 
@@ -215,11 +231,13 @@ namespace F5Clothes_DAL.Reponsitories
 
                     if (sanPhamChiTiet == null)
                         throw new Exception($"Sản phẩm chi tiết {chiTiet.IdSpct} không tồn tại");
+                    if (hoaDon.TrangThai != 1)
+                    {
+                        if (sanPhamChiTiet.SoLuongTon < chiTiet.SoLuong)
+                            throw new Exception($"Sản phẩm {sanPhamChiTiet.Id} không đủ số lượng");
 
-                    if (sanPhamChiTiet.SoLuongTon < chiTiet.SoLuong)
-                        throw new Exception($"Sản phẩm {sanPhamChiTiet.Id} không đủ số lượng");
-
-                    sanPhamChiTiet.SoLuongTon -= chiTiet.SoLuong;
+                        sanPhamChiTiet.SoLuongTon -= chiTiet.SoLuong;
+                    }
 
                     var newChiTiet = new HoaDonChiTiet
                     {
@@ -415,24 +433,128 @@ namespace F5Clothes_DAL.Reponsitories
 
         public async Task updateStatus(HoaDon Hd)
         {
-            var invoiceStatus = await _context.HoaDons.FindAsync(Hd.Id);
-            if (invoiceStatus != null)
             {
-                try
+                var invoiceStatus = await _context.HoaDons.FindAsync(Hd.Id);
+                if (invoiceStatus != null)
                 {
-                    invoiceStatus.TrangThai = Hd.TrangThai;
-                    await _context.SaveChangesAsync();
+                    try
+                    {
+                        if (Hd.TrangThai == 6)
+                        {
+                            if (invoiceStatus.TrangThai == 5)
+                            {
+                                throw new InvalidOperationException("Không thể chuyển trạng thái hóa đơn từ 3, 4, hoặc 5 sang 6.");
+                            }
+                            else if (invoiceStatus.TrangThai == 1)
+                            {
+                                invoiceStatus.TrangThai = invoiceStatus.TrangThai;
+                            }
+                            else if (invoiceStatus.TrangThai >= 2 && invoiceStatus.TrangThai <= 4)
+                            {
+                                foreach (var chiTiet in Hd.HoaDonChiTiets)
+                                {
+                                    var product = await _context.SanPhamChiTiets.FindAsync(chiTiet.IdSpct);
+                                    if (product != null)
+                                    {
+                                        product.SoLuongTon += chiTiet.SoLuong;
+                                    }
+                                }
+                            }
+
+                            invoiceStatus.TrangThai = 6;
+                        }
+                        else if (invoiceStatus.TrangThai == 5 || invoiceStatus.TrangThai == 6)
+                        {
+                            throw new InvalidOperationException("Không thể sửa đổi trạng thái hóa đơn đã được đặt thành 5 hoặc 6.");
+                        }
+                        else if (invoiceStatus.TrangThai == 1)
+                        {
+                            if (invoiceStatus.TrangThai == 1 && Hd.TrangThai == 6)
+                            {
+                                invoiceStatus.TrangThai = invoiceStatus.TrangThai;
+                            }
+                            invoiceStatus.TrangThai = Hd.TrangThai;
+                            foreach (var chiTiet in Hd.HoaDonChiTiets)
+                            {
+                                var product = await _context.SanPhamChiTiets.FindAsync(chiTiet.IdSpct);
+                                if (product != null)
+                                {
+                                    product.SoLuongTon -= chiTiet.SoLuong;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (Hd.TrangThai != invoiceStatus.TrangThai + 1)
+                            {
+                                throw new InvalidOperationException("Trạng thái chỉ có thể tăng tiến từ 1 đến 6.");
+                            }
+                            invoiceStatus.TrangThai = Hd.TrangThai;
+                        }
+
+                        // Lưu thay đổi
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        throw new Exception("An error occurred while updating the invoice status.", ex);
+                    }
                 }
-                catch (DbUpdateException ex)
+                else
                 {
-                    // Log the error (ex) here
-                    throw new Exception("An error occurred while updating the invoice status.", ex);
+                    throw new KeyNotFoundException("Invoice not found.");
                 }
             }
-            else
-            {
-                throw new KeyNotFoundException("Invoice not found.");
-            }
+        }
+        public async Task<object> GetByMaKh(Guid id)
+        {
+            var result = await _context.HoaDons
+                .Where(hd => hd.IdKh == id)
+                .OrderByDescending(hd => hd.NgayTao)
+                .Select(hd => new
+                {
+                    hd.Id,
+                    hd.MaHoaDon,
+                    hd.NgayTao,
+                    hd.TenNguoiNhan,
+                    hd.DiaChiNhanHang,
+                    HoaDonChiTiets = hd.HoaDonChiTiets
+                        .Where(hdct => hdct.IdHd == hd.Id)
+                        .Select(hdct => new
+                        {
+                            hdct.Id,
+                            hdct.IdSpct,
+                            SanPham = hdct.IdSpctNavigation == null ? null : new
+                            {
+                                hdct.IdSpctNavigation.Id,
+                                TenSanPham = hdct.IdSpctNavigation.IdSpNavigation != null
+                                    ? hdct.IdSpctNavigation.IdSpNavigation.TenSp
+                                    : null,
+                                Anh = hdct.IdSpctNavigation.IdSpNavigation != null
+                                    ? hdct.IdSpctNavigation.IdSpNavigation.ImageDefaul
+                                    : null,
+                                Size = hdct.IdSpctNavigation.IdSizeNavigation != null ?
+                                    hdct.IdSpctNavigation.IdSizeNavigation.TenSize : null,
+                                MauSac = hdct.IdSpctNavigation.IdMsNavigation != null ?
+                                    hdct.IdSpctNavigation.IdMsNavigation.TenMauSac : null
+                            },
+                            hdct.SoLuong,
+                            hdct.DonGia,
+                            Tongtien = hdct.SoLuong * hdct.DonGia
+
+                        })
+                        .ToList(),
+                    hd.GiaTriGiam,
+                    hd.ThanhTien,
+                    TinhTrangThanhToan = hd.TrangThai
+                    ,
+                    TrangThaiThanhToan = hd.HinhThucThanhToans
+                .Select(httt => httt.TrangThai)
+                .FirstOrDefault()
+                })
+                .ToListAsync();
+
+            return result;
         }
     }
 }

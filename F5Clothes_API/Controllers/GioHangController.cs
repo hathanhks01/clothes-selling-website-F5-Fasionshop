@@ -5,20 +5,21 @@ using F5Clothes_DAL.Models;
 
 using F5Clothes_Services.IServices;
 using F5Clothes_Services.Services;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 [Route("api/[controller]")]
 [ApiController]
 public class GioHangController : ControllerBase
 {
     private readonly IGioHangServices _gioHangServices;
+    private readonly IVnPayService _vpnPayService;
 
-
-    public GioHangController(IGioHangServices ghSev)
+    public GioHangController(IGioHangServices ghSev, IVnPayService vpnPayService)
     {
         _gioHangServices = ghSev;
-
+        _vpnPayService = vpnPayService;
     }
 
     [HttpGet("GetAllGioHang/{idKh}")]
@@ -176,5 +177,4 @@ public class GioHangController : ControllerBase
             });
         }
     }
-
 }
